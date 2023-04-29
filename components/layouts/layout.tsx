@@ -6,7 +6,7 @@ import HeaderMain from "./HeaderMain";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="items-center flex flex-col h-max min-h-screen w-full z-0 bg-light text-dark">
+		<div className="items-center flex flex-col h-max min-h-screen w-full z-0 bg-theme-light text-theme-dark">
 			<Head>
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />

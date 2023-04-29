@@ -1,12 +1,12 @@
 // base user token
 const tokenDomainLocal = "localhost";
 const tokenDomainDastan = "dastandev.ir";
-export const tokenStatics = { tokenMaxAge: 60 * 60 * 12 * 30, tokenDomain: tokenDomainLocal, tokenPath: "/" };
+export const tokenStatics = { tokenMaxAge: 60 * 60 * 12 * 30, tokenDomain: tokenDomainDastan, tokenPath: "/" };
 
 // email callback domain
 const emailDomainLocal = "http://localhost:3000";
 const emailDomainDastan = "dastandev.ir";
-export const emailDomain = emailDomainLocal;
+export const emailDomain = emailDomainDastan;
 
 // external media
 export const bucketName = "dastan";
@@ -23,3 +23,6 @@ export const permissionLevels = { phoneSubmit: 2 };
 // sms
 export const smsKey = process.env.SMS_KEY;
 export const smsTemplate = process.env.SMS_TEMPLATE;
+
+// json schemas
+export { default as themeColors } from "./theme-colors.json";

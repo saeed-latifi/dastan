@@ -5,7 +5,7 @@ export default function FooterMain() {
 	const { isLoggedIn, permissionLevel } = useAccount();
 
 	return (
-		<div className="grow-0 w-full flex items-center justify-center sticky z-10 bottom-0 bg-shade text-accent border-t border-border ">
+		<div className="grow-0 w-full flex items-center justify-center sticky z-10 bottom-0 bg-theme-shade text-theme-accent border-t border-theme-border ">
 			<ul className="max-w-7xl flex flex-1 p-2 h-max items-center justify-evenly min-h-[3rem]">
 				<FooterLink href="/" text="home" />
 				<FooterLink href="/school" text="school" />

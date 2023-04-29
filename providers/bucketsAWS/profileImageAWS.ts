@@ -1,5 +1,5 @@
 import AWS from "aws-sdk";
-import { AWSProfileConfig, bucketName } from "statics";
+import { AWSProfileConfig, bucketName } from "@static/keys";
 
 const S3 = new AWS.S3(AWSProfileConfig);
 export default async function profileImageAWS({ file, fileName, ContentType }: { file: AWS.S3.Body; fileName: string; ContentType: string }) {

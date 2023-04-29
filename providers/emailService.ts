@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { changeEmailTokenCreator, emailTokenCreator } from "./tokenProvider";
-import { emailDomain } from "statics";
+import { emailDomain } from "@static/keys";
 
 const authHTMLGenerator = (link: string) => {
 	const domain = `${emailDomain}/profile/verify`;

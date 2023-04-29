@@ -1,17 +1,11 @@
+const colors = require("./static/theme-colors.json");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {
-			colors: {
-				select: "#4200DC",
-				border: "#B8AF00",
-				light: "#FEFFD3",
-				dark: "#12011D",
-				warn: "#AB2B00",
-				shade: "#443A61",
-				accent: "#E6EE00",
-			},
+			colors: colors,
 
 			fontFamily: {
 				// "yekan-bakh": ["yekan-bakh"],
@@ -33,6 +27,9 @@ module.exports = {
 			},
 			borderRadius: {
 				input: "0.4rem",
+			},
+			boxShadow: {
+				"theme-input": `0 0 0.1rem  0rem ${colors["theme-select"]}`,
 			},
 		},
 	},

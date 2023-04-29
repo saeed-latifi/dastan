@@ -1,7 +1,7 @@
 import { setCookie } from "cookies-next";
 import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
-import { tokenStatics } from "statics";
+import { tokenStatics } from "@static/keys";
 
 type token = { userId: number; permissionLevel: number; username: string; slug: string };
 export function tokenValidator(token: string): token | false {

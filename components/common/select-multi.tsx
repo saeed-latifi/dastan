@@ -60,8 +60,8 @@ export default function SelectMulti({ preSelect = [], options = [], onChange }: 
 
 	return (
 		<div
-			className={`flex flex-col items-center justify-center bg-white text-dark border  rounded-input min-h-input w-full flex-1 ${
-				isOpen ? "border-select" : "border-border"
+			className={`flex flex-col items-center justify-center bg-white text-theme-dark border  rounded-input min-h-input w-full flex-1 ${
+				isOpen ? "border-theme-select" : "border-theme-border"
 			}`}
 			ref={wrapperRef}
 			onClick={() => {
@@ -100,13 +100,13 @@ export default function SelectMulti({ preSelect = [], options = [], onChange }: 
 			</div>
 			<div className="relative w-full">
 				<div
-					className={`absolute z-30 top-2 flex flex-col rounded-input min-w-full border-select transition-border bg-white h-max  overflow-y-auto ${
+					className={`absolute z-30 top-2 flex flex-col rounded-input min-w-full border-theme-select transition-border bg-white h-max  overflow-y-auto ${
 						isOpen ? "border max-h-select opacity-100" : "border-0 max-h-0 opacity-0"
 					} `}
 				>
 					{options.map((option, index: number) => (
 						<div
-							className={`w-full p-2 flex items-center justify-between cursor-pointer hover:bg-accent select-none`}
+							className={`w-full p-2 flex items-center justify-between cursor-pointer hover:bg-theme-accent select-none`}
 							key={index}
 							onClick={(e) => {
 								e.stopPropagation();
