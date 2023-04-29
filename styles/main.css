@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*::-webkit-scrollbar {
+	width: inherit;
+	background-color: inherit;
+}
+*::-webkit-scrollbar-thumb {
+	background: inherit;
+}
+
+*:focus {
+	outline: none;
+}
+
+*::-webkit-scrollbar {
+	width: 0.2rem;
+	background-color: rgba(0, 0, 0, 0);
+}
+*::-webkit-scrollbar-thumb {
+	background: rgba(0, 0, 0, 0.4);
+}
+
+* {
+	scrollbar-color: rgba(0, 0, 0, 0.4) rgba(0, 0, 0, 0);
+	scrollbar-gutter: rgba(0, 0, 0, 0.4);
+	scrollbar-width: thin;
+}

@@ -1,0 +1,210 @@
+// npx prisma migrate dev --name init
+// npx prisma generate
+
+// LOCAL_DATABASE_URL
+// EXTERNAL_DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("EXTERNAL_DATABASE_URL")
+}
+
+//level one
+
+model province {
+  id    Int    @id @default(autoincrement()) @db.SmallInt
+  title String @db.VarChar(30)
+  user  user[]
+}
+
+model category {
+  id    Int    @id @default(autoincrement()) @db.SmallInt
+  title String @db.VarChar(30)
+  user  user[]
+  // course course[]
+  // post   post[]
+  // news   news[]
+}
+
+//level two
+
+model user {
+  id              Int        @id @default(autoincrement())
+  slug            String     @default(uuid())
+  username        String     @unique @db.VarChar(30)
+  email           String     @unique @db.VarChar(70)
+  password        String     @db.VarChar(30)
+  firstName       String?    @db.VarChar(30)
+  lastName        String?    @db.VarChar(30)
+  phone           String?    @unique @db.VarChar(11)
+  permissionLevel Int        @default(0) @db.SmallInt
+  RegisterDate    DateTime   @default(now()) @db.Date
+  isActive        Boolean    @default(false)
+  isDeletete      Boolean    @default(false)
+  provinceId      Int?       @db.SmallInt
+  province        province?  @relation(fields: [provinceId], references: [id])
+  interests       category[]
+  //   course           course[]
+  //   post             post[]
+  //   news             news[]
+  //   adminMessage     adminMessage[]
+  //   courseComment    courseComment[]
+  //   postComment      postComment[]
+  //   newsComment      newsComment[]
+  //   lessonComment    lessonComment[]
+  //   postReport       postReport[]
+  //   PurchasedCourses course[]        @relation(name: "PurchasedCourses")
+}
+
+model keyword {
+  id       Int     @id @default(autoincrement())
+  title    String  @db.VarChar(30)
+  isActive Boolean @default(true)
+  // course   course[]
+  // lesson   lesson[]
+  // post     post[]
+  // news     news[]
+}
+
+//level three
+
+// model course {
+//   id           Int             @id @default(autoincrement()) @db.SmallInt
+//   title        String          @db.VarChar(30)
+//   description  String
+//   bannerUrl    String
+//   authorId     Int
+//   categoryId   Int             @db.SmallInt
+//   isActive     Boolean         @default(true)
+//   creationDate DateTime        @default(now()) @db.Date
+//   updateDate   DateTime?       @db.Date
+//   price        Int?
+//   author       user            @relation(fields: [authorId], references: [id])
+//   category     category        @relation(fields: [categoryId], references: [id])
+//   keywords     keyword[]
+//   comments     courseComment[]
+//   lessons      lesson[]
+//   userId       Int?
+//   buyers       user[]          @relation(name: "PurchasedCourses")
+// }
+
+// model lesson {
+//   id            Int             @id @default(autoincrement())
+//   slug          String          @default(uuid())
+//   title         String          @db.VarChar(30)
+//   description   String
+//   bannerUrl     String
+//   videoUrl      String
+//   courseId      Int
+//   isActive      Boolean         @default(true)
+//   creationDate  DateTime        @default(now()) @db.Date
+//   updateDate    DateTime?       @db.Date
+//   keywords      keyword[]
+//   lessonComment lessonComment[]
+//   course        course          @relation(fields: [courseId], references: [id])
+// }
+
+// model post {
+//   id           Int           @id @default(autoincrement())
+//   title        String        @db.VarChar(30)
+//   description  String
+//   bannerUrl    String
+//   authorId     Int
+//   categoryId   Int           @db.SmallInt
+//   isActive     Boolean       @default(true)
+//   creationDate DateTime      @default(now()) @db.Date
+//   updateDate   DateTime?     @db.Date
+//   author       user          @relation(fields: [authorId], references: [id])
+//   category     category      @relation(fields: [categoryId], references: [id])
+//   keywords     keyword[]
+//   comments     postComment[]
+//   reports      postReport[]
+// }
+
+// model news {
+//   id           Int           @id @default(autoincrement())
+//   title        String        @db.VarChar(30)
+//   description  String
+//   bannerUrl    String
+//   authorId     Int
+//   categoryId   Int           @db.SmallInt
+//   isActive     Boolean       @default(true)
+//   creationDate DateTime      @default(now()) @db.Date
+//   updateDate   DateTime?     @db.Date
+//   category     category      @relation(fields: [categoryId], references: [id])
+//   author       user          @relation(fields: [authorId], references: [id])
+//   keywords     keyword[]
+//   comments     newsComment[]
+// }
+
+// model adminMessage {
+//   id           Int      @id @default(autoincrement())
+//   title        String   @db.VarChar(30)
+//   description  String
+//   userId       Int
+//   isActive     Boolean  @default(true)
+//   isReaded     Boolean  @default(false)
+//   creationDate DateTime @default(now()) @db.Date
+//   user         user?    @relation(fields: [userId], references: [id])
+// }
+
+// //level four
+
+// model courseComment {
+//   id           Int      @id @default(autoincrement())
+//   description  String
+//   subjectId    Int      @db.SmallInt
+//   userId       Int
+//   creationDate DateTime @default(now()) @db.Date
+//   course       course   @relation(fields: [subjectId], references: [id])
+//   user         user     @relation(fields: [userId], references: [id])
+//   isActive     Boolean  @default(true)
+// }
+
+// model lessonComment {
+//   id           Int      @id @default(autoincrement())
+//   description  String
+//   subjectId    Int
+//   userId       Int
+//   creationDate DateTime @default(now()) @db.Date
+//   lesson       lesson   @relation(fields: [subjectId], references: [id])
+//   user         user     @relation(fields: [userId], references: [id])
+//   isActive     Boolean  @default(true)
+// }
+
+// model postComment {
+//   id           Int      @id @default(autoincrement())
+//   description  String
+//   subjectId    Int
+//   userId       Int
+//   creationDate DateTime @default(now()) @db.Date
+//   post         post     @relation(fields: [subjectId], references: [id])
+//   user         user     @relation(fields: [userId], references: [id])
+//   isActive     Boolean  @default(true)
+// }
+
+// model newsComment {
+//   id           Int      @id @default(autoincrement())
+//   description  String
+//   subjectId    Int
+//   userId       Int
+//   creationDate DateTime @default(now()) @db.Date
+//   news         news     @relation(fields: [subjectId], references: [id])
+//   user         user     @relation(fields: [userId], references: [id])
+//   isActive     Boolean  @default(true)
+// }
+
+// model postReport {
+//   id           Int      @id @default(autoincrement())
+//   description  String
+//   subjectId    Int
+//   userId       Int
+//   creationDate DateTime @default(now()) @db.Date
+//   post         post     @relation(fields: [subjectId], references: [id])
+//   user         user     @relation(fields: [userId], references: [id])
+//   isActive     Boolean  @default(true)
+// }
