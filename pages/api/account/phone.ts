@@ -4,17 +4,14 @@ import { sendSMS } from "@providers/otpService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import TempOTP from "@providers/tempOTP";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { otpGenerator } from "@utilities/otpGenerator";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const tempOTP = new TempOTP();
 const userPrismaProvider = new UserPrismaProvider();
 
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
+	// phone req
 	if (req.method === "POST") {
 		try {
 			// token
@@ -58,6 +55,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		}
 	}
 
+	// phone verify
 	if (req.method === "PATCH") {
 		try {
 			// token
@@ -104,10 +102,4 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	else {
 		return res.json(onErrorResponse("not supported method"));
 	}
-}
-
-function otpGenerator() {
-	var minVal = 100000;
-	var maxVal = 999999;
-	return Math.floor(Math.random() * (maxVal - minVal + 1)) + minVal;
 }

@@ -80,7 +80,6 @@ export function useAccount() {
 		}
 	}
 
-	// TODO on change
 	async function onRegister(body: iUserCreate) {
 		try {
 			const { data }: { data: apiResponse<any> } = await HTTPService.post("account", body);
@@ -102,7 +101,7 @@ export function useAccount() {
 
 	async function onActiveUser({ token }: any) {
 		try {
-			const { data }: { data: apiResponse<any> } = await HTTPService.patch("account", { token });
+			const { data }: { data: apiResponse<any> } = await HTTPService.put("account/email", { token });
 			if (data.resState === responseState.notValid) return data.warnings.map((warn) => toast.warn(warn.message));
 			if (data.resState === responseState.error) return toast.warn(data.error);
 			if (data.resState === responseState.ok) {
@@ -131,7 +130,7 @@ export function useAccount() {
 	}
 
 	async function onUpdateUser(body: iUserUpdate) {
-		const { data } = await HTTPService.put(`account/${userInfo.id}`, body);
+		const { data } = await HTTPService.patch(`account`, body);
 		if (data.resState === responseState.ok) {
 			mutate(() => data, {
 				populateCache(result, _) {
@@ -144,13 +143,19 @@ export function useAccount() {
 	}
 
 	async function onUpdatePassword(body: iPasswordUpdate) {
-		const { data } = await HTTPService.patch(`account/${userInfo.id}`, body);
-		return data as apiResponse<any>;
+		try {
+			const { data }: { data: apiResponse<any> } = await HTTPService.patch(`account/password`, body);
+			if (data.resState === responseState.ok) toast.success(data.data);
+			if (data.resState === responseState.notValid) return data.warnings.map((warn) => toast.warn(warn.message));
+			if (data.resState === responseState.error) toast.warn(data.error);
+		} catch (error) {
+			toast.warn("bad network try again");
+		}
 	}
 
 	async function onResendActivationEmail(body: iUserEmail) {
 		try {
-			const { data }: { data: apiResponse<any> } = await HTTPService.patch("account/recover", body);
+			const { data }: { data: apiResponse<any> } = await HTTPService.get("account/email", { params: body });
 			if (data.resState === responseState.notValid) return data.warnings.map((warn) => toast.warn(warn.message));
 			if (data.resState === responseState.error) return toast.warn(data.error);
 			if (data.resState === responseState.ok) {
@@ -164,7 +169,7 @@ export function useAccount() {
 
 	async function onRecoverPasswordRequest(body: iUserEmail) {
 		try {
-			const { data }: { data: apiResponse<any> } = await HTTPService.post("account/recover", body);
+			const { data }: { data: apiResponse<any> } = await HTTPService.post("account/password", body);
 			if (data.resState === responseState.notValid) return data.warnings.map((warn) => toast.warn(warn.message));
 			if (data.resState === responseState.error) return toast.warn(data.error);
 			if (data.resState === responseState.ok) {
@@ -179,7 +184,7 @@ export function useAccount() {
 	async function onResetPassword(args: iResetPassword) {
 		try {
 			const body = { ...args, token: router.query.token };
-			const { data }: { data: apiResponse<any> } = await HTTPService.put("account/recover", body);
+			const { data }: { data: apiResponse<any> } = await HTTPService.put("account/password", body);
 			if (data.resState === responseState.notValid) return data.warnings.map((warn) => toast.warn(warn.message));
 			if (data.resState === responseState.error) return toast.warn(data.error);
 			if (data.resState === responseState.ok) {

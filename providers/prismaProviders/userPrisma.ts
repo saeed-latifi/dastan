@@ -18,7 +18,7 @@ export default class UserPrismaProvider implements iCRUD {
 		slug: true,
 	};
 
-	private uniqueParams = { phone: true, username: true, email: true, id: true, isActive: true };
+	private uniqueParams = { phone: true, username: true, email: true, id: true, isActive: true, isDelete: true };
 
 	async getSome(body: any) {
 		try {

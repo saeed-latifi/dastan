@@ -5,9 +5,7 @@ import FormInput from "@components/forms/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { iPasswordUpdate, zPasswordUpdate } from "@models/iUser";
-import { responseState } from "@providers/apiResponseHandler";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 
 export default function ChangePassword() {
 	const { checkHasAccessAndDo, isLoading, onUpdatePassword } = useAccount();
@@ -21,16 +19,10 @@ export default function ChangePassword() {
 		resolver: zodResolver(zPasswordUpdate),
 	});
 
-	async function onUpdateUser(body: iPasswordUpdate) {
-		const res = await onUpdatePassword(body);
-		if (res.resState === responseState.ok) toast.success(res.data);
-		else if (res.resState === responseState.error) toast.warn(res.error);
-	}
-
 	if (isLoading) return <LoaderSpinner />;
 
 	return (
-		<Form onSubmit={handleSubmit((data) => onUpdateUser(data))}>
+		<Form onSubmit={handleSubmit(onUpdatePassword)}>
 			<FormInput
 				labelText="your old password"
 				type="password"

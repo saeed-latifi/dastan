@@ -12,11 +12,6 @@ export const config = {
 };
 
 export default async function profileImageApi(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
 	// add image
 	if (req.method === "POST") {
 		try {

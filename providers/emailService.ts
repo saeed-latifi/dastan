@@ -2,26 +2,32 @@ import nodemailer from "nodemailer";
 import { changeEmailTokenCreator, emailTokenCreator } from "./tokenProvider";
 import { emailDomain } from "@static/keys";
 
+const emailStyle = `
+	<style>
+		h1 {
+			color: blue;
+		}
+		button {
+			background-color: darkgoldenrod;
+			outline: none;
+		}
+		a {
+			outline: none;
+			cursor: pointer;
+		}
+	</style>`;
+
 const authHTMLGenerator = (link: string) => {
 	const domain = `${emailDomain}/profile/verify`;
 	return `
 <html>
     <head>
-        <style>
-            h1{ color: blue; }
-			button {
-				background-color: darkgoldenrod;
-				outline: none;
-			}
-			a {
-				outline: none;
-			}
-		</style>
+        ${emailStyle}
     </head>
     <body>
         <h1>verify your email</h1>
 		<button>
-		    <a href="${domain + "?token=" + link}">
+			<a href="${domain + "?token=" + link}" target="_blank">
 				active your account
 			</a>
 		</button>
@@ -35,21 +41,12 @@ const recoverPasswordHTMLGenerator = (link: string) => {
 	return `
 <html>
     <head>
-        <style>
-            h1{ color: blue; }
-			button {
-				background-color: darkgoldenrod;
-				outline: none;
-			}
-			a {
-				outline: none;
-			}
-		</style>
+        ${emailStyle}
     </head>
     <body>
         <h1>reset your password</h1>
 		<button>
-		    <a href="${domain + "?token=" + link}">
+			<a href="${domain + "?token=" + link}" target="_blank">
 				reset your password
 			</a>
 		</button>
@@ -63,21 +60,12 @@ const changeEmailNewHTMLGenerator = (link: string) => {
 	return `
 <html>
     <head>
-        <style>
-            h1{ color: blue; }
-			button {
-				background-color: darkgoldenrod;
-				outline: none;
-			}
-			a {
-				outline: none;
-			}
-		</style>
+        ${emailStyle}
     </head>
     <body>
         <h1>confirm your new email</h1>
 		<button>
-		    <a href="${domain + "?token=" + link}">
+			<a href="${domain + "?token=" + link}" target="_blank">
 				confirm your new email
 			</a>
 		</button>
@@ -90,16 +78,7 @@ const changeEmailOldHTMLGenerator = (newEmail: string) => {
 	return `
 <html>
     <head>
-        <style>
-            h1{ color: blue; }
-			button {
-				background-color: darkgoldenrod;
-				outline: none;
-			}
-			a {
-				outline: none;
-			}
-		</style>
+        ${emailStyle}
     </head>
     <body>
         <h1>changed email</h1>

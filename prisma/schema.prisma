@@ -44,7 +44,7 @@ model user {
   permissionLevel Int        @default(0) @db.SmallInt
   RegisterDate    DateTime   @default(now()) @db.Date
   isActive        Boolean    @default(false)
-  isDeletete      Boolean    @default(false)
+  isDelete        Boolean    @default(false)
   provinceId      Int?       @db.SmallInt
   province        province?  @relation(fields: [provinceId], references: [id])
   interests       category[]

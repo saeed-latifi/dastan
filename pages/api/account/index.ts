@@ -2,16 +2,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { emailTokenValidator, removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import zodErrorMapper, { iValidationWarnings, onErrorResponse, onNotValidResponse, onSuccessResponse } from "@providers/apiResponseHandler";
-import { zUserCreate, zUserLogin } from "@models/iUser";
+import { zUserCreate, zUserLogin, zUserUpdate } from "@models/iUser";
 import { authEmailSender } from "@providers/emailService";
 
 const userPrismaProvider = new UserPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
 	// identify
 	if (req.method === "GET") {
 		try {
@@ -71,8 +66,8 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const user = await userPrismaProvider.create(validateRegister.data);
 			if (user === "ERR") return res.json(onErrorResponse("Error on register ORM"));
 
-			// TODO fix
-			return res.json(onSuccessResponse(false));
+			// api
+			return res.json(onSuccessResponse("success! check your inbox for verify email"));
 		} catch (error) {
 			return res.json(onErrorResponse("err on register"));
 		}
@@ -102,33 +97,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		}
 	}
 
-	// Activate user
-	else if (req.method === "PATCH") {
-		try {
-			// token
-			const emailToken = emailTokenValidator(req.body.token);
-			if (!emailToken) return res.json(onErrorResponse("activate failed! perhaps email expired! pleases try again"));
-
-			// prisma
-			const user = await userPrismaProvider.Activate(emailToken.email);
-			if (user === "ERR") return res.json(onErrorResponse("Error on active ORM"));
-
-			// token
-			const authToken = tokenCreator({
-				userId: user.id,
-				username: user.username,
-				permissionLevel: user.permissionLevel,
-				slug: user.slug,
-			});
-
-			// api
-			setCookieToken({ req, res, token: authToken });
-			return res.json(onSuccessResponse(user));
-		} catch (error) {
-			return res.json(onErrorResponse("err on logout"));
-		}
-	}
-
 	// logout
 	else if (req.method === "DELETE") {
 		try {
@@ -141,6 +109,55 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			return res.json(onSuccessResponse(false));
 		} catch (error) {
 			return res.json(onErrorResponse("err on logout"));
+		}
+	}
+
+	// update user
+	if (req.method === "PATCH") {
+		try {
+			// token
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) {
+				removeCookieToken({ req, res });
+				return res.json(onErrorResponse("bad user request"));
+			}
+
+			// validation !
+			const validateUpdate = zUserUpdate.safeParse(req.body);
+			if (!validateUpdate.success) return res.json(zodErrorMapper(validateUpdate.error.issues));
+
+			// prisma
+			const { username } = validateUpdate.data;
+
+			// check not repetitive
+			const notUnique = await userPrismaProvider.checkUniqueField({ username, userId: token.userId });
+			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
+
+			// on repetitive
+			if (notUnique) {
+				const validationWarnings: iValidationWarnings[] = [];
+				if (username === notUnique.username)
+					validationWarnings.push({ name: "username", message: "this username already is exist" });
+
+				return res.json(onNotValidResponse(validationWarnings));
+			}
+
+			const body: any = {
+				...validateUpdate.data,
+			};
+
+			if (validateUpdate.data.interests) {
+				body.interests = { set: validateUpdate.data.interests.map((cat) => ({ id: cat.id })) };
+			}
+
+			// prisma
+			const user = await userPrismaProvider.update(token.userId, body);
+			if (user === "ERR") return res.json(onErrorResponse("Error on update ORM"));
+
+			// api
+			return res.json(onSuccessResponse(user));
+		} catch (error) {
+			return res.json(onErrorResponse("err on update user"));
 		}
 	}
 
