@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { emailTokenValidator, removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
+import { removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
-import zodErrorMapper, { iValidationWarnings, onErrorResponse, onNotValidResponse, onSuccessResponse } from "@providers/apiResponseHandler";
+import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { zUserCreate, zUserLogin, zUserUpdate } from "@models/iUser";
 import { authEmailSender } from "@providers/emailService";
 
@@ -20,11 +20,10 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 				return res.json(onErrorResponse("bad identify request"));
 			}
 
-			// validation !
 			// prisma
 			const user = await userPrismaProvider.getOne(token.userId);
 			if (user === "ERR") return res.json(onErrorResponse("err on identify ORM"));
-			if (user === null) return res.json(onNotValidResponse([{ name: "not found", message: "not found this user" }]));
+			if (user === null) return res.json(onErrorResponse("not found this user"));
 
 			// api
 			return res.json(onSuccessResponse(user));
@@ -36,11 +35,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	// register
 	else if (req.method === "POST") {
 		try {
-			// token
 			// validation
 			const validateRegister = zUserCreate.safeParse(req.body);
-			if (!validateRegister.success) return res.json(zodErrorMapper(validateRegister.error.issues));
-
+			if (!validateRegister.success) return res.json(onZodErrorResponse(validateRegister.error.issues));
 			const { email, username } = validateRegister.data;
 
 			// prisma
@@ -49,12 +46,10 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// validation
 			if (notUnique) {
-				const validationWarnings: iValidationWarnings[] = [];
-				if (email === notUnique.email) validationWarnings.push({ name: "email", message: "this email already is exist" });
-				if (username === notUnique.username)
-					validationWarnings.push({ name: "username", message: "this username already is exist" });
-
-				return res.json(onNotValidResponse(validationWarnings));
+				const uniqueErrors: errorType = {};
+				if (email === notUnique.email) uniqueErrors.email = "this email already taken";
+				if (username === notUnique.username) uniqueErrors.username = "this username already taken";
+				return res.json(onErrorResponse(uniqueErrors));
 			}
 
 			// email
@@ -76,10 +71,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	// login
 	else if (req.method === "PUT") {
 		try {
-			// token !
 			// validation
 			const validateLogin = zUserLogin.safeParse(req.body);
-			if (!validateLogin.success) return res.json(zodErrorMapper(validateLogin.error.issues));
+			if (!validateLogin.success) return res.json(onZodErrorResponse(validateLogin.error.issues));
 
 			// prisma
 			const user = await userPrismaProvider.checkEmailAuth(validateLogin.data);
@@ -100,11 +94,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	// logout
 	else if (req.method === "DELETE") {
 		try {
-			// token
-			// validation!
-			// prisma!
 			// api
-
 			removeCookieToken({ req, res });
 			return res.json(onSuccessResponse(false));
 		} catch (error) {
@@ -122,9 +112,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 				return res.json(onErrorResponse("bad user request"));
 			}
 
-			// validation !
+			// validation
 			const validateUpdate = zUserUpdate.safeParse(req.body);
-			if (!validateUpdate.success) return res.json(zodErrorMapper(validateUpdate.error.issues));
+			if (!validateUpdate.success) return res.json(onZodErrorResponse(validateUpdate.error.issues));
 
 			// prisma
 			const { username } = validateUpdate.data;
@@ -135,11 +125,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// on repetitive
 			if (notUnique) {
-				const validationWarnings: iValidationWarnings[] = [];
-				if (username === notUnique.username)
-					validationWarnings.push({ name: "username", message: "this username already is exist" });
-
-				return res.json(onNotValidResponse(validationWarnings));
+				const validationErrors: errorType = {};
+				if (username === notUnique.username) validationErrors.username = "this username already taken";
+				return res.json(onErrorResponse(validationErrors));
 			}
 
 			const body: any = {

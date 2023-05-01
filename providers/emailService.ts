@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { changeEmailTokenCreator, emailTokenCreator } from "./tokenProvider";
-import { emailDomain } from "@static/keys";
+import { emailDomain } from "statics/keys";
 
 const emailStyle = `
 	<style>

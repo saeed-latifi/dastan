@@ -1,5 +1,5 @@
 import { onErrorResponse } from "@providers/apiResponseHandler";
-import CategoryPrismaProvider from "@providers/prismaProviders/categoyPrisma";
+import CategoryPrismaProvider from "@providers/prismaProviders/categoryPrisma";
 import ProvincePrismaProvider from "@providers/prismaProviders/provincePrisma";
 import { NextApiRequest, NextApiResponse } from "next";
 

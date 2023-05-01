@@ -4,11 +4,6 @@ import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandle
 
 const provincePrismaProvider = new ProvincePrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
 	// identify
 	if (req.method === "GET") {
 		try {

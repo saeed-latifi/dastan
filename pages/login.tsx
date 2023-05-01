@@ -8,7 +8,7 @@ import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 
 export default function Login() {
-	const { onLogin, warnings } = useAccount();
+	const { onLogin } = useAccount();
 	const {
 		register,
 		handleSubmit,

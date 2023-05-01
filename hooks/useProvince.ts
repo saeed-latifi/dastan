@@ -12,7 +12,7 @@ export function useProvince() {
 
 	async function getProvinces() {
 		try {
-			const { data }: { data: apiResponse<iProvince> } = await HTTPService.get("province");
+			const { data }: { data: apiResponse<iProvince[]> } = await HTTPService.get("province");
 			if (data.resState === responseState.ok) {
 				return data.data as iProvince[];
 			}

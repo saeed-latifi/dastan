@@ -26,7 +26,6 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				const buffer = await webp512Buffer({ path: files.image.filepath });
 				const fileName = slug + "." + buffer.info.format;
 
-				//TODO  To download server
 				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 				if (awsRes) return res.json(onSuccessResponse("ok"));
 				else return res.json(onErrorResponse("error on aws"));

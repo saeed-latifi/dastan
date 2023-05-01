@@ -7,7 +7,7 @@ import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 
 export default function SignUp() {
-	const { onRegister } = useAccount();
+	const { onRegister, error, onErrorPurge } = useAccount();
 	const {
 		register,
 		formState: { errors },
@@ -32,15 +32,18 @@ export default function SignUp() {
 
 			<FormInput
 				labelText="username"
-				warnings={errors.username?.message}
-				register={register("username", { setValueAs: (v) => (v === "" ? undefined : v) })}
+				warnings={errors.username?.message || error?.username}
+				register={register("username", {
+					setValueAs: (v) => (v === "" ? undefined : v),
+					onChange: () => onErrorPurge("username"),
+				})}
 				required
 			/>
 
 			<FormInput
 				labelText="email"
-				warnings={errors.email?.message}
-				register={register("email", { setValueAs: (v) => (v === "" ? undefined : v) })}
+				warnings={errors.email?.message || error?.email}
+				register={register("email", { setValueAs: (v) => (v === "" ? undefined : v), onChange: () => onErrorPurge("email") })}
 				required
 			/>
 

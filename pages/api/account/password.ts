@@ -1,6 +1,6 @@
 import { zUserEmail, zResetPassword, zPasswordUpdate } from "@models/iUser";
-import zodErrorMapper, { onErrorResponse, onNotValidResponse, onSuccessResponse } from "@providers/apiResponseHandler";
-import { authEmailSender, recoverPasswordEmailSender } from "@providers/emailService";
+import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
+import { recoverPasswordEmailSender } from "@providers/emailService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { emailTokenValidator, removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -11,7 +11,7 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 	if (req.method === "POST") {
 		// validation
 		const validateData = zUserEmail.safeParse(req.body);
-		if (!validateData.success) return res.json(zodErrorMapper(validateData.error.issues));
+		if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
 
 		// prisma
 		const user = await userPrismaProvider.getByEmail(validateData.data);
@@ -34,7 +34,7 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 
 		// validation
 		const validateData = zResetPassword.safeParse(req.body);
-		if (!validateData.success) return res.json(zodErrorMapper(validateData.error.issues));
+		if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
 
 		// prisma
 		const user = await userPrismaProvider.resetPassword({ email: emailToken.email, password: validateData.data.password });
@@ -55,7 +55,7 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 
 			// validation !
 			const validateUpdate = zPasswordUpdate.safeParse(req.body);
-			if (!validateUpdate.success) return res.json(zodErrorMapper(validateUpdate.error.issues));
+			if (!validateUpdate.success) return res.json(onZodErrorResponse(validateUpdate.error.issues));
 
 			// prisma check password
 			const hasPassword = await userPrismaProvider.checkPassword({ id: token.userId, password: validateUpdate.data.oldPassword });

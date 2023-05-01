@@ -1,14 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
-import CategoryPrismaProvider from "@providers/prismaProviders/categoyPrisma";
+import CategoryPrismaProvider from "@providers/prismaProviders/categoryPrisma";
 
 const categoryPrismaProvider = new CategoryPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
 	// identify
 	if (req.method === "GET") {
 		try {

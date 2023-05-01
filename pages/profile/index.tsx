@@ -5,11 +5,9 @@ import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
-import { responseState } from "@providers/apiResponseHandler";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
 import Select, { selectOptionType } from "@components/common/select";
 import { iProvince } from "@models/iProvince";
 import SelectMulti from "@components/common/select-multi";
@@ -23,7 +21,7 @@ export default function Profile() {
 	const [selectedProvince, setSelectedProvince] = useState<iProvince>();
 	const [selectedCategories, setSelectedCategories] = useState<iCategory[]>();
 
-	const { userInfo, isLoading, checkHasAccessAndDo, onUpdateUser } = useAccount();
+	const { userInfo, isLoading, checkAccessRedirect, onUpdateUser, onErrorPurge, error } = useAccount();
 	const { provinces } = useProvince();
 	const { categories } = useCategory();
 
@@ -35,7 +33,7 @@ export default function Profile() {
 		resolver: zodResolver(zUserUpdate),
 		values: userInfo,
 	});
-	checkHasAccessAndDo();
+	checkAccessRedirect();
 
 	useEffect(() => {
 		if (!isLoading && userInfo) {
@@ -55,9 +53,7 @@ export default function Profile() {
 	async function onSubmit(body: iUserUpdate) {
 		body.interests = selectedCategories;
 		body.provinceId = selectedProvince?.id;
-		const res = await onUpdateUser(body);
-		if (res.resState === responseState.ok) toast.success("your profile is updated");
-		else if (res.resState === responseState.error) toast.info(res.error);
+		onUpdateUser(body);
 	}
 
 	if (isLoading) return <LoaderSpinner />;
@@ -76,8 +72,11 @@ export default function Profile() {
 			/>
 			<FormInput
 				labelText="username"
-				warnings={errors.username?.message}
-				register={register("username", { setValueAs: (v) => (v === "" ? undefined : v) })}
+				warnings={errors.username?.message || error?.username}
+				register={register("username", {
+					setValueAs: (v) => (v === "" ? undefined : v),
+					onChange: () => onErrorPurge("username"),
+				})}
 				required
 			/>
 

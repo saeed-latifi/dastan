@@ -3,14 +3,16 @@ import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import { useAccount } from "@hooks/useAccount";
+import { useProfileImageParam } from "@hooks/useProfileImageParam";
 import base64ToBlob from "@utilities/base64ToBlob";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
 
 export default function ProfileImageCropper() {
-	const { checkHasAccessAndDo, isLoading, onImageChange, userInfo, imgParam } = useAccount();
-	checkHasAccessAndDo();
+	const { checkAccessRedirect, isLoading, userInfo } = useAccount();
+	const { onUpdateProfileImage, profileImageParam } = useProfileImageParam();
+	checkAccessRedirect();
 
 	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });
 	const [scale, setScale] = useState<number>(1.0);
@@ -21,7 +23,7 @@ export default function ProfileImageCropper() {
 	const imageSize = 512;
 
 	useEffect(() => {
-		if (!isLoading) setFile(`/images/profile/${userInfo.slug}/${imgParam}.webp`);
+		if (!isLoading) setFile(`/images/profile/${userInfo.slug}/${profileImageParam}.webp`);
 	}, [isLoading]);
 
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -34,7 +36,7 @@ export default function ProfileImageCropper() {
 			const blob = await base64ToBlob(dataUrl);
 			const form = new FormData();
 			form.append("image", blob);
-			await onImageChange({ formData: form });
+			await onUpdateProfileImage({ formData: form });
 			setWaiter(false);
 		} catch (error) {}
 	}

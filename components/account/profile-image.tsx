@@ -1,8 +1,8 @@
-import { useAccount } from "@hooks/useAccount";
+import { useProfileImageParam } from "@hooks/useProfileImageParam";
 
 export default function ProfileImage({ slug }: { slug: string }) {
-	const { imgParam } = useAccount();
-	const src = `/images/profile/${slug}/${imgParam}.webp`;
+	const { profileImageParam } = useProfileImageParam();
+	const src = `/images/profile/${slug}/${profileImageParam}.webp`;
 
 	return (
 		<img

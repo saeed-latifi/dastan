@@ -1,4 +1,4 @@
-const colors = require("./static/theme-colors.json");
+const colors = require("./statics/theme-colors.json");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {

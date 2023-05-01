@@ -1,5 +1,5 @@
 import Ghasedak from "ghasedak";
-import { smsKey, smsTemplate } from "@static/keys";
+import { smsKey, smsTemplate } from "statics/keys";
 
 let ghasedak = new Ghasedak(smsKey);
 

@@ -1,5 +1,5 @@
 import { zPhone } from "@models/iUser";
-import zodErrorMapper, { iValidationWarnings, onErrorResponse, onNotValidResponse, onSuccessResponse } from "@providers/apiResponseHandler";
+import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { sendSMS } from "@providers/otpService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import TempOTP from "@providers/tempOTP";
@@ -23,7 +23,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// zod
 			const validate = zPhone.safeParse(req.body);
-			if (!validate.success) return res.json(zodErrorMapper(validate.error.issues));
+			if (!validate.success) return res.json(onZodErrorResponse(validate.error.issues));
 
 			// check not repetitive
 			const notUnique = await userPrismaProvider.checkUniqueField({ phone: validate.data.phone, userId: token.userId });
@@ -31,11 +31,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// on repetitive
 			if (notUnique) {
-				const validationWarnings: iValidationWarnings[] = [];
-				if (validate.data.phone === notUnique.phone)
-					validationWarnings.push({ name: "phone", message: "this phone number already exist" });
-
-				return res.json(onNotValidResponse(validationWarnings));
+				const validationErrors: errorType = {};
+				if (validate.data.phone === notUnique.phone) validationErrors.phone = "this phone number already taken";
+				return res.json(onErrorResponse(validationErrors));
 			}
 
 			// otp
@@ -77,16 +75,15 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// on repetitive
 			if (notUnique) {
-				const validationWarnings: iValidationWarnings[] = [];
-				if (otp.phone === notUnique.phone) validationWarnings.push({ name: "phone", message: "this phone number already exist" });
-
-				return res.json(onNotValidResponse(validationWarnings));
+				const validationErrors: errorType = {};
+				if (otp.phone === notUnique.phone) validationErrors.phone = "this phone number already taken";
+				return res.json(onErrorResponse(validationErrors));
 			}
 
 			// prisma
 			const user = await userPrismaProvider.addPhone({ id: token.userId, phone: otp.phone });
 			if (user === "ERR") return res.json(onErrorResponse("err on add phone ORM"));
-			if (user === null) return res.json(onNotValidResponse([{ name: "not found", message: "not found this user" }]));
+			if (user === null) return res.json(onErrorResponse("not found this user"));
 
 			// otp purge
 			tempOTP.remove(token.userId);

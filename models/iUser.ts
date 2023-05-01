@@ -46,3 +46,22 @@ export type iUserCreate = z.infer<typeof zUserCreate>;
 export type iUserEmail = z.infer<typeof zUserEmail>;
 export type iResetPassword = z.infer<typeof zResetPassword>;
 export type iPhone = z.infer<typeof zPhone>;
+
+// general optional
+const zUserOptional = z.object({
+	id,
+	username,
+	email,
+	password,
+	confirm,
+	firstName,
+	lastName,
+	phone,
+	provinceId,
+	interests,
+	isActive,
+	permissionLevel,
+	RegisterDate,
+});
+
+export type iUser = z.infer<typeof zUserOptional>;

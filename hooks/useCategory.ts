@@ -12,7 +12,7 @@ export function useCategory() {
 
 	async function getCategories() {
 		try {
-			const { data }: { data: apiResponse<iCategory> } = await HTTPService.get("category");
+			const { data }: { data: apiResponse<iCategory[]> } = await HTTPService.get("category");
 			if (data.resState === responseState.ok) {
 				return data.data as iCategory[];
 			}

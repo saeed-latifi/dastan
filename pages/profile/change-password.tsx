@@ -8,8 +8,8 @@ import { iPasswordUpdate, zPasswordUpdate } from "@models/iUser";
 import { useForm } from "react-hook-form";
 
 export default function ChangePassword() {
-	const { checkHasAccessAndDo, isLoading, onUpdatePassword } = useAccount();
-	checkHasAccessAndDo();
+	const { checkAccessRedirect, isLoading, onUpdatePassword } = useAccount();
+	checkAccessRedirect();
 
 	const {
 		register,

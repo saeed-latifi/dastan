@@ -28,8 +28,7 @@
 			"@utilities/*": ["utilities/*"],
 			"@providers/*": ["providers/*"],
 			"@models/*": ["models/*"],
-			"@hooks/*": ["hooks/*"],
-			"@static/*": ["static/*"]
+			"@hooks/*": ["hooks/*"]
 		}
 	},
 	"include": [

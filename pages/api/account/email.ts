@@ -1,5 +1,5 @@
 import { zUserEmail, zUserLogin } from "@models/iUser";
-import zodErrorMapper, { onErrorResponse, onNotValidResponse, onSuccessResponse } from "@providers/apiResponseHandler";
+import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { authEmailSender, changeEmailEmailSender } from "@providers/emailService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { changeEmailTokenValidator, emailTokenValidator, removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
@@ -9,8 +9,6 @@ const userPrismaProvider = new UserPrismaProvider();
 export default async function changeEmailApi(req: NextApiRequest, res: NextApiResponse) {
 	// change email request
 	if (req.method === "POST") {
-		console.log("body : ", req.body);
-
 		// token
 		const token = tokenValidator(req?.cookies?.token as string);
 		if (!token) {
@@ -20,21 +18,31 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 
 		// validation
 		const validateData = zUserLogin.safeParse(req.body);
-		if (!validateData.success) return res.json(zodErrorMapper(validateData.error.issues));
+		if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
 
 		// prisma check password
 		const hasPassword = await userPrismaProvider.checkPassword({ id: token.userId, password: validateData.data.password });
 		if (hasPassword === "ERR") return res.json(onErrorResponse("Error on password ORM"));
 		if (hasPassword === null) return res.json(onErrorResponse("your password is not correct"));
 
+		// check not repetitive
+		const notUnique = await userPrismaProvider.checkUniqueField({ email: validateData.data.email, userId: token.userId });
+		if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
+
+		// on repetitive
+		if (notUnique) {
+			const validationErrors: errorType = {};
+			if (validateData.data.email === notUnique.email) validationErrors.email = "this email already taken";
+			return res.json(onErrorResponse(validationErrors));
+		}
+
 		// prisma
 		const user = await userPrismaProvider.getOne(token.userId);
 		if (user === "ERR") return res.json(onErrorResponse("err on identify ORM"));
-		if (user === null) return res.json(onNotValidResponse([{ name: "not found", message: "not found this user" }]));
+		if (user === null) return res.json(onErrorResponse("not found this user"));
 
+		// email
 		const emailRes = await changeEmailEmailSender({ newEmail: validateData.data.email, oldEmail: user.email });
-		console.log("emailRes :: ", emailRes);
-
 		if (!emailRes) return res.json(onErrorResponse("It failed to send the email, please try again"));
 
 		// api
@@ -45,8 +53,26 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 	else if (req.method === "PATCH") {
 		try {
 			// token
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) {
+				removeCookieToken({ req, res });
+				return res.json(onErrorResponse("bad identify"));
+			}
+
+			// token
 			const emailToken = changeEmailTokenValidator(req.body.token);
 			if (!emailToken) return res.json(onErrorResponse("activate failed! perhaps email expired! pleases try again"));
+
+			// check not repetitive
+			const notUnique = await userPrismaProvider.checkUniqueField({ email: emailToken.newEmail, userId: token.userId });
+			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
+
+			// on repetitive
+			if (notUnique) {
+				const validationErrors: errorType = {};
+				if (emailToken.newEmail === notUnique.email) validationErrors.email = "this email already taken, change email failed!";
+				return res.json(onErrorResponse(validationErrors));
+			}
 
 			// prisma
 			const user = await userPrismaProvider.changeEmail({ newEmail: emailToken.newEmail, oldEmail: emailToken.oldEmail });
@@ -62,14 +88,14 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 	if (req.method === "GET") {
 		// validation
 		const validateData = zUserEmail.safeParse(req.query);
-		if (!validateData.success) return res.json(zodErrorMapper(validateData.error.issues));
+		if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
 
 		// prisma
 		const user = await userPrismaProvider.getByEmail(validateData.data);
 		if (user === "ERR") return res.json(onErrorResponse("Error on recover ORM"));
 		if (user === null) return res.json(onErrorResponse("this email is not registered"));
 		// TODO check isDeleted
-		if (user.isActive) return res.json(onNotValidResponse([{ name: "already", message: "your account is already verified" }]));
+		if (user.isActive) return res.json(onErrorResponse("your account is already verified"));
 
 		// email
 		const emailRes = await authEmailSender({ email: user.email });
