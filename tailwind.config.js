@@ -11,13 +11,18 @@ module.exports = {
 				// "yekan-bakh": ["yekan-bakh"],
 			},
 			minWidth: {
-				button: "7rem",
+				"theme-small": "5rem",
+				"theme-medium": "7rem",
 			},
 			rotate: {
 				270: "270deg",
 			},
 			transitionProperty: {
-				border: "max-height , opacity ",
+				"theme-select": "max-height , opacity ",
+				"theme-check": "scale , opacity ",
+			},
+			transitionDuration: {
+				"theme-slow": "400ms",
 			},
 			minHeight: {
 				input: "2.4rem",
@@ -26,10 +31,10 @@ module.exports = {
 				select: "9rem",
 			},
 			borderRadius: {
-				input: "0.4rem",
+				"theme-border": "0.4rem",
 			},
 			boxShadow: {
-				"theme-input": `0 0 0.1rem  0rem ${colors["theme-select"]}`,
+				"theme-dark": `0 0 0.1rem  0rem ${colors["theme-select"]}`,
 			},
 		},
 	},

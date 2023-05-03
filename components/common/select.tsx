@@ -33,7 +33,7 @@ export default function Select({ preSelect, onChange, selectId, options, onExtra
 
 	return (
 		<div
-			className={`relative flex items-center justify-center bg-white text-theme-dark border  rounded-input min-h-input w-full flex-1 ${
+			className={`relative flex items-center justify-center bg-white text-theme-dark border  rounded-theme-border min-h-input w-full flex-1 ${
 				isOpen ? "border-theme-select" : "border-theme-border"
 			}`}
 			ref={wrapperRef}
@@ -57,7 +57,7 @@ export default function Select({ preSelect, onChange, selectId, options, onExtra
 				</div>
 			</div>
 			<div
-				className={`absolute z-30 top-10 flex flex-col rounded-input min-w-full border-theme-select transition-border bg-white h-max  overflow-y-auto ${
+				className={`absolute z-30 top-10 flex flex-col rounded-theme-border min-w-full border-theme-select transition-theme-select bg-white h-max  overflow-y-auto ${
 					isOpen ? "border max-h-select opacity-100" : "border-0 max-h-0 opacity-0"
 				} `}
 			>

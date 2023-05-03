@@ -1,5 +1,5 @@
 import { iCRUD } from "@models/iCRUD";
-import { PrismaClient } from "@prisma/client";
+import prismaProvider from "@providers/prismaProvider";
 
 export const categoriesSeed = [
 	{ id: 1, title: "Animate" },
@@ -14,11 +14,10 @@ export const categoriesSeed = [
 	{ id: 10, title: "UI UX Design" },
 ];
 
-const prisma = new PrismaClient();
 export default class CategoryPrismaProvider implements iCRUD {
 	async getSome() {
 		try {
-			const Categories = await prisma.category.findMany();
+			const Categories = await prismaProvider.category.findMany();
 			return Categories;
 		} catch (error) {
 			return "ERR";
@@ -39,7 +38,7 @@ export default class CategoryPrismaProvider implements iCRUD {
 
 	async seed() {
 		try {
-			const categories = await prisma.category.createMany({ data: categoriesSeed, skipDuplicates: true });
+			const categories = await prismaProvider.category.createMany({ data: categoriesSeed, skipDuplicates: true });
 			return categories;
 		} catch (error) {
 			return "ERR";

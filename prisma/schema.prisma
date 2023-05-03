@@ -10,29 +10,26 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("EXTERNAL_DATABASE_URL")
+  url      = env("LOCAL_DATABASE_URL")
 }
 
 //level one
 
-model province {
+model Province {
   id    Int    @id @default(autoincrement()) @db.SmallInt
   title String @db.VarChar(30)
-  user  user[]
+  user  User[]
+  job   Job[]
 }
 
-model category {
+model Category {
   id    Int    @id @default(autoincrement()) @db.SmallInt
   title String @db.VarChar(30)
-  user  user[]
-  // course course[]
-  // post   post[]
-  // news   news[]
+  user  User[]
 }
 
 //level two
-
-model user {
+model User {
   id              Int        @id @default(autoincrement())
   slug            String     @default(uuid())
   username        String     @unique @db.VarChar(30)
@@ -42,12 +39,12 @@ model user {
   lastName        String?    @db.VarChar(30)
   phone           String?    @unique @db.VarChar(11)
   permissionLevel Int        @default(0) @db.SmallInt
-  RegisterDate    DateTime   @default(now()) @db.Date
+  createdAt       DateTime   @default(now()) @db.Date
   isActive        Boolean    @default(false)
   isDelete        Boolean    @default(false)
   provinceId      Int?       @db.SmallInt
-  province        province?  @relation(fields: [provinceId], references: [id])
-  interests       category[]
+  province        Province?  @relation(fields: [provinceId], references: [id])
+  interests       Category[]
   //   course           course[]
   //   post             post[]
   //   news             news[]
@@ -60,17 +57,39 @@ model user {
   //   PurchasedCourses course[]        @relation(name: "PurchasedCourses")
 }
 
-model keyword {
-  id       Int     @id @default(autoincrement())
-  title    String  @db.VarChar(30)
-  isActive Boolean @default(true)
-  // course   course[]
-  // lesson   lesson[]
-  // post     post[]
-  // news     news[]
-}
+// model keyword {
+//   id       Int     @id @default(autoincrement())
+//   title    String  @db.VarChar(30)
+//   isActive Boolean @default(true)
+// }
 
 //level three
+
+enum JobType {
+  FIXED
+  PARTNERSHIP
+  AGREEMENT
+}
+
+model Job {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+
+  createdAt    DateTime  @default(now()) @db.Date
+  updatedAt    DateTime  @updatedAt
+  isActive     Boolean   @default(false)
+  showEmail    Boolean   @default(false)
+  showPhone    Boolean   @default(false)
+  hasCover     Boolean   @default(false)
+  type         JobType
+  wage         Int?
+  provinceId   Int?      @db.SmallInt
+  province     Province? @relation(fields: [provinceId], references: [id])
+  requirements String[]
+  benefits     String[]
+  keywords     String[]
+}
 
 // model course {
 //   id           Int             @id @default(autoincrement()) @db.SmallInt
@@ -125,22 +144,6 @@ model keyword {
 //   reports      postReport[]
 // }
 
-// model news {
-//   id           Int           @id @default(autoincrement())
-//   title        String        @db.VarChar(30)
-//   description  String
-//   bannerUrl    String
-//   authorId     Int
-//   categoryId   Int           @db.SmallInt
-//   isActive     Boolean       @default(true)
-//   creationDate DateTime      @default(now()) @db.Date
-//   updateDate   DateTime?     @db.Date
-//   category     category      @relation(fields: [categoryId], references: [id])
-//   author       user          @relation(fields: [authorId], references: [id])
-//   keywords     keyword[]
-//   comments     newsComment[]
-// }
-
 // model adminMessage {
 //   id           Int      @id @default(autoincrement())
 //   title        String   @db.VarChar(30)
@@ -183,17 +186,6 @@ model keyword {
 //   userId       Int
 //   creationDate DateTime @default(now()) @db.Date
 //   post         post     @relation(fields: [subjectId], references: [id])
-//   user         user     @relation(fields: [userId], references: [id])
-//   isActive     Boolean  @default(true)
-// }
-
-// model newsComment {
-//   id           Int      @id @default(autoincrement())
-//   description  String
-//   subjectId    Int
-//   userId       Int
-//   creationDate DateTime @default(now()) @db.Date
-//   news         news     @relation(fields: [subjectId], references: [id])
 //   user         user     @relation(fields: [userId], references: [id])
 //   isActive     Boolean  @default(true)
 // }

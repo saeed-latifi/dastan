@@ -1,5 +1,5 @@
 import { iCRUD } from "@models/iCRUD";
-import { PrismaClient } from "@prisma/client";
+import prismaProvider from "@providers/prismaProvider";
 
 const provincesSeed = [
 	{ id: 1, title: "آذربایجان شرقی" },
@@ -35,11 +35,10 @@ const provincesSeed = [
 	{ id: 31, title: "یزد " },
 ];
 
-const prisma = new PrismaClient();
 export default class ProvincePrismaProvider implements iCRUD {
 	async getSome() {
 		try {
-			const provinces = await prisma.province.findMany();
+			const provinces = await prismaProvider.province.findMany();
 			return provinces;
 		} catch (error) {
 			return "ERR";
@@ -60,7 +59,7 @@ export default class ProvincePrismaProvider implements iCRUD {
 
 	async seed() {
 		try {
-			const provinces = await prisma.province.createMany({ data: provincesSeed, skipDuplicates: true });
+			const provinces = await prismaProvider.province.createMany({ data: provincesSeed, skipDuplicates: true });
 			return provinces;
 		} catch (error) {
 			return "ERR";

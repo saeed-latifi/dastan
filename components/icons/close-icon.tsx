@@ -1,8 +1,7 @@
-import React from "react";
-
-export default function CloseIcon() {
+type props = React.SVGProps<SVGSVGElement>;
+export default function CloseIcon({ ...props }: props) {
 	return (
-		<svg viewBox="0 0 135.46666 135.46667" version="1.1" id="svg5" xmlns="http://www.w3.org/2000/svg">
+		<svg viewBox="0 0 135.46666 135.46667" version="1.1" id="svg5" xmlns="http://www.w3.org/2000/svg" {...props}>
 			<defs id="defs2" />
 			<path
 				id="rect234"

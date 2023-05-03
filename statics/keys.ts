@@ -1,12 +1,12 @@
 // base user token
 const tokenDomainLocal = "localhost";
 const tokenDomainDastan = "dastandev.ir";
-export const tokenStatics = { tokenMaxAge: 60 * 60 * 12 * 30, tokenDomain: tokenDomainDastan, tokenPath: "/" };
+export const tokenStatics = { tokenMaxAge: 60 * 60 * 12 * 30, tokenDomain: tokenDomainLocal, tokenPath: "/" };
 
 // email callback domain
 const emailDomainLocal = "http://localhost:3000";
 const emailDomainDastan = "dastandev.ir";
-export const emailDomain = emailDomainDastan;
+export const emailDomain = emailDomainLocal;
 
 // external media
 export const bucketName = "dastan";

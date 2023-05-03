@@ -2,9 +2,8 @@ type Props = {
 	labelText?: string;
 	register?: any;
 	warnings?: string;
-} & React.InputHTMLAttributes<HTMLInputElement>;
-
-export default function FormInput({ labelText, warnings, register, ...props }: Props) {
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+export default function TextArea({ register, warnings, labelText, ...props }: Props) {
 	return (
 		<div className="flex flex-col items-start gap-1 w-full">
 			{labelText && (
@@ -13,7 +12,8 @@ export default function FormInput({ labelText, warnings, register, ...props }: P
 					{labelText}
 				</label>
 			)}
-			<input
+
+			<textarea
 				{...props}
 				id={props.id || labelText}
 				{...register}
