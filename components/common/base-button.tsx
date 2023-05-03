@@ -9,7 +9,7 @@ export default function ButtonBase({ Variety = BaseButtonVariety.primary, ...pro
 			{...props}
 			className={`${typeRender(
 				Variety
-			)} flex items-center justify-center rounded-theme-border outline-none py-2 px-4 align-middle  min-w-theme-medium active:opacity-70`}
+			)} flex items-center justify-center rounded-theme-border outline-none py-2 px-4 align-middle  min-w-theme-medium active:opacity-70  bg-theme-form`}
 		/>
 	);
 }
@@ -20,7 +20,7 @@ function typeRender(Variety: BaseButtonVariety) {
 			return "text-white bg-theme-shade  hover:bg-theme-select";
 
 		case BaseButtonVariety.form:
-			return "bg-lime-700 text-white hover:bg-theme-select";
+			return "bg-theme-form text-white hover:bg-theme-select";
 
 		default:
 			break;

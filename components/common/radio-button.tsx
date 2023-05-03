@@ -1,13 +1,13 @@
 import CheckIcon from "@components/icons/check-icon";
 
-type props = {
-	onChange?: (value: string | number) => void;
-	selected?: string | number;
+type props<T> = {
+	onChange?: (value: T) => void;
+	selected?: T;
 	id?: string;
-	value: string | number;
+	value: T;
 };
 
-export default function Radio({ value, onChange, selected, id }: props) {
+export default function Radio<T>({ value, onChange, selected, id }: props<T>) {
 	return (
 		<label
 			htmlFor={id}
@@ -21,11 +21,7 @@ export default function Radio({ value, onChange, selected, id }: props) {
 				}}
 				hidden
 			/>
-			<CheckIcon
-				className={`transition-theme-check duration-theme-slow + ${
-					value === selected ? "opacity-100 scale-100" : "opacity-0 scale-0"
-				}`}
-			/>
+			<CheckIcon className={`transition-theme-check ${value === selected ? "opacity-100 scale-100" : "opacity-0 scale-0"}`} />
 		</label>
 	);
 }

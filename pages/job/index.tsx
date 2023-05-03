@@ -1,59 +1,66 @@
 import FormInput from "@components/forms/form-input";
 import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import { iJobCreate, zJobCreate } from "@models/iJob";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import FormSection from "@components/forms/form-section";
 import Select from "@components/common/select";
 import { useProvince } from "@hooks/useProvince";
 import { selectOptionType } from "@components/common/select-multi";
 import { iProvince } from "@models/iProvince";
+import { WageType } from "@prisma/client";
+import TextArea from "@components/forms/form-text-area";
+import FormItemRow from "@components/forms/form-item-row";
+import FormRadio from "@components/forms/form-radio";
+import FormToggle from "@components/forms/form-toggle";
 
 {
-	//   jobType,   showEmail, showPhone,   keywords;
+	//         keywords;
 }
 
 export default function Jobs() {
 	const { provinces } = useProvince();
+	const [requirement, setRequirement] = useState("");
+	const [benefit, setBenefit] = useState("");
 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
-	const [wage, setWage] = useState("");
 	const [requirements, setRequirements] = useState<string[]>([]);
 	const [benefits, setBenefits] = useState<string[]>([]);
-
-	const requirementsRef = useRef<HTMLTextAreaElement>(null);
-	const benefitsRef = useRef<HTMLTextAreaElement>(null);
-
+	const [wageType, setWageType] = useState<WageType>("FIXED");
+	const [wage, setWage] = useState(0);
 	const [selectedProvince, setSelectedProvince] = useState<iProvince>();
-
-	function onSelectProvince(option: selectOptionType) {
-		setSelectedProvince({ id: option.value, title: option.label });
-	}
+	const [showPhone, setShowPhone] = useState(true);
+	const [showEmail, setShowEmail] = useState(false);
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		const body = { title, description, wage, requirements, benefits, wageType, selectedProvince, showPhone, showEmail };
+		console.log("body ", body);
+	};
+
+	const onSelectProvince = (option: selectOptionType) => {
+		setSelectedProvince({ id: option.value, title: option.label });
 	};
 
 	const addRequirement = () => {
-		if (requirementsRef.current) {
-			const newItem = requirementsRef.current.value;
-			setRequirements([...requirements, newItem]);
-			requirementsRef.current.value = "";
+		if (requirement) {
+			setRequirements([...requirements, requirement]);
+			setRequirement("");
 		}
 	};
+
 	const removeRequirement = (index: number) => {
 		const newArr = requirements.filter((_, i) => index !== i);
 		setRequirements(newArr);
 	};
 
 	const addBenefits = () => {
-		if (benefitsRef.current) {
-			const newItem = benefitsRef.current.value;
-			setBenefits([...benefits, newItem]);
-			benefitsRef.current.value = "";
+		if (benefit) {
+			setBenefits([...benefits, benefit]);
+			setBenefit("");
 		}
 	};
+
 	const removeBenefits = (index: number) => {
 		const newArr = benefits.filter((_, i) => index !== i);
 		setBenefits(newArr);
@@ -61,50 +68,57 @@ export default function Jobs() {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<FormInput labelText="title" value={title} onChange={(e) => setTitle(e.target.value)}></FormInput>
-			<FormInput labelText="description" value={description} onChange={(e) => setDescription(e.target.value)}></FormInput>
-			<FormInput labelText="wage" type="number" value={wage} onChange={(e) => setWage(e.target.value)}></FormInput>
+			<FormSection title="title">
+				<FormInput value={title} onChange={(e) => setTitle(e.target.value)} />
+			</FormSection>
+
+			<FormSection title="description">
+				<TextArea value={description} onChange={(e) => setDescription(e.target.value)} />
+			</FormSection>
 
 			<FormSection title="requirements">
-				<textarea
-					ref={requirementsRef}
-					className="border-theme-border focus:border-theme-select focus:shadow-theme-dark rounded-theme-border outline-none border px-2 py-1  min-w-0 w-full min-h-input"
-				/>
+				<TextArea value={requirement} onChange={(e) => setRequirement(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addRequirement}>
 					add new requirement
 				</ButtonBase>
-				{requirements.map((requirement, index) => (
-					<div key={index} className="w-full flex items-center justify-between">
-						<span>{requirement}</span>
-						<span onClick={() => removeRequirement(index)}>x</span>
-					</div>
+				{requirements.map((title, index) => (
+					<FormItemRow key={index} index={index} title={title} onClick={removeRequirement} />
 				))}
 			</FormSection>
 
 			<FormSection title="benefits">
-				<textarea
-					ref={benefitsRef}
-					className="border-theme-border focus:border-theme-select focus:shadow-theme-dark rounded-theme-border outline-none border px-2 py-1  min-w-0 w-full min-h-input"
-				/>
+				<TextArea value={benefit} onChange={(e) => setBenefit(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addBenefits}>
 					add new benefits
 				</ButtonBase>
-				{benefits.map((benefit, index) => (
-					<div key={index} className="w-full flex items-center justify-between">
-						<span>{benefit}</span>
-						<span onClick={() => removeBenefits(index)}>x</span>
-					</div>
+				{benefits.map((title, index) => (
+					<FormItemRow key={index} index={index} title={title} onClick={removeBenefits} />
 				))}
 			</FormSection>
 
-			<div className="flex flex-col w-full gap-1 text-gray-600">
-				<p className="px-2">select your province help for local events </p>
+			<FormSection title="location">
 				<Select
 					selectId="profileProvinces"
 					options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
 					onChange={onSelectProvince}
 				/>
-			</div>
+			</FormSection>
+
+			<FormSection title="wage">
+				<div className="flex w-full items-center justify-around text-gray-600">
+					<FormRadio label="FIXED" value={WageType.FIXED} onChange={setWageType} selected={wageType} />
+					<FormRadio label="AGREEMENT" value={WageType.AGREEMENT} onChange={setWageType} selected={wageType} />
+					<FormRadio label="PARTNERSHIP" value={WageType.PARTNERSHIP} onChange={setWageType} selected={wageType} />
+				</div>
+				{wageType === WageType.FIXED && (
+					<FormInput type="number" value={wage} onChange={(e) => setWage(parseInt(e.target.value))}></FormInput>
+				)}
+			</FormSection>
+
+			<FormSection title="contact">
+				<FormToggle title="showPhone" preChecked={showPhone} onChange={setShowPhone} />
+				<FormToggle title="showEmail" preChecked={showEmail} onChange={setShowEmail} />
+			</FormSection>
 
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
 				add job

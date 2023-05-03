@@ -29,7 +29,7 @@ export default function CheckBox({ id, onChange, preChecked = false }: props) {
 				checked={checked}
 				hidden
 			/>
-			<CheckIcon className={`transition-theme-check duration-theme-slow + ${checked ? "opacity-100 scale-100" : "opacity-0 scale-0"}`} />
+			<CheckIcon className={`transition-theme-check ${checked ? "opacity-100 scale-100" : "opacity-0 scale-0"}`} />
 		</label>
 	);
 }

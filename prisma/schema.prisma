@@ -55,40 +55,43 @@ model User {
   //   lessonComment    lessonComment[]
   //   postReport       postReport[]
   //   PurchasedCourses course[]        @relation(name: "PurchasedCourses")
+  keyword         keyword[]
 }
 
-// model keyword {
-//   id       Int     @id @default(autoincrement())
-//   title    String  @db.VarChar(30)
-//   isActive Boolean @default(true)
-// }
+model keyword {
+  id       Int     @id @default(autoincrement())
+  title    String  @db.VarChar(30)
+  isActive Boolean @default(true)
+  author   User    @relation(fields: [userId], references: [id])
+  userId   Int
+  Jobs     Job[]
+}
 
 //level three
 
-enum JobType {
+enum WageType {
   FIXED
   PARTNERSHIP
   AGREEMENT
 }
 
 model Job {
-  id          Int    @id @default(autoincrement())
-  title       String
-  description String
-
+  id           Int       @id @default(autoincrement())
+  title        String
+  description  String
   createdAt    DateTime  @default(now()) @db.Date
   updatedAt    DateTime  @updatedAt
   isActive     Boolean   @default(false)
   showEmail    Boolean   @default(false)
   showPhone    Boolean   @default(false)
   hasCover     Boolean   @default(false)
-  type         JobType
+  wageType     WageType
   wage         Int?
   provinceId   Int?      @db.SmallInt
   province     Province? @relation(fields: [provinceId], references: [id])
   requirements String[]
   benefits     String[]
-  keywords     String[]
+  keywords     keyword[]
 }
 
 // model course {
