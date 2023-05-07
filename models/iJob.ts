@@ -1,14 +1,15 @@
-import { JobType } from "@prisma/client";
+import { WageType } from "@prisma/client";
 import { z } from "zod";
 
 const id = z.number();
 const title = z.string().max(50);
 const description = z.string().max(300);
-const jobType = z.nativeEnum(JobType);
+const wageType = z.nativeEnum(WageType);
+export const zJobTerm = z.string().max(200, "so long word term").min(10, "so short word term");
 
 // optional
-const needs = z.array(z.string().max(100).min(5)).max(10);
-const gives = z.array(z.string().max(100).min(5)).max(10);
+const requirements = z.array(zJobTerm).max(10).optional();
+const benefits = z.array(zJobTerm).max(10).optional();
 const showEmail = z.boolean().optional();
 const showPhone = z.boolean().optional();
 const wage = z.number().optional();
@@ -23,7 +24,7 @@ const updatedAt = z.date();
 const hasCover = z.boolean();
 
 // schema
-export const zJobCreate = z.object({ title, description, jobType, needs, showEmail, gives, showPhone, wage, provinceId, keywords });
+export const zJobCreate = z.object({ title, description, wageType, requirements, showEmail, benefits, showPhone, wage, provinceId, keywords });
 
 // types
 export type iJobCreate = z.infer<typeof zJobCreate>;

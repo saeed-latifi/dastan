@@ -12,18 +12,24 @@ import TextArea from "@components/forms/form-text-area";
 import FormItemRow from "@components/forms/form-item-row";
 import FormRadio from "@components/forms/form-radio";
 import FormToggle from "@components/forms/form-toggle";
+import { zJobTerm, zJobCreate } from "@models/iJob";
+import { toast } from "react-toastify";
+import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
+import { emptyPurger } from "@utilities/nullPurger";
 
 {
 	//         keywords;
+	// manager;
 }
 
 export default function Jobs() {
 	const { provinces } = useProvince();
-	const [requirement, setRequirement] = useState("");
-	const [benefit, setBenefit] = useState("");
 
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
+	const [requirement, setRequirement] = useState<string>();
+	const [benefit, setBenefit] = useState<string>();
+
+	const [title, setTitle] = useState<string>();
+	const [description, setDescription] = useState<string>();
 	const [requirements, setRequirements] = useState<string[]>([]);
 	const [benefits, setBenefits] = useState<string[]>([]);
 	const [wageType, setWageType] = useState<WageType>("FIXED");
@@ -32,10 +38,19 @@ export default function Jobs() {
 	const [showPhone, setShowPhone] = useState(true);
 	const [showEmail, setShowEmail] = useState(false);
 
+	const [errors, setErrors] = useState<errorType>();
+
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		const body = { title, description, wage, requirements, benefits, wageType, selectedProvince, showPhone, showEmail };
-		console.log("body ", body);
+		const body = { title, description, wageType, requirements, showEmail, benefits, showPhone, wage, provinceId: selectedProvince?.id };
+
+		const purged = emptyPurger(body);
+		const job = zJobCreate.safeParse(body);
+		if (job.success) console.log(job.data);
+		else {
+			console.log(zodErrorMapper(job.error.issues));
+			setErrors(zodErrorMapper(job.error.issues));
+		}
 	};
 
 	const onSelectProvince = (option: selectOptionType) => {
@@ -44,6 +59,8 @@ export default function Jobs() {
 
 	const addRequirement = () => {
 		if (requirement) {
+			const term = zJobTerm.safeParse(requirement);
+			if (!term.success) return toast.warn(term.error.issues[0].message);
 			setRequirements([...requirements, requirement]);
 			setRequirement("");
 		}
@@ -56,6 +73,8 @@ export default function Jobs() {
 
 	const addBenefits = () => {
 		if (benefit) {
+			const term = zJobTerm.safeParse(benefit);
+			if (!term.success) return toast.warn(term.error.issues[0].message);
 			setBenefits([...benefits, benefit]);
 			setBenefit("");
 		}

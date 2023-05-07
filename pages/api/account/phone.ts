@@ -49,7 +49,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// api
 			return res.json(onSuccessResponse("your code send via sms. please enter your code."));
 		} catch (error) {
-			return res.send("error on send SMS");
+			return res.json(onErrorResponse("error on send SMS"));
 		}
 	}
 
@@ -91,7 +91,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// api
 			return res.json(onSuccessResponse(user));
 		} catch (error) {
-			return res.send("error on send SMS");
+			return res.json(onErrorResponse("error on send SMS"));
 		}
 	}
 

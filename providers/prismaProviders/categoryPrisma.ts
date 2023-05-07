@@ -12,6 +12,8 @@ export const categoriesSeed = [
 	{ id: 8, title: "3D Modeling" },
 	{ id: 9, title: "Texturing" },
 	{ id: 10, title: "UI UX Design" },
+	{ id: 11, title: "Sound and Music" },
+	{ id: 12, title: "Narrative" },
 ];
 
 export default class CategoryPrismaProvider implements iCRUD {

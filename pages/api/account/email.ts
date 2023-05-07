@@ -134,6 +134,6 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 
 	// not supported
 	else {
-		return res.send("not allowed method");
+		return res.json(onErrorResponse("not supported method"));
 	}
 }

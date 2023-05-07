@@ -130,6 +130,12 @@ export default function Profile() {
 						{userInfo.phone ? "change phone number" : " Add phone"}
 					</ButtonBase>
 				</div>
+				<div className="w-full flex flex-col gap-1">
+					{userInfo.phone && <p className="text-gray-500 select-none mx-auto">{userInfo.phone}</p>}
+					<ButtonBase type="button" onClick={() => router.push("/team")}>
+						your teams
+					</ButtonBase>
+				</div>
 			</div>
 		</Form>
 	);

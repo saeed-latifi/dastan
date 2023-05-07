@@ -75,6 +75,6 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 
 	// not supported
 	else {
-		return res.send("not allowed method");
+		return res.json(onErrorResponse("not supported method"));
 	}
 }

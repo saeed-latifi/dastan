@@ -1,3 +1,5 @@
+import { ZodIssue } from "zod";
+
 export enum responseState {
 	ok = 1,
 	error = 2,
@@ -19,13 +21,16 @@ export function onErrorResponse<T>(errors: string | errorType): apiResponse<T> {
 }
 
 export function onZodErrorResponse<T>(issues: any): apiResponse<T> {
+	return {
+		resState: responseState.error,
+		errors: zodErrorMapper(issues),
+	};
+}
+
+export function zodErrorMapper(issues: ZodIssue[]) {
 	const mappedErrors: errorType = {};
 	issues.map((error: any) => {
 		mappedErrors[error.path[0]] = error.message;
 	});
-
-	return {
-		resState: responseState.error,
-		errors: mappedErrors,
-	};
+	return mappedErrors;
 }
