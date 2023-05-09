@@ -4,8 +4,8 @@ import { paramGenerator } from "@utilities/paramGenerator";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
-export function useProfileImageParam() {
-	const { data: profileImageParam, mutate: imgParamMutate } = useSWR("forceChangeImageParam", paramGenerator, {
+export function useImage() {
+	const { data: forceImageParam, mutate: imgParamMutate } = useSWR("forceChangeImageParam", paramGenerator, {
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
@@ -30,5 +30,24 @@ export function useProfileImageParam() {
 		}
 	}
 
-	return { onUpdateProfileImage, profileImageParam };
+	async function onUpdateTeamLogo({ formData }: { formData: FormData }) {
+		try {
+			const { data } = await HTTPService.post("/team/logo", formData);
+			if (data.resState === responseState.ok) {
+				imgParamMutate(paramGenerator, {
+					populateCache(result, _) {
+						return result;
+					},
+					revalidate: false,
+				});
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
+	}
+
+	return { onUpdateProfileImage, onUpdateTeamLogo, forceImageParam };
 }

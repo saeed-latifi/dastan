@@ -45,16 +45,6 @@ model User {
   provinceId      Int?       @db.SmallInt
   province        Province?  @relation(fields: [provinceId], references: [id])
   interests       Category[]
-  //   course           course[]
-  //   post             post[]
-  //   news             news[]
-  //   adminMessage     adminMessage[]
-  //   courseComment    courseComment[]
-  //   postComment      postComment[]
-  //   newsComment      newsComment[]
-  //   lessonComment    lessonComment[]
-  //   postReport       postReport[]
-  //   PurchasedCourses course[]        @relation(name: "PurchasedCourses")
   keyword         keyword[]
   Team            Team[]
 }
@@ -63,9 +53,8 @@ model keyword {
   id       Int     @id @default(autoincrement())
   title    String  @unique @db.VarChar(30)
   isActive Boolean @default(true)
-  author   User    @relation(fields: [userId], references: [id])
   userId   Int
-  Jobs     Job[]
+  author   User    @relation(fields: [userId], references: [id])
 }
 
 //level three
@@ -89,7 +78,6 @@ model Job {
   province     Province? @relation(fields: [provinceId], references: [id])
   benefits     String[]
   requirements String[]
-  keywords     keyword[]
   team         Team      @relation(fields: [teamId], references: [id])
   teamId       Int
 }
@@ -98,7 +86,6 @@ model Team {
   id             Int      @id @default(autoincrement())
   title          String   @unique
   description    String
-  hasCover       Boolean  @default(false)
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now()) @db.Date
   managerId      Int

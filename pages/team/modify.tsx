@@ -5,6 +5,7 @@ import FormInput from "@components/forms/form-input";
 import FormItemRow from "@components/forms/form-item-row";
 import FormSection from "@components/forms/form-section";
 import TextArea from "@components/forms/form-text-area";
+import TeamLogo from "@components/images/team-logo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { useTeam } from "@hooks/useTeam";
@@ -23,7 +24,7 @@ export default function ModifyTeam() {
 	const { userInfo, checkAccessRedirect } = useAccount();
 	checkAccessRedirect();
 
-	const { onAddTeam, teamsInfo } = useTeam();
+	const { onAddTeam, onUpdateTeam, teamsInfo } = useTeam();
 
 	const {
 		register,
@@ -43,8 +44,13 @@ export default function ModifyTeam() {
 	}, [router, teamsInfo]);
 
 	async function onSubmit(data: iTeamCreate) {
-		const res = await onAddTeam({ ...data, userId: userInfo.id, contactMethods });
-		console.log(res);
+		if (team) {
+			const res = await onUpdateTeam({ ...data, id: team.id, contactMethods });
+			console.log(res);
+		} else {
+			const res = await onAddTeam({ ...data, userId: userInfo.id, contactMethods });
+			console.log(res);
+		}
 	}
 
 	const onAddContactMethod = () => {
@@ -85,7 +91,22 @@ export default function ModifyTeam() {
 				))}
 			</FormSection>
 
-			<ButtonBase>create your team</ButtonBase>
+			<FormSection title="submit">
+				<ButtonBase>{team ? "update info" : "create your team"}</ButtonBase>
+			</FormSection>
+			{team && (
+				<FormSection title="team logo">
+					<TeamLogo id={team.id} />
+					<ButtonBase type="button" onClick={() => router.push(`/team/logo?item=${team.id}`)}>
+						update your team logo
+					</ButtonBase>
+				</FormSection>
+			)}
+			{team && (
+				<FormSection title="jobs">
+					<ButtonBase type="button">open a new job</ButtonBase>
+				</FormSection>
+			)}
 		</Form>
 	);
 }

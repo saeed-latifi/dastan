@@ -29,8 +29,6 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = 512, height
 	}, []);
 
 	async function onHandleSubmit() {
-		console.log("ready");
-
 		try {
 			if (!editor || file === "") return toast.warn("please select an image");
 			const dataUrl = editor.getImageScaledToCanvas().toDataURL();
@@ -105,6 +103,7 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = 512, height
 				name="newImage"
 				type="file"
 				accept="image/*"
+				crossOrigin="anonymous"
 				onChange={(e) => {
 					onAddImage(e);
 				}}

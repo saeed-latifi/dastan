@@ -5,14 +5,17 @@ import Form from "@components/forms/form";
 import { useAccount } from "@hooks/useAccount";
 import { useImage } from "@hooks/useImage";
 import base64ToBlob from "@utilities/base64ToBlob";
+import { useRouter } from "next/router";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
 
-export default function ProfileImageCropper() {
+export default function TeamLogoCropper() {
 	const { checkAccessRedirect, isLoading, userInfo } = useAccount();
-	const { onUpdateProfileImage, forceImageParam } = useImage();
+	const { onUpdateTeamLogo, forceImageParam } = useImage();
 	checkAccessRedirect();
+
+	const router = useRouter();
 
 	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });
 	const [scale, setScale] = useState<number>(1.0);
@@ -23,8 +26,8 @@ export default function ProfileImageCropper() {
 	const imageSize = 512;
 
 	useEffect(() => {
-		if (!isLoading) setFile(`/images/profile/${userInfo.slug}/${forceImageParam}.webp`);
-	}, [isLoading]);
+		if (!isLoading && router.isReady) setFile(`/images/team/${router.query.item}/${forceImageParam}.webp`);
+	}, [isLoading, router]);
 
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -36,7 +39,8 @@ export default function ProfileImageCropper() {
 			const blob = await base64ToBlob(dataUrl);
 			const form = new FormData();
 			form.append("image", blob);
-			await onUpdateProfileImage({ formData: form });
+			form.append("id", router.query.item as string);
+			await onUpdateTeamLogo({ formData: form });
 			setWaiter(false);
 		} catch (error) {}
 	}

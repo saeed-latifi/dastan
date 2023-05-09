@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useAccount } from "@hooks/useAccount";
-import ProfileImage from "./account/profile-image";
+import ProfileImage from "./images/profile-image";
 
 export default function Account() {
 	const { isLoading, userInfo, onLogout, isLoggedIn } = useAccount();

@@ -3,7 +3,7 @@ import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
 import webp512Buffer from "@providers/imageGenerators/webp512";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
-import profileImageAWS from "@providers/bucketsAWS/profileImageAWS";
+import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
 
 export const config = {
 	api: {
@@ -33,7 +33,7 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				return res.json(onErrorResponse("no image file"));
 			}
 		} catch (error) {
-			return res.json(onErrorResponse("err on sharp"));
+			return res.json(onErrorResponse("err profile image"));
 		}
 	}
 

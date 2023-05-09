@@ -57,4 +57,19 @@ export default class TeamPrismaProvider implements iCRUD {
 			return "ERR";
 		}
 	}
+
+	async checkTeamManager({ teamId }: { teamId: number }) {
+		try {
+			const team = await prismaProvider.team.findFirst({
+				where: {
+					id: teamId,
+				},
+				select: { managerId: true },
+			});
+			return team;
+		} catch (error) {
+			console.log("error :: ", error);
+			return "ERR";
+		}
+	}
 }

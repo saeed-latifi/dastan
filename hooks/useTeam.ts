@@ -27,6 +27,7 @@ export function useTeam() {
 	}
 
 	function onAddTeam(body: { title: string; description: string; userId: number; contactMethods?: string[] }) {
+		// TODO MUTATE
 		fetchHandler({
 			fetcher: () => HTTPService.post("team", body),
 			onOK: (res) => {
@@ -37,8 +38,9 @@ export function useTeam() {
 	}
 
 	function onUpdateTeam(body: { id: number; title?: string; description?: string; contactMethods?: string[] }) {
+		// TODO MUTATE
 		fetchHandler({
-			fetcher: () => HTTPService.post("put", body),
+			fetcher: () => HTTPService.put("team", body),
 			onOK: (res) => {
 				// router.push("/team");
 				console.log(res.data);

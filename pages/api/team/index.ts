@@ -83,6 +83,12 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
 			const { id, title, description, contactMethods } = validateData.data;
 
+			// prisma check team manager
+			const manager = await teamPrismaProvider.checkTeamManager({ teamId: id });
+			if (manager === "ERR") return res.json(onErrorResponse("Error on team ORM"));
+			if (manager === null) return res.json(onErrorResponse("this team not exist"));
+			if (manager.managerId !== token.userId) return res.json(onErrorResponse("team err : access denied!"));
+
 			// prisma
 			const notUnique = await teamPrismaProvider.checkUniqueField({ title, teamId: id });
 			if (notUnique === "ERR") return res.json(onErrorResponse("Error on team ORM"));
