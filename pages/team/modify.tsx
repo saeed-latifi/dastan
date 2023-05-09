@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
+import LoaderSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormItemRow from "@components/forms/form-item-row";
@@ -16,15 +17,15 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export default function ModifyTeam() {
+	const { userInfo, checkAccessRedirect } = useAccount();
+	checkAccessRedirect();
+
 	const [contactMethod, setContactMethod] = useState<string>();
 	const [contactMethods, setContactMethods] = useState<string[]>([]);
 	const [team, setTeam] = useState<any>();
 	const router = useRouter();
 
-	const { userInfo, checkAccessRedirect } = useAccount();
-	checkAccessRedirect();
-
-	const { onAddTeam, onUpdateTeam, teamsInfo } = useTeam();
+	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam } = useTeam();
 
 	const {
 		register,
@@ -66,6 +67,29 @@ export default function ModifyTeam() {
 		const newArr = contactMethods.filter((_, i) => index !== i);
 		setContactMethods(newArr);
 	};
+
+	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (router.query.item && !team) {
+		return (
+			<div className="flex flex-col items-center gap-4">
+				<p>bad address</p>
+				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+					back to your teams list
+				</ButtonBase>
+			</div>
+		);
+	}
+
+	if (!router.query.item && !allowMoreTeam()) {
+		return (
+			<div className="flex flex-col items-center gap-4">
+				<p>You have reached your team limit</p>
+				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+					back to your teams list
+				</ButtonBase>
+			</div>
+		);
+	}
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>

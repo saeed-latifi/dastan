@@ -46,6 +46,7 @@ export function useAccount() {
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
 				router.push("/");
+				router.reload();
 			},
 			okMessage: "logged out",
 		});

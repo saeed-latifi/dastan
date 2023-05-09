@@ -4,11 +4,16 @@ import { toast } from "react-toastify";
 import useSWR from "swr";
 import { errorMutateHandler, fetchHandler, okMutateHandler } from "./useFetch";
 import { useRouter } from "next/router";
+import { teamLimits } from "statics/limits";
 
 export function useTeam() {
 	const router = useRouter();
 
-	const { data: teamsInfo, mutate: teamsMutate } = useSWR("userTeams", getTeams, {
+	const {
+		data: teamsInfo,
+		mutate: teamsMutate,
+		isLoading,
+	} = useSWR("userTeams", getTeams, {
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
@@ -48,5 +53,11 @@ export function useTeam() {
 		});
 	}
 
-	return { teamsInfo, onAddTeam, onUpdateTeam };
+	const allowMoreTeam = () => {
+		if (isLoading) return false;
+		if (teamsInfo && teamsInfo.length >= teamLimits.number) return false;
+		return true;
+	};
+
+	return { teamsInfo, onAddTeam, onUpdateTeam, isLoading, allowMoreTeam };
 }
