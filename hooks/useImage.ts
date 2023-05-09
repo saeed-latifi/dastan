@@ -1,10 +1,12 @@
 import HTTPService from "@providers/HTTPService";
 import { responseState } from "@providers/apiResponseHandler";
 import { paramGenerator } from "@utilities/paramGenerator";
+import { useRouter } from "next/router";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 
 export function useImage() {
+	const router = useRouter();
 	const { data: forceImageParam, mutate: imgParamMutate } = useSWR("forceChangeImageParam", paramGenerator, {
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
@@ -21,6 +23,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
+				router.push("/profile");
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");
@@ -40,6 +43,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
+				router.push("/team");
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");

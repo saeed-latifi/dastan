@@ -10,8 +10,8 @@ import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
 
 export default function ProfileImageCropper() {
-	const { checkAccessRedirect, isLoading, userInfo } = useAccount();
-	const { onUpdateProfileImage, forceImageParam } = useImage();
+	const { checkAccessRedirect, isLoading } = useAccount();
+	const { onUpdateProfileImage } = useImage();
 	checkAccessRedirect();
 
 	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });
@@ -21,10 +21,6 @@ export default function ProfileImageCropper() {
 	const [file, setFile] = useState<File | string>("");
 
 	const imageSize = 512;
-
-	useEffect(() => {
-		if (!isLoading) setFile(`/images/profile/${userInfo.slug}/${forceImageParam}.webp`);
-	}, [isLoading]);
 
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -62,7 +58,7 @@ export default function ProfileImageCropper() {
 	return (
 		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>
 			<AvatarEditor
-				className="w-full aspect-square flex relative  bg-white border border-slate-600 rounded-xl overflow-hidden"
+				className="w-full aspect-square flex relative  bg-white bg-theme-profile border border-theme-border rounded-theme-border overflow-hidden"
 				image={file}
 				ref={(e) => setEditor(e)}
 				scale={scale}

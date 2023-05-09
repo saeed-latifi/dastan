@@ -111,7 +111,7 @@ export default function Profile() {
 
 			<div className="flex flex-col gap-4 max-w-sm w-full  mx-auto">
 				<ButtonBase type="button" onClick={() => router.push("/profile/add-image")}>
-					add profile image
+					update profile image
 				</ButtonBase>
 				<ButtonBase type="button" onClick={() => router.push("/profile/change-password")}>
 					change password

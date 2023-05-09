@@ -6,7 +6,7 @@ import FormInput from "@components/forms/form-input";
 import FormItemRow from "@components/forms/form-item-row";
 import FormSection from "@components/forms/form-section";
 import TextArea from "@components/forms/form-text-area";
-import TeamLogo from "@components/images/team-logo";
+import TeamLogo, { logoImageTypes } from "@components/images/team-logo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { useTeam } from "@hooks/useTeam";
@@ -47,10 +47,8 @@ export default function ModifyTeam() {
 	async function onSubmit(data: iTeamCreate) {
 		if (team) {
 			const res = await onUpdateTeam({ ...data, id: team.id, contactMethods });
-			console.log(res);
 		} else {
 			const res = await onAddTeam({ ...data, userId: userInfo.id, contactMethods });
-			console.log(res);
 		}
 	}
 
@@ -93,18 +91,33 @@ export default function ModifyTeam() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<FormInput
-				labelText="title"
-				warnings={errors.title?.message}
-				register={register("title", { setValueAs: (v) => (v === "" ? undefined : v) })}
-				required
-			/>
-			<TextArea
-				labelText="description"
-				warnings={errors.description?.message}
-				register={register("description", { setValueAs: (v) => (v === "" ? undefined : v) })}
-				required
-			/>
+			{team && (
+				<FormSection title="jobs">
+					<ButtonBase type="button">open a new job</ButtonBase>
+				</FormSection>
+			)}
+			{team && (
+				<FormSection title="team logo">
+					<TeamLogo id={team.id} logoType={logoImageTypes.full} />
+					<ButtonBase type="button" onClick={() => router.push(`/team/logo?item=${team.id}`)}>
+						update your team logo
+					</ButtonBase>
+				</FormSection>
+			)}
+			<FormSection title="base info">
+				<FormInput
+					labelText="title"
+					warnings={errors.title?.message}
+					register={register("title", { setValueAs: (v) => (v === "" ? undefined : v) })}
+					required
+				/>
+				<TextArea
+					labelText="description"
+					warnings={errors.description?.message}
+					register={register("description", { setValueAs: (v) => (v === "" ? undefined : v) })}
+					required
+				/>
+			</FormSection>
 			<FormSection title="contact methods">
 				<TextArea value={contactMethod} onChange={(e) => setContactMethod(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={onAddContactMethod}>
@@ -114,23 +127,9 @@ export default function ModifyTeam() {
 					<FormItemRow key={index} index={index} title={title} onClick={onRemoveContactMethod} />
 				))}
 			</FormSection>
-
-			<FormSection title="submit">
-				<ButtonBase>{team ? "update info" : "create your team"}</ButtonBase>
+			<FormSection title={team ? "update" : "create"}>
+				<ButtonBase>{team ? "update info" : "create new team"}</ButtonBase>
 			</FormSection>
-			{team && (
-				<FormSection title="team logo">
-					<TeamLogo id={team.id} />
-					<ButtonBase type="button" onClick={() => router.push(`/team/logo?item=${team.id}`)}>
-						update your team logo
-					</ButtonBase>
-				</FormSection>
-			)}
-			{team && (
-				<FormSection title="jobs">
-					<ButtonBase type="button">open a new job</ButtonBase>
-				</FormSection>
-			)}
 		</Form>
 	);
 }

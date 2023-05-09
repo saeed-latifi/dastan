@@ -9,6 +9,7 @@ const emailDomainDastan = "dastandev.ir";
 export const emailDomain = emailDomainLocal;
 
 // external media
+export const bucketUrl = "https://dastan.storage.iran.liara.space";
 export const bucketName = "dastan";
 export const AWSProfileConfig = {
 	endpoint: "storage.iran.liara.space",

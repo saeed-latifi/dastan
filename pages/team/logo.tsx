@@ -25,10 +25,6 @@ export default function TeamLogoCropper() {
 
 	const imageSize = 512;
 
-	useEffect(() => {
-		if (!isLoading && router.isReady) setFile(`/images/team/${router.query.item}/${forceImageParam}.webp`);
-	}, [isLoading, router]);
-
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
@@ -66,7 +62,7 @@ export default function TeamLogoCropper() {
 	return (
 		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>
 			<AvatarEditor
-				className="w-full aspect-square flex relative  bg-white border border-slate-600 rounded-xl overflow-hidden"
+				className="w-full aspect-square flex relative  bg-white bg-theme-team-logo border border-theme-border rounded-theme-border overflow-hidden"
 				image={file}
 				ref={(e) => setEditor(e)}
 				scale={scale}

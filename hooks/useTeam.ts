@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { errorMutateHandler, fetchHandler, okMutateHandler } from "./useFetch";
 import { useRouter } from "next/router";
 import { teamLimits } from "statics/limits";
+import { produce } from "immer";
 
 export function useTeam() {
 	const router = useRouter();
@@ -27,28 +28,51 @@ export function useTeam() {
 			}
 		} catch (error: any) {
 			toast.warn("bad connection");
-			throw "bad connection";
 		}
 	}
 
 	function onAddTeam(body: { title: string; description: string; userId: number; contactMethods?: string[] }) {
-		// TODO MUTATE
 		fetchHandler({
 			fetcher: () => HTTPService.post("team", body),
 			onOK: (res) => {
-				// router.push("/team");
-				console.log(res.data);
+				teamsMutate(res.data, {
+					populateCache(result, baseState) {
+						const teamsMutate = produce(baseState, (draft) => {
+							if (Array.isArray(draft)) {
+								draft.push(result);
+							} else {
+								draft = [result];
+							}
+						});
+
+						return teamsMutate;
+					},
+					revalidate: false,
+				});
+				router.push("/team");
 			},
 		});
 	}
 
 	function onUpdateTeam(body: { id: number; title?: string; description?: string; contactMethods?: string[] }) {
-		// TODO MUTATE
 		fetchHandler({
 			fetcher: () => HTTPService.put("team", body),
 			onOK: (res) => {
-				// router.push("/team");
-				console.log(res.data);
+				teamsMutate(res.data, {
+					populateCache(result, baseState) {
+						const teamsMutate = produce(baseState, (draft) => {
+							draft?.map((item, index) => {
+								if (item.id === result.id) {
+									draft[index] = { ...result };
+								}
+							});
+						});
+
+						return teamsMutate;
+					},
+					revalidate: false,
+				});
+				router.push("/team");
 			},
 		});
 	}

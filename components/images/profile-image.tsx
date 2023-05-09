@@ -1,8 +1,9 @@
 import { useImage } from "@hooks/useImage";
+import { bucketUrl } from "statics/keys";
 
 export default function ProfileImage({ slug }: { slug: string }) {
 	const { forceImageParam } = useImage();
-	const src = `/images/profile/${slug}/${forceImageParam}.webp`;
+	const src = `${bucketUrl}/profile/${slug}.webp?v=${forceImageParam}`;
 
 	return (
 		<img
@@ -10,6 +11,7 @@ export default function ProfileImage({ slug }: { slug: string }) {
 			src={src}
 			onError={(e: any) => (e?.target?.src?.includes(src) ? (e.target.src = "/images/profile.svg") : "")}
 			alt=""
+			key={forceImageParam}
 		/>
 	);
 }

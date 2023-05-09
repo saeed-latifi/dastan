@@ -6,6 +6,10 @@ module.exports = {
 	theme: {
 		extend: {
 			colors: colors,
+			backgroundImage: {
+				"theme-profile": "url('/images/profile.svg')",
+				"theme-team-logo": "url('/images/team.svg')",
+			},
 
 			fontFamily: {
 				// "yekan-bakh": ["yekan-bakh"],

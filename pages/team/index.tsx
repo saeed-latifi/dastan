@@ -1,6 +1,7 @@
 import ButtonBase from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
+import TeamLogo from "@components/images/team-logo";
 import { useAccount } from "@hooks/useAccount";
 import { useTeam } from "@hooks/useTeam";
 import Link from "next/link";
@@ -17,7 +18,7 @@ export default function Team() {
 	if (isLoading) return <LoaderSpinner />;
 
 	return (
-		<div className="flex flex-col gap-4 w-full max-w-md">
+		<div className="flex flex-col gap-4 w-full max-w-md py-4">
 			{allowMoreTeam() && (
 				<ButtonBase type="button" onClick={() => router.push("/team/modify")}>
 					add new Team
@@ -27,9 +28,10 @@ export default function Team() {
 			{teamsInfo && teamsInfo.length > 0 && (
 				<FormSection title="your Teams">
 					{teamsInfo.map((team, index) => (
-						<Link key={index} href={"/team/modify?item=" + team.id}>
-							{team.title}
-						</Link>
+						<div key={index} className="flex items-center justify-between gap-2">
+							<Link href={"/team/modify?item=" + team.id}>{team.title}</Link>
+							<TeamLogo id={team.id} />
+						</div>
 					))}
 				</FormSection>
 			)}
