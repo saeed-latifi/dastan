@@ -59,6 +59,18 @@ model keyword {
 
 //level three
 
+model Team {
+  id             Int      @id @default(autoincrement())
+  title          String   @unique
+  description    String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now()) @db.Date
+  managerId      Int
+  manager        User     @relation(fields: [managerId], references: [id])
+  contactMethods String[]
+  Jobs           Job[]
+}
+
 enum WageType {
   FIXED
   PARTNERSHIP
@@ -71,7 +83,7 @@ model Job {
   description  String
   createdAt    DateTime  @default(now()) @db.Date
   updatedAt    DateTime  @updatedAt
-  isActive     Boolean   @default(false)
+  isActive     Boolean   @default(true)
   wageType     WageType
   wage         Int?
   provinceId   Int?      @db.SmallInt
@@ -80,18 +92,6 @@ model Job {
   requirements String[]
   team         Team      @relation(fields: [teamId], references: [id])
   teamId       Int
-}
-
-model Team {
-  id             Int      @id @default(autoincrement())
-  title          String   @unique
-  description    String
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now()) @db.Date
-  managerId      Int
-  manager        User     @relation(fields: [managerId], references: [id])
-  contactMethods String[]
-  Jobs           Job[]
 }
 
 // model course {

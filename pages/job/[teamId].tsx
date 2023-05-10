@@ -1,7 +1,7 @@
 import FormInput from "@components/forms/form-input";
 import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import FormSection from "@components/forms/form-section";
 import Select from "@components/common/select";
 import { useProvince } from "@hooks/useProvince";
@@ -16,10 +16,35 @@ import { toast } from "react-toastify";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
+import { useTeam } from "@hooks/useTeam";
+import LoaderSpinner from "@components/common/loader-spinner";
 
 export default function Jobs() {
 	const router = useRouter();
 	const { provinces } = useProvince();
+	const { onAddJob, teamsInfo, isLoading, allowMoreJob, onUpdateJob } = useTeam();
+	const [job, setJob] = useState<any>();
+
+	useEffect(() => {
+		if (router.isReady) {
+			const team = teamsInfo?.find((item) => item.id === parseInt(router.query.teamId as string));
+			if (team) {
+				const item = team.Jobs?.find((item: any) => item.id === parseInt(router.query.item as string));
+				if (item) {
+					console.log("item :: ", item);
+					setJob(item);
+
+					setTitle(item.title);
+					setDescription(item.description);
+					setRequirements(item.requirements);
+					setBenefits(item.benefits);
+					setWageType(item.wageType);
+					setWage(item.wage);
+					item.province && setSelectedProvince(item.province);
+				}
+			}
+		}
+	}, [router, teamsInfo]);
 
 	const [requirement, setRequirement] = useState<string>();
 	const [benefit, setBenefit] = useState<string>();
@@ -30,33 +55,39 @@ export default function Jobs() {
 	const [benefits, setBenefits] = useState<string[]>([]);
 	const [wageType, setWageType] = useState<WageType>("FIXED");
 	const [wage, setWage] = useState(0);
-	const [selectedProvince, setSelectedProvince] = useState<iProvince>();
+	const [selectedProvince, setSelectedProvince] = useState<iProvince>({ id: 0, title: "remote" });
 
 	const [errors, setErrors] = useState<errorType>();
 
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		const body = {
-			title,
-			description,
-			wageType,
-			requirements,
-			benefits,
-			wage,
-			provinceId: selectedProvince?.id,
-			teamId: router.query.teamId,
-		};
+		if (router.query.teamId) {
+			const body = {
+				title,
+				description,
+				wageType,
+				requirements,
+				benefits,
+				wage,
+				provinceId: selectedProvince && selectedProvince.id > 0 ? selectedProvince.id : undefined,
+				teamId: parseInt(router.query.teamId as string),
+			};
 
-		const purged = emptyPurger(body);
-		const job = zJobCreate.safeParse(purged);
-		if (job.success) {
-			console.log(job.data);
-			setErrors({});
-		} else {
-			console.log(zodErrorMapper(job.error.issues));
-			setErrors(zodErrorMapper(job.error.issues));
+			const purged = emptyPurger(body);
+			const validJob = zJobCreate.safeParse(purged);
+			if (validJob.success) {
+				setErrors({});
+				if (job) {
+					await onUpdateJob({ ...validJob.data, id: parseInt(router.query.item as string) });
+				} else {
+					await onAddJob(validJob.data);
+				}
+			} else {
+				console.log(zodErrorMapper(validJob.error.issues));
+				setErrors(zodErrorMapper(validJob.error.issues));
+			}
 		}
-	};
+	}
 
 	const onSelectProvince = (option: selectOptionType) => {
 		setSelectedProvince({ id: option.value, title: option.label });
@@ -96,6 +127,41 @@ export default function Jobs() {
 		setBenefits(newArr);
 	};
 
+	// function handleOnChange({ key, value }: { key: string; value: string }) {}
+
+	function provinceMapper() {
+		const options = [{ value: 0, label: "remote" }];
+		if (provinces) {
+			provinces.forEach((p) => {
+				options.push({ label: p.title, value: p.id });
+			});
+		}
+		return options;
+	}
+
+	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (router.query.item && !job) {
+		return (
+			<div className="flex flex-col items-center gap-4">
+				<p>bad address</p>
+				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+					back to your teams list
+				</ButtonBase>
+			</div>
+		);
+	}
+
+	if (!router.query.item && !allowMoreJob(parseInt(router.query.teamId as string))) {
+		return (
+			<div className="flex flex-col items-center gap-4">
+				<p>You have reached your jobs limit</p>
+				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+					back to your teams list
+				</ButtonBase>
+			</div>
+		);
+	}
+
 	return (
 		<Form onSubmit={handleSubmit}>
 			<FormSection title="title">
@@ -129,7 +195,8 @@ export default function Jobs() {
 			<FormSection title="location">
 				<Select
 					selectId="profileProvinces"
-					options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
+					options={provinceMapper()}
+					preSelect={{ label: selectedProvince?.title as string, value: selectedProvince?.id as number }}
 					onChange={onSelectProvince}
 				/>
 			</FormSection>

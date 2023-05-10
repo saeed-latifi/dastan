@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { useTeam } from "@hooks/useTeam";
 import { iTeamCreate, zTeamContact, zTeamCreate } from "@models/iTeam";
+import DateFormatter from "@components/dateFormatter";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -38,7 +40,7 @@ export default function ModifyTeam() {
 
 	useEffect(() => {
 		if (router.isReady) {
-			const item = teamsInfo?.filter((item) => item.id === parseInt(router.query.item as string))[0];
+			const item = teamsInfo?.find((item) => item.id === parseInt(router.query.item as string));
 			setTeam(item);
 			if (item?.contactMethods && Array.isArray(item.contactMethods)) setContactMethods(item.contactMethods);
 		}
@@ -46,9 +48,9 @@ export default function ModifyTeam() {
 
 	async function onSubmit(data: iTeamCreate) {
 		if (team) {
-			const res = await onUpdateTeam({ ...data, id: team.id, contactMethods });
+			await onUpdateTeam({ ...data, id: team.id, contactMethods });
 		} else {
-			const res = await onAddTeam({ ...data, userId: userInfo.id, contactMethods });
+			await onAddTeam({ ...data, userId: userInfo.id, contactMethods });
 		}
 	}
 
@@ -92,11 +94,6 @@ export default function ModifyTeam() {
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			{team && (
-				<FormSection title="jobs">
-					<ButtonBase type="button">open a new job</ButtonBase>
-				</FormSection>
-			)}
-			{team && (
 				<FormSection title="team logo">
 					<TeamLogo id={team.id} logoType={logoImageTypes.full} />
 					<ButtonBase type="button" onClick={() => router.push(`/team/logo?item=${team.id}`)}>
@@ -130,6 +127,20 @@ export default function ModifyTeam() {
 			<FormSection title={team ? "update" : "create"}>
 				<ButtonBase>{team ? "update info" : "create new team"}</ButtonBase>
 			</FormSection>
+			{team && (
+				<FormSection title="jobs">
+					<ButtonBase type="button" onClick={() => router.push(`/job/${team.id}`)}>
+						open a new job
+					</ButtonBase>
+					{Array.isArray(team.Jobs) &&
+						team.Jobs.map((job: any, index: number) => (
+							<div key={index} className="flex items-center justify-between gap-2 py-2">
+								<Link href={`/job/${team.id}?item=${job.id}`}>{job.title}</Link>
+								<DateFormatter date={job.updatedAt} />
+							</div>
+						))}
+				</FormSection>
+			)}
 		</Form>
 	);
 }

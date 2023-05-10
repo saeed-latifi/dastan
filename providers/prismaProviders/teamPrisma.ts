@@ -1,10 +1,30 @@
 import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 
+const jobSelect = {
+	Jobs: {
+		select: {
+			wageType: true,
+			benefits: true,
+			description: true,
+			id: true,
+			province: true,
+			requirements: true,
+			title: true,
+			updatedAt: true,
+			wage: true,
+			teamId: true,
+		},
+	},
+};
+
 export default class TeamPrismaProvider implements iCRUD {
 	async getSome(userId: number) {
 		try {
-			const teams = await prismaProvider.team.findMany({ where: { managerId: userId } });
+			const teams = await prismaProvider.team.findMany({
+				where: { managerId: userId },
+				include: jobSelect,
+			});
 			return teams;
 		} catch (error) {
 			return "ERR";
@@ -12,17 +32,15 @@ export default class TeamPrismaProvider implements iCRUD {
 	}
 
 	async getOne(id: number) {
-		try {
-			const team = await prismaProvider.team.findFirst({ where: { id } });
-			return team;
-		} catch (error) {
-			return "ERR";
-		}
+		throw new Error("Method not implemented.");
 	}
 
 	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }) {
 		try {
-			const team = await prismaProvider.team.create({ data: body });
+			const team = await prismaProvider.team.create({
+				data: body,
+				include: jobSelect,
+			});
 			return team;
 		} catch (error) {
 			return "ERR";
@@ -31,7 +49,7 @@ export default class TeamPrismaProvider implements iCRUD {
 
 	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }) {
 		try {
-			const team = await prismaProvider.team.update({ data: body, where: { id } });
+			const team = await prismaProvider.team.update({ data: body, where: { id }, include: jobSelect });
 			return team;
 		} catch (error) {
 			return "ERR";
