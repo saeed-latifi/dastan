@@ -137,8 +137,8 @@ export default function ModifyTeam() {
 							open a new job
 						</ButtonBase>
 					)}
-					{Array.isArray(team.Jobs) &&
-						team.Jobs.map((job: any, index: number) => (
+					{Array.isArray(team.jobs) &&
+						team.jobs.map((job: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
 								<Link href={`/job/${team.id}?item=${job.id}`}>{job.title}</Link>
 								<DateFormatter date={job.updatedAt} />

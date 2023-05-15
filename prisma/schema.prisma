@@ -15,21 +15,22 @@ datasource db {
 
 //level one
 
-model Province {
+model province {
   id    Int    @id @default(autoincrement()) @db.SmallInt
   title String @db.VarChar(30)
-  user  User[]
-  job   Job[]
+  user  user[]
+  job   job[]
 }
 
-model Category {
-  id    Int    @id @default(autoincrement()) @db.SmallInt
-  title String @db.VarChar(30)
-  user  User[]
+model category {
+  id     Int      @id @default(autoincrement()) @db.SmallInt
+  title  String   @db.VarChar(30)
+  user   user[]
+  course course[]
 }
 
 //level two
-model User {
+model user {
   id              Int        @id @default(autoincrement())
   slug            String     @default(uuid())
   username        String     @unique @db.VarChar(30)
@@ -43,32 +44,34 @@ model User {
   isActive        Boolean    @default(false)
   isDelete        Boolean    @default(false)
   provinceId      Int?       @db.SmallInt
-  province        Province?  @relation(fields: [provinceId], references: [id])
-  interests       Category[]
+  province        province?  @relation(fields: [provinceId], references: [id])
+  interests       category[]
   keyword         keyword[]
-  Team            Team[]
+  Team            team[]
+  course          course[]
 }
 
 model keyword {
   id       Int     @id @default(autoincrement())
   title    String  @unique @db.VarChar(30)
-  isActive Boolean @default(true)
-  userId   Int
-  author   User    @relation(fields: [userId], references: [id])
+  authorId Int
+  author   user    @relation(fields: [authorId], references: [id])
+  courseId Int?    @db.SmallInt
+  course   course? @relation(fields: [courseId], references: [id])
 }
 
 //level three
 
-model Team {
+model team {
   id             Int      @id @default(autoincrement())
   title          String   @unique
   description    String
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now()) @db.Date
   managerId      Int
-  manager        User     @relation(fields: [managerId], references: [id])
+  manager        user     @relation(fields: [managerId], references: [id])
   contactMethods String[]
-  Jobs           Job[]
+  Jobs           job[]
 }
 
 enum WageType {
@@ -77,7 +80,7 @@ enum WageType {
   AGREEMENT
 }
 
-model Job {
+model job {
   id           Int       @id @default(autoincrement())
   title        String
   description  String
@@ -87,32 +90,28 @@ model Job {
   wageType     WageType
   wage         Int?
   provinceId   Int?      @db.SmallInt
-  province     Province? @relation(fields: [provinceId], references: [id])
+  province     province? @relation(fields: [provinceId], references: [id])
   benefits     String[]
   requirements String[]
-  team         Team      @relation(fields: [teamId], references: [id])
+  team         team      @relation(fields: [teamId], references: [id])
   teamId       Int
 }
 
-// model course {
-//   id           Int             @id @default(autoincrement()) @db.SmallInt
-//   title        String          @db.VarChar(30)
-//   description  String
-//   bannerUrl    String
-//   authorId     Int
-//   categoryId   Int             @db.SmallInt
-//   isActive     Boolean         @default(true)
-//   creationDate DateTime        @default(now()) @db.Date
-//   updateDate   DateTime?       @db.Date
-//   price        Int?
-//   author       user            @relation(fields: [authorId], references: [id])
-//   category     category        @relation(fields: [categoryId], references: [id])
-//   keywords     keyword[]
-//   comments     courseComment[]
-//   lessons      lesson[]
-//   userId       Int?
-//   buyers       user[]          @relation(name: "PurchasedCourses")
-// }
+model course {
+  id          Int       @id @default(autoincrement()) @db.SmallInt
+  title       String    @unique @db.VarChar(30)
+  description String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @db.Date
+  updatedAt   DateTime  @updatedAt
+  authorId    Int
+  author      user      @relation(fields: [authorId], references: [id])
+  categoryId  Int       @db.SmallInt
+  category    category  @relation(fields: [categoryId], references: [id])
+  keywords    keyword[]
+  // price       Int?
+  // buyers       user[]          @relation(name: "PurchasedCourses")
+}
 
 // model lesson {
 //   id            Int             @id @default(autoincrement())

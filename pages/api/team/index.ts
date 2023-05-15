@@ -95,7 +95,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			if (manager === null) return res.json(onErrorResponse("this team not exist"));
 			if (manager.managerId !== token.userId) return res.json(onErrorResponse("Error team access denied!"));
 
-			// prisma
+			// unique check
 			const notUnique = await teamPrismaProvider.checkUniqueField({ title, teamId: id });
 			if (notUnique === "ERR") return res.json(onErrorResponse("Error on team ORM"));
 

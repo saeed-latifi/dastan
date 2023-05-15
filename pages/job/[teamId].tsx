@@ -30,7 +30,7 @@ export default function Jobs() {
 		if (router.isReady) {
 			const team = teamsInfo?.find((item) => item.id === parseInt(router.query.teamId as string));
 			if (team) {
-				const item = team.Jobs?.find((item: any) => item.id === parseInt(router.query.item as string));
+				const item = team.jobs?.find((item: any) => item.id === parseInt(router.query.item as string));
 				if (item) {
 					console.log("item :: ", item);
 					setJob(item);

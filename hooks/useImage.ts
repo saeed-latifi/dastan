@@ -53,5 +53,6 @@ export function useImage() {
 		}
 	}
 
-	return { onUpdateProfileImage, onUpdateTeamLogo, forceImageParam };
+	// TODO fix return to number shape
+	return { onUpdateProfileImage, onUpdateTeamLogo, forceImageParam: forceImageParam?.value };
 }

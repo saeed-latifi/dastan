@@ -16,6 +16,7 @@ import { iUserUpdate, zUserUpdate } from "@models/iUser";
 import { useProvince } from "@hooks/useProvince";
 import { useCategory } from "@hooks/useCategory";
 import FormSection from "@components/forms/form-section";
+import { staticClientURL } from "statics/url";
 
 export default function Profile() {
 	const router = useRouter();
@@ -143,6 +144,12 @@ export default function Profile() {
 				<div className="w-full flex flex-col gap-1">
 					<ButtonBase type="button" onClick={() => router.push("/team")}>
 						your teams
+					</ButtonBase>
+				</div>
+
+				<div className="w-full flex flex-col gap-1">
+					<ButtonBase type="button" onClick={() => router.push(staticClientURL.panel.course.all)}>
+						your courses
 					</ButtonBase>
 				</div>
 			</div>

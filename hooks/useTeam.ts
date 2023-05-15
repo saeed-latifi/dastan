@@ -80,8 +80,8 @@ export function useTeam() {
 							draft?.forEach((team) => {
 								if (team.id === result.teamId) {
 									itemId = result.teamId;
-									if (Array.isArray(team.Jobs)) team.Jobs.push(result);
-									else team.Jobs = [result];
+									if (Array.isArray(team.jobs)) team.jobs.push(result);
+									else team.jobs = [result];
 								}
 							});
 						});
@@ -104,11 +104,11 @@ export function useTeam() {
 						const mutated = produce(baseState, (draft) => {
 							draft?.forEach((team) => {
 								if (team.id === result.teamId) {
-									if (Array.isArray(team.Jobs)) {
-										team.Jobs.forEach((job: any, index: number) => {
+									if (Array.isArray(team.jobs)) {
+										team.jobs.forEach((job: any, index: number) => {
 											if (job.id === result.id) {
 												itemId = result.teamId;
-												team.Jobs[index] = { ...result };
+												team.jobs[index] = { ...result };
 											}
 										});
 									}
