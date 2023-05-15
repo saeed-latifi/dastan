@@ -27,7 +27,7 @@ export default function ModifyTeam() {
 	const [team, setTeam] = useState<any>();
 	const router = useRouter();
 
-	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam } = useTeam();
+	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam, allowMoreJob } = useTeam();
 
 	const {
 		register,
@@ -129,9 +129,11 @@ export default function ModifyTeam() {
 			</FormSection>
 			{team && (
 				<FormSection title="jobs">
-					<ButtonBase type="button" onClick={() => router.push(`/job/${team.id}`)}>
-						open a new job
-					</ButtonBase>
+					{allowMoreJob(team.id) && (
+						<ButtonBase type="button" onClick={() => router.push(`/job/${team.id}`)}>
+							open a new job
+						</ButtonBase>
+					)}
 					{Array.isArray(team.Jobs) &&
 						team.Jobs.map((job: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">

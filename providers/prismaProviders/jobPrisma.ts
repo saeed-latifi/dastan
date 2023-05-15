@@ -2,6 +2,40 @@ import { iCRUD } from "@models/iCRUD";
 import { WageType } from "@prisma/client";
 import prismaProvider from "@providers/prismaProvider";
 
+const jobSelectedData = {
+	benefits: true,
+	description: true,
+	id: true,
+	province: true,
+	requirements: true,
+	teamId: true,
+	title: true,
+	updatedAt: true,
+	wage: true,
+	wageType: true,
+};
+
+type createBodyType = {
+	teamId: number;
+	description: string;
+	title: string;
+	wageType: WageType;
+	benefits?: string[];
+	provinceId?: number;
+	requirements?: string[];
+	wage?: number;
+};
+
+type updateBodyType = {
+	description?: string;
+	title?: string;
+	wageType?: WageType;
+	benefits?: string[];
+	provinceId?: number;
+	requirements?: string[];
+	wage?: number;
+};
+
 export default class JobPrismaProvider implements iCRUD {
 	getSome(body: any) {
 		throw new Error("Method not implemented.");
@@ -15,7 +49,7 @@ export default class JobPrismaProvider implements iCRUD {
 
 	async create(body: createBodyType) {
 		try {
-			const job = await prismaProvider.job.create({ data: body });
+			const job = await prismaProvider.job.create({ data: body, select: jobSelectedData });
 			return job;
 		} catch (error) {
 			return "ERR";
@@ -24,7 +58,7 @@ export default class JobPrismaProvider implements iCRUD {
 
 	async update(id: number, body: updateBodyType) {
 		try {
-			const job = await prismaProvider.job.update({ where: { id }, data: body });
+			const job = await prismaProvider.job.update({ where: { id }, data: body, select: jobSelectedData });
 			return job;
 		} catch (error) {
 			return "ERR";
@@ -54,24 +88,3 @@ export default class JobPrismaProvider implements iCRUD {
 		}
 	}
 }
-
-type createBodyType = {
-	teamId: number;
-	description: string;
-	title: string;
-	wageType: WageType;
-	benefits?: string[];
-	provinceId?: number;
-	requirements?: string[];
-	wage?: number;
-};
-
-type updateBodyType = {
-	description?: string;
-	title?: string;
-	wageType?: WageType;
-	benefits?: string[];
-	provinceId?: number;
-	requirements?: string[];
-	wage?: number;
-};

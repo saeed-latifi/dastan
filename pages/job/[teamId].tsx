@@ -127,8 +127,6 @@ export default function Jobs() {
 		setBenefits(newArr);
 	};
 
-	// function handleOnChange({ key, value }: { key: string; value: string }) {}
-
 	function provinceMapper() {
 		const options = [{ value: 0, label: "remote" }];
 		if (provinces) {
@@ -213,7 +211,7 @@ export default function Jobs() {
 			</FormSection>
 
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
-				add job
+				{job ? "update" : "create"}
 			</ButtonBase>
 		</Form>
 	);
