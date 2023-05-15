@@ -1,6 +1,7 @@
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
+import FormSection from "@components/forms/form-section";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { zUserEmail, iUserEmail } from "@models/iUser";
@@ -17,11 +18,13 @@ export default function ResendActivation() {
 
 	return (
 		<Form onSubmit={handleSubmit(onResendActivationEmail)}>
-			<FormInput labelText="email" warnings={errors.email?.message} register={register("email")} required />
+			<FormSection title="active email">
+				<FormInput labelText="email" warnings={errors.email?.message} register={register("email")} required />
 
-			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
-				resend activation email
-			</ButtonBase>
+				<ButtonBase Variety={BaseButtonVariety.form} type="submit">
+					resend activation email
+				</ButtonBase>
+			</FormSection>
 		</Form>
 	);
 }

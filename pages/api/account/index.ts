@@ -52,10 +52,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 				return res.json(onErrorResponse(uniqueErrors));
 			}
 
-			// TODO
 			// email
-			// const emailRes = await authEmailSender({ email: validateRegister.data.email });
-			// if (!emailRes) return res.json(onErrorResponse("error on sending email. please try again"));
+			const emailRes = await authEmailSender({ email: validateRegister.data.email });
+			if (!emailRes) return res.json(onErrorResponse("error on sending email. please try again"));
 
 			// prisma
 			delete validateRegister.data.confirm;

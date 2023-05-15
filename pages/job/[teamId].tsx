@@ -18,6 +18,7 @@ import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
 import { useTeam } from "@hooks/useTeam";
 import LoaderSpinner from "@components/common/loader-spinner";
+import Navigation from "@components/navigation";
 
 export default function Jobs() {
 	const router = useRouter();
@@ -55,11 +56,18 @@ export default function Jobs() {
 	const [benefits, setBenefits] = useState<string[]>([]);
 	const [wageType, setWageType] = useState<WageType>("FIXED");
 	const [wage, setWage] = useState(0);
-	const [selectedProvince, setSelectedProvince] = useState<iProvince>({ id: 0, title: "remote" });
+	const [selectedProvince, setSelectedProvince] = useState<iProvince>({ id: -1, title: "remote" });
 
 	const [errors, setErrors] = useState<errorType>();
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+		function provinceHandler() {
+			if (selectedProvince) {
+				if (selectedProvince.id > 0) return selectedProvince.id;
+				return null;
+			}
+			return undefined;
+		}
 		event.preventDefault();
 		if (router.query.teamId) {
 			const body = {
@@ -69,7 +77,6 @@ export default function Jobs() {
 				requirements,
 				benefits,
 				wage,
-				provinceId: selectedProvince && selectedProvince.id > 0 ? selectedProvince.id : undefined,
 				teamId: parseInt(router.query.teamId as string),
 			};
 
@@ -77,6 +84,10 @@ export default function Jobs() {
 			const validJob = zJobCreate.safeParse(purged);
 			if (validJob.success) {
 				setErrors({});
+
+				// for remote jobs
+				validJob.data.provinceId = provinceHandler();
+
 				if (job) {
 					await onUpdateJob({ ...validJob.data, id: parseInt(router.query.item as string) });
 				} else {
@@ -159,17 +170,15 @@ export default function Jobs() {
 			</div>
 		);
 	}
-
 	return (
 		<Form onSubmit={handleSubmit}>
+			<Navigation label="" path={`/team/modify?item=${router.query.teamId}`} />
 			<FormSection title="title">
 				<FormInput value={title} onChange={(e) => setTitle(e.target.value)} warnings={errors?.title} />
 			</FormSection>
-
 			<FormSection title="description">
 				<TextArea value={description} onChange={(e) => setDescription(e.target.value)} warnings={errors?.description} />
 			</FormSection>
-
 			<FormSection title="requirements">
 				<TextArea value={requirement} onChange={(e) => setRequirement(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addRequirement}>
@@ -179,7 +188,6 @@ export default function Jobs() {
 					<FormItemRow key={index} index={index} title={title} onClick={removeRequirement} />
 				))}
 			</FormSection>
-
 			<FormSection title="benefits">
 				<TextArea value={benefit} onChange={(e) => setBenefit(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addBenefits}>
@@ -189,7 +197,6 @@ export default function Jobs() {
 					<FormItemRow key={index} index={index} title={title} onClick={removeBenefits} />
 				))}
 			</FormSection>
-
 			<FormSection title="location">
 				<Select
 					selectId="profileProvinces"
@@ -198,7 +205,6 @@ export default function Jobs() {
 					onChange={onSelectProvince}
 				/>
 			</FormSection>
-
 			<FormSection title="wage">
 				<div className="flex w-full items-center justify-around text-gray-600">
 					<FormRadio label="FIXED" value={WageType.FIXED} onChange={setWageType} selected={wageType} />
@@ -209,7 +215,6 @@ export default function Jobs() {
 					<FormInput type="number" value={wage} onChange={(e) => setWage(parseInt(e.target.value))}></FormInput>
 				)}
 			</FormSection>
-
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
 				{job ? "update" : "create"}
 			</ButtonBase>

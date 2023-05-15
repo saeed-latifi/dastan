@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "@components/forms/form-input";
 import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
+import FormSection from "@components/forms/form-section";
 
 export default function Login() {
 	const { onLogin } = useAccount();
@@ -16,8 +17,8 @@ export default function Login() {
 	} = useForm<iUserLogin>({ resolver: zodResolver(zUserLogin) });
 
 	return (
-		<div className="flex flex-col gap-4 p-2 items-center">
-			<Form onSubmit={handleSubmit(onLogin)}>
+		<Form onSubmit={handleSubmit(onLogin)}>
+			<FormSection title="login">
 				<FormInput labelText="email" type="email" warnings={errors.email?.message} register={register("email")} required />
 
 				<FormInput
@@ -31,8 +32,7 @@ export default function Login() {
 				<ButtonBase Variety={BaseButtonVariety.form} type="submit">
 					log in
 				</ButtonBase>
-			</Form>
-
+			</FormSection>
 			<Link className="link bold" href="/sign_up">
 				<p>create your account</p>
 			</Link>
@@ -42,6 +42,6 @@ export default function Login() {
 			<Link className="link bold" href="/resend-activation">
 				<p>resend Activation email</p>
 			</Link>
-		</div>
+		</Form>
 	);
 }

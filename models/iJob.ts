@@ -12,7 +12,7 @@ export const zJobTerm = z.string().min(5, "so short! minimum 5 character").max(2
 export const zRequirements = z.array(zJobTerm).max(5, "no more than 5 term").optional();
 export const zBenefits = z.array(zJobTerm).max(5, "no more than 5 term").optional();
 const wage = z.number().optional();
-const provinceId = z.number().optional();
+const provinceId = z.number().nullish();
 
 // read only
 const isActive = z.boolean();

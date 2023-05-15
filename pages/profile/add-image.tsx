@@ -2,6 +2,7 @@
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
+import Navigation from "@components/navigation";
 import { useAccount } from "@hooks/useAccount";
 import { useImage } from "@hooks/useImage";
 import base64ToBlob from "@utilities/base64ToBlob";
@@ -57,6 +58,8 @@ export default function ProfileImageCropper() {
 
 	return (
 		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>
+			<Navigation label="" path="/profile" />
+
 			<AvatarEditor
 				className="w-full aspect-square flex relative  bg-white bg-theme-profile border border-theme-border rounded-theme-border overflow-hidden"
 				image={file}

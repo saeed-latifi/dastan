@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import Navigation from "@components/navigation";
 
 export default function ModifyTeam() {
 	const { userInfo, checkAccessRedirect } = useAccount();
@@ -93,6 +94,8 @@ export default function ModifyTeam() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
+			<Navigation label="" path="/team" />
+
 			{team && (
 				<FormSection title="team logo">
 					<TeamLogo id={team.id} logoType={logoImageTypes.full} />

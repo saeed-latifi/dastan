@@ -1,6 +1,8 @@
 import ButtonBase from "@components/common/base-button";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
+import FormSection from "@components/forms/form-section";
+import Navigation from "@components/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { iPhone, zPhone } from "@models/iUser";
@@ -19,14 +21,18 @@ export default function AddPhone() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSendOTP)}>
-			<FormInput
-				labelText="your phone number"
-				warnings={errors.phone?.message}
-				register={register("phone", { setValueAs: (v) => (v === "" ? undefined : v) })}
-				required
-			/>
+			<Navigation label="" path="/profile" />
 
-			<ButtonBase> add phone number</ButtonBase>
+			<FormSection title="add phone">
+				<FormInput
+					labelText="your phone number"
+					warnings={errors.phone?.message}
+					register={register("phone", { setValueAs: (v) => (v === "" ? undefined : v) })}
+					required
+				/>
+
+				<ButtonBase> add phone number</ButtonBase>
+			</FormSection>
 		</Form>
 	);
 }

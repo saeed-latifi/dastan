@@ -21,7 +21,7 @@ type createBodyType = {
 	title: string;
 	wageType: WageType;
 	benefits?: string[];
-	provinceId?: number;
+	provinceId?: number | null;
 	requirements?: string[];
 	wage?: number;
 };
@@ -31,7 +31,7 @@ type updateBodyType = {
 	title?: string;
 	wageType?: WageType;
 	benefits?: string[];
-	provinceId?: number;
+	provinceId?: number | null;
 	requirements?: string[];
 	wage?: number;
 };

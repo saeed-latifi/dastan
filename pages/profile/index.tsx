@@ -15,6 +15,7 @@ import { iCategory } from "@models/iCategory";
 import { iUserUpdate, zUserUpdate } from "@models/iUser";
 import { useProvince } from "@hooks/useProvince";
 import { useCategory } from "@hooks/useCategory";
+import FormSection from "@components/forms/form-section";
 
 export default function Profile() {
 	const router = useRouter();
@@ -60,50 +61,59 @@ export default function Profile() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<FormInput
-				labelText="firstName"
-				warnings={errors.firstName?.message}
-				register={register("firstName", { setValueAs: (v) => (v === "" ? undefined : v) })}
-			/>
-			<FormInput
-				labelText="lastName"
-				warnings={errors.lastName?.message}
-				register={register("lastName", { setValueAs: (v) => (v === "" ? undefined : v) })}
-			/>
-			<FormInput
-				labelText="username"
-				warnings={errors.username?.message || error?.username}
-				register={register("username", {
-					setValueAs: (v) => (v === "" ? undefined : v),
-					onChange: () => onErrorPurge("username"),
-				})}
-				required
-			/>
-
-			<div className="flex flex-col w-full gap-1 text-gray-600">
-				<p className="px-2">select your province help for local events </p>
-				<Select
-					selectId="profileProvinces"
-					preSelect={userInfo?.province && { label: userInfo?.province?.title, value: userInfo?.province?.id }}
-					options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
-					onChange={onSelectProvince}
+			<FormSection title="info">
+				<FormInput
+					labelText="firstName"
+					warnings={errors.firstName?.message}
+					register={register("firstName", { setValueAs: (v) => (v === "" ? undefined : v) })}
 				/>
-			</div>
-
-			<div className="flex flex-col w-full gap-1 text-gray-600">
-				<p className="px-2">select your interest filed help for better content </p>
-				<SelectMulti
-					preSelect={
-						userInfo?.interests &&
-						(userInfo.interests as iCategory[]).map((interest) => ({ label: interest.title, value: interest.id }))
-					}
-					options={categories?.map((category) => ({
-						value: category.id,
-						label: category.title,
-					}))}
-					onChange={onChangeInterests}
+				<FormInput
+					labelText="lastName"
+					warnings={errors.lastName?.message}
+					register={register("lastName", { setValueAs: (v) => (v === "" ? undefined : v) })}
 				/>
-			</div>
+				<FormInput
+					labelText="username"
+					warnings={errors.username?.message || error?.username}
+					register={register("username", {
+						setValueAs: (v) => (v === "" ? undefined : v),
+						onChange: () => onErrorPurge("username"),
+					})}
+					required
+				/>
+			</FormSection>
+
+			<FormSection title="location">
+				<div className="flex flex-col w-full gap-1 text-gray-600">
+					<p className="px-2">select your province help for local events </p>
+					<Select
+						selectId="profileProvinces"
+						preSelect={userInfo?.province && { label: userInfo?.province?.title, value: userInfo?.province?.id }}
+						options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
+						onChange={onSelectProvince}
+					/>
+				</div>
+			</FormSection>
+
+			<FormSection title="interested">
+				<div className="flex flex-col w-full gap-1 text-gray-600">
+					<p className="px-2">select your interest filed help for better content </p>
+					<SelectMulti
+						preSelect={
+							userInfo?.interests &&
+							(userInfo.interests as iCategory[]).map((interest) => ({
+								label: interest.title,
+								value: interest.id,
+							}))
+						}
+						options={categories?.map((category) => ({
+							value: category.id,
+							label: category.title,
+						}))}
+						onChange={onChangeInterests}
+					/>
+				</div>
+			</FormSection>
 
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit" style={{ marginTop: "1rem" }}>
 				update
@@ -131,7 +141,6 @@ export default function Profile() {
 					</ButtonBase>
 				</div>
 				<div className="w-full flex flex-col gap-1">
-					{userInfo.phone && <p className="text-gray-500 select-none mx-auto">{userInfo.phone}</p>}
 					<ButtonBase type="button" onClick={() => router.push("/team")}>
 						your teams
 					</ButtonBase>

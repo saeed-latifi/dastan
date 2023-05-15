@@ -17,7 +17,7 @@ export default function ButtonBase({ Variety = BaseButtonVariety.primary, ...pro
 function typeRender(Variety: BaseButtonVariety) {
 	switch (Variety) {
 		case BaseButtonVariety.primary:
-			return "text-white bg-theme-shade  hover:bg-theme-select";
+			return "text-white bg-theme-shade hover:bg-theme-select";
 
 		case BaseButtonVariety.form:
 			return "bg-theme-form text-white hover:bg-theme-select";
