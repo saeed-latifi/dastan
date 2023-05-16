@@ -1,7 +1,7 @@
 import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
 import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
-import webp512Buffer from "@providers/imageGenerators/webp512";
+import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { teamLogoAWS } from "@providers/bucketsAWS/imageAWS";
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
@@ -33,7 +33,7 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			if (manager.managerId !== token.userId) return res.json(onErrorResponse("team err : access denied!"));
 
 			// sharp
-			const buffer = await webp512Buffer({ path: files.image.filepath });
+			const buffer = await webpSquareBuffer({ path: files.image.filepath });
 			const fileName = fields.id + "." + buffer.info.format;
 
 			// aws

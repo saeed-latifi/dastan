@@ -3,6 +3,7 @@ import { responseState } from "@providers/apiResponseHandler";
 import { paramGenerator } from "@utilities/paramGenerator";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
+import { staticClientURL } from "statics/url";
 import useSWR from "swr";
 
 export function useImage() {
@@ -53,6 +54,26 @@ export function useImage() {
 		}
 	}
 
+	async function onUpdateCourseImage({ formData }: { formData: FormData }) {
+		try {
+			const { data } = await HTTPService.post("/course/image", formData);
+			if (data.resState === responseState.ok) {
+				imgParamMutate(paramGenerator, {
+					populateCache(result, _) {
+						return result;
+					},
+					revalidate: false,
+				});
+				router.push(staticClientURL.panel.course.all);
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
+	}
+
 	// TODO fix return to number shape
-	return { onUpdateProfileImage, onUpdateTeamLogo, forceImageParam: forceImageParam?.value };
+	return { onUpdateProfileImage, onUpdateTeamLogo, onUpdateCourseImage, forceImageParam: forceImageParam?.value };
 }

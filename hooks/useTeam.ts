@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import useSWR from "swr";
 import { fetchHandler } from "./useFetch";
 import { useRouter } from "next/router";
-import { jobLimits, teamLimits } from "statics/limits";
+import { jobLimits, teamLimits } from "statics/measures";
 import { produce } from "immer";
 import { iJobCreate, iJobUpdate } from "@models/iJob";
 

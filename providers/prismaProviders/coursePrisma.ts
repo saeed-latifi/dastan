@@ -18,7 +18,7 @@ import prismaProvider from "@providers/prismaProvider";
 // 	},
 // };
 
-const courseReturnFields = { id: true, author: true, category: true, description: true, keywords: true, title: true, updatedAt: true };
+const courseReturnFields = { id: true, category: true, description: true, keywords: true, title: true, updatedAt: true };
 
 export default class CoursePrismaProvider implements iCRUD {
 	async getSome(userId: number) {
@@ -43,6 +43,7 @@ export default class CoursePrismaProvider implements iCRUD {
 		try {
 			const course = await prismaProvider.course.create({
 				data: body,
+				select: courseReturnFields,
 				// include: lessonSelect,
 			});
 			return course;
@@ -57,6 +58,7 @@ export default class CoursePrismaProvider implements iCRUD {
 			const course = await prismaProvider.course.update({
 				data: body,
 				where: { id },
+				select: courseReturnFields,
 				// include: lessonSelect,
 			});
 			return course;

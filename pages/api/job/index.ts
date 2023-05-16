@@ -3,7 +3,7 @@ import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } fro
 import JobPrismaProvider from "@providers/prismaProviders/jobPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { NextApiRequest, NextApiResponse } from "next";
-import { jobLimits } from "statics/limits";
+import { jobLimits } from "statics/measures";
 
 const jobPrismaProvider = new JobPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {

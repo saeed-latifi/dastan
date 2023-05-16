@@ -3,7 +3,7 @@ import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } fro
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { NextApiRequest, NextApiResponse } from "next";
-import { teamLimits } from "statics/limits";
+import { teamLimits } from "statics/measures";
 
 const teamPrismaProvider = new TeamPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {

@@ -9,6 +9,7 @@ import base64ToBlob from "@utilities/base64ToBlob";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
+import { squareImage } from "statics/measures";
 
 export default function ProfileImageCropper() {
 	const { checkAccessRedirect, isLoading } = useAccount();
@@ -20,8 +21,6 @@ export default function ProfileImageCropper() {
 	const [editor, setEditor] = useState<AvatarEditor | null>(null);
 	const [waiter, setWaiter] = useState(false);
 	const [file, setFile] = useState<File | string>("");
-
-	const imageSize = 512;
 
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -65,8 +64,8 @@ export default function ProfileImageCropper() {
 				image={file}
 				ref={(e) => setEditor(e)}
 				scale={scale}
-				width={imageSize}
-				height={imageSize}
+				width={squareImage.width}
+				height={squareImage.height}
 				position={position}
 				backgroundColor="white"
 				onPositionChange={handlePositionChange}

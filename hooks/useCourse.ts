@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { fetchHandler } from "./useFetch";
 import { staticClientURL } from "statics/url";
 import { iCourseUpdate } from "@models/iCourse";
+import { produce } from "immer";
 
 export function useCourse() {
 	const router = useRouter();
@@ -33,16 +34,16 @@ export function useCourse() {
 		fetchHandler({
 			fetcher: () => HTTPService.post("course", body),
 			onOK: (res) => {
-				// coursesMutate(res.data, {
-				// 	populateCache(result, baseState) {
-				// 		const mutated = produce(baseState, (draft) => {
-				// 			if (Array.isArray(draft)) draft.push(result);
-				// 			else draft = [result];
-				// 		});
-				// 		return mutated;
-				// 	},
-				// 	revalidate: false,
-				// });
+				coursesMutate(res.data, {
+					populateCache(result, baseState) {
+						const mutated = produce(baseState, (draft) => {
+							if (Array.isArray(draft)) draft.push(result);
+							else draft = [result];
+						});
+						return mutated;
+					},
+					revalidate: false,
+				});
 				router.push(staticClientURL.panel.course.all);
 			},
 		});
@@ -52,16 +53,17 @@ export function useCourse() {
 		fetchHandler({
 			fetcher: () => HTTPService.put("course", body),
 			onOK: (res) => {
-				// coursesMutate(res.data, {
-				// 	populateCache(result, baseState) {
-				// 		const mutated = produce(baseState, (draft) => {
-				// 			if (Array.isArray(draft)) draft.push(result);
-				// 			else draft = [result];
-				// 		});
-				// 		return mutated;
-				// 	},
-				// 	revalidate: false,
-				// });
+				coursesMutate(res.data, {
+					populateCache(result, baseState) {
+						const mutated = produce(baseState, (draft) => {
+							draft?.forEach((item, index) => {
+								if (item.id === result.id) draft[index] = { ...result };
+							});
+						});
+						return mutated;
+					},
+					revalidate: false,
+				});
 				router.push(staticClientURL.panel.course.all);
 			},
 		});

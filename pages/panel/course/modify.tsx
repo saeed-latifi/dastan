@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
+import ButtonBase from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
@@ -19,6 +19,7 @@ import { useCategory } from "@hooks/useCategory";
 import Select from "@components/common/select";
 import { selectOptionType } from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
+import CourseImage from "@components/images/course-image";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -79,14 +80,14 @@ export default function ModifyCourse() {
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<Navigation label="" path={staticClientURL.panel.course.all} />
 
-			{/* {course && (
-				<FormSection title="course logo">
-					<courseLogo id={course.id} logoType={logoImageTypes.full} />
-					<ButtonBase type="button" onClick={() => router.push(`/course/logo?item=${course.id}`)}>
-						update your course logo
+			{course && (
+				<FormSection title="course image">
+					<CourseImage id={course.id} />
+					<ButtonBase type="button" onClick={() => router.push(staticClientURL.panel.course.image({ courseId: course.id }))}>
+						update your course image
 					</ButtonBase>
 				</FormSection>
-			)} */}
+			)}
 			<FormSection title="base info">
 				<FormInput
 					labelText="title"

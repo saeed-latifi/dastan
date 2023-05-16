@@ -1,46 +1,43 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
+import LoaderSpinner from "@components/common/loader-spinner";
+import Form from "@components/forms/form";
+import { useAccount } from "@hooks/useAccount";
+import { useImage } from "@hooks/useImage";
 import base64ToBlob from "@utilities/base64ToBlob";
-import { ChangeEvent, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
-import { squareImage } from "statics/measures";
+import { landscapeImage } from "statics/measures";
 
-type props = {
-	preLoadURL?: string;
-	onSubmit?: (blob: any) => void;
-	width?: number;
-	height?: number;
-	label?: string;
-};
-export default function ImageCropper({ preLoadURL, onSubmit, width = squareImage.width, height = squareImage.height, label }: props) {
-	const [position, sePosition] = useState<any>({ x: 0.5, y: 0.5 });
+export default function TeamLogoCropper() {
+	const { checkAccessRedirect, isLoading } = useAccount();
+	const { onUpdateCourseImage } = useImage();
+	checkAccessRedirect();
+
+	const router = useRouter();
+
+	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });
 	const [scale, setScale] = useState<number>(1.0);
 	const [editor, setEditor] = useState<AvatarEditor | null>(null);
+	const [waiter, setWaiter] = useState(false);
 	const [file, setFile] = useState<File | string>("");
 
-	useEffect(() => {
-		preLoadURL && setFile(preLoadURL);
-		return () => {
-			sePosition(null);
-			setScale(0);
-			setEditor(null);
-			setFile("");
-		};
-	}, []);
+	async function onSubmit(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
 
-	async function onHandleSubmit() {
 		try {
 			if (!editor || file === "") return toast.warn("please select an image");
+			setWaiter(true);
 			const dataUrl = editor.getImageScaledToCanvas().toDataURL();
 			const blob = await base64ToBlob(dataUrl);
-			onSubmit && onSubmit(blob);
-			return blob;
-		} catch (error) {
-			console.log(error);
-
-			toast.warn("bad image. try again!");
-		}
+			const form = new FormData();
+			form.append("image", blob);
+			form.append("id", router.query.item as string);
+			await onUpdateCourseImage({ formData: form });
+			setWaiter(false);
+		} catch (error) {}
 	}
 
 	function handleScale(event: ChangeEvent<HTMLInputElement>) {
@@ -59,15 +56,17 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = squareImage
 		}
 	};
 
+	if (isLoading) return <LoaderSpinner />;
+
 	return (
-		<div>
+		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>
 			<AvatarEditor
-				className="w-full aspect-square flex relative  bg-white border border-slate-600 rounded-xl overflow-hidden"
+				className="w-full aspect-video flex relative  bg-white bg-theme-team-logo border border-theme-border rounded-theme-border overflow-hidden"
 				image={file}
 				ref={(e) => setEditor(e)}
 				scale={scale}
-				width={width}
-				height={height}
+				width={landscapeImage.width}
+				height={landscapeImage.height}
 				position={position}
 				backgroundColor="white"
 				onPositionChange={handlePositionChange}
@@ -91,25 +90,23 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = squareImage
 				/>
 
 				<ButtonBase type="button" onClick={() => document.getElementById("fileSelect")?.click()}>
-					select pic
+					select
 				</ButtonBase>
 
-				<ButtonBase onClick={onHandleSubmit} type="button" Variety={BaseButtonVariety.form}>
-					{label ? label : "submit"}
+				<ButtonBase type="submit" Variety={BaseButtonVariety.form}>
+					{waiter ? "..." : "save"}
 				</ButtonBase>
 			</div>
-			<button></button>
 			<input
 				id="fileSelect"
 				name="newImage"
 				type="file"
 				accept="image/*"
-				crossOrigin="anonymous"
 				onChange={(e) => {
 					onAddImage(e);
 				}}
 				hidden
 			/>
-		</div>
+		</Form>
 	);
 }

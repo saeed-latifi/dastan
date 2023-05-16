@@ -1,7 +1,7 @@
 import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
 import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
-import webp512Buffer from "@providers/imageGenerators/webp512";
+import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
 
@@ -23,7 +23,7 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 			const slug = token.slug;
 			const { files } = await formParser(req);
 			if (files.image) {
-				const buffer = await webp512Buffer({ path: files.image.filepath });
+				const buffer = await webpSquareBuffer({ path: files.image.filepath });
 				const fileName = slug + "." + buffer.info.format;
 
 				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });

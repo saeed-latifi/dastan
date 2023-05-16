@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
+import { squareImage } from "statics/measures";
 
 export default function TeamLogoCropper() {
 	const { checkAccessRedirect, isLoading, userInfo } = useAccount();
@@ -22,8 +23,6 @@ export default function TeamLogoCropper() {
 	const [editor, setEditor] = useState<AvatarEditor | null>(null);
 	const [waiter, setWaiter] = useState(false);
 	const [file, setFile] = useState<File | string>("");
-
-	const imageSize = 512;
 
 	async function onSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -66,8 +65,8 @@ export default function TeamLogoCropper() {
 				image={file}
 				ref={(e) => setEditor(e)}
 				scale={scale}
-				width={imageSize}
-				height={imageSize}
+				width={squareImage.width}
+				height={squareImage.height}
 				position={position}
 				backgroundColor="white"
 				onPositionChange={handlePositionChange}
