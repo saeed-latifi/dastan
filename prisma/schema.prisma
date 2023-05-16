@@ -13,8 +13,7 @@ datasource db {
   url      = env("LOCAL_DATABASE_URL")
 }
 
-//level one
-
+// location
 model province {
   id    Int    @id @default(autoincrement()) @db.SmallInt
   title String @db.VarChar(30)
@@ -22,45 +21,56 @@ model province {
   job   job[]
 }
 
+// category
 model category {
   id     Int      @id @default(autoincrement()) @db.SmallInt
   title  String   @db.VarChar(30)
   user   user[]
   course course[]
+  post   post[]
 }
 
-//level two
+//user
 model user {
-  id              Int        @id @default(autoincrement())
-  slug            String     @default(uuid())
-  username        String     @unique @db.VarChar(30)
-  email           String     @unique @db.VarChar(70)
-  password        String     @db.VarChar(30)
-  firstName       String?    @db.VarChar(30)
-  lastName        String?    @db.VarChar(30)
-  phone           String?    @unique @db.VarChar(11)
-  permissionLevel Int        @default(0) @db.SmallInt
-  createdAt       DateTime   @default(now()) @db.Date
-  isActive        Boolean    @default(false)
-  isDelete        Boolean    @default(false)
-  provinceId      Int?       @db.SmallInt
-  province        province?  @relation(fields: [provinceId], references: [id])
+  id              Int            @id @default(autoincrement())
+  slug            String         @default(uuid())
+  username        String         @unique @db.VarChar(30)
+  email           String         @unique @db.VarChar(70)
+  password        String         @db.VarChar(30)
+  firstName       String?        @db.VarChar(30)
+  lastName        String?        @db.VarChar(30)
+  phone           String?        @unique @db.VarChar(11)
+  permissionLevel Int            @default(0) @db.SmallInt
+  createdAt       DateTime       @default(now()) @db.Date
+  isActive        Boolean        @default(false)
+  isDelete        Boolean        @default(false)
+  provinceId      Int?           @db.SmallInt
+  province        province?      @relation(fields: [provinceId], references: [id])
   interests       category[]
   keyword         keyword[]
   Team            team[]
   course          course[]
+  comment         comment[]
+  report          report[]
+  adminMessage    adminMessage[]
+  post            post[]
+  like            like[]
 }
 
-model keyword {
-  id       Int     @id @default(autoincrement())
-  title    String  @unique @db.VarChar(30)
-  authorId Int
-  author   user    @relation(fields: [authorId], references: [id])
-  courseId Int?    @db.SmallInt
-  course   course? @relation(fields: [courseId], references: [id])
+// TODO implement
+model adminMessage {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(30)
+  description String
+  isActive    Boolean  @default(true)
+  isReaded    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
+  userId      Int
+  user        user     @relation(fields: [userId], references: [id])
 }
 
-//level three
+//team
 
 model team {
   id             Int      @id @default(autoincrement())
@@ -97,108 +107,151 @@ model job {
   teamId       Int
 }
 
+// contents
+// TODO
+
+model keyword {
+  id       Int       @id @default(autoincrement())
+  title    String    @unique @db.VarChar(30)
+  authorId Int
+  author   user      @relation(fields: [authorId], references: [id])
+  content  content[]
+}
+
+model content {
+  id      String    @id @default(uuid())
+  course  course?
+  lesson  lesson?
+  post    post?
+  comment comment[]
+  report  report[]
+  like    like[]
+  keyword keyword[]
+}
+
 model course {
-  id          Int       @id @default(autoincrement()) @db.SmallInt
-  title       String    @unique @db.VarChar(30)
+  id          Int      @id @default(autoincrement())
+  title       String   @unique @db.VarChar(30)
   description String
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @db.Date
-  updatedAt   DateTime  @updatedAt
-  authorId    Int
-  author      user      @relation(fields: [authorId], references: [id])
-  categoryId  Int       @db.SmallInt
-  category    category  @relation(fields: [categoryId], references: [id])
-  keywords    keyword[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
+
+  // lesson
+  lesson lesson[]
+
+  // author
+  authorId Int
+  author   user @relation(fields: [authorId], references: [id])
+
+  // category
+  categoryId Int      @db.SmallInt
+  category   category @relation(fields: [categoryId], references: [id])
+
+  // content
+  contentId String  @unique
+  content   content @relation(fields: [contentId], references: [id])
+
+  // TODO shop info
   // price       Int?
   // buyers       user[]          @relation(name: "PurchasedCourses")
 }
 
-// model lesson {
-//   id            Int             @id @default(autoincrement())
-//   slug          String          @default(uuid())
-//   title         String          @db.VarChar(30)
-//   description   String
-//   bannerUrl     String
-//   videoUrl      String
-//   courseId      Int
-//   isActive      Boolean         @default(true)
-//   creationDate  DateTime        @default(now()) @db.Date
-//   updateDate    DateTime?       @db.Date
-//   keywords      keyword[]
-//   lessonComment lessonComment[]
-//   course        course          @relation(fields: [courseId], references: [id])
-// }
+model lesson {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(30)
+  description String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
+  videoUrl    String
+  attached    String[]
 
-// model post {
-//   id           Int           @id @default(autoincrement())
-//   title        String        @db.VarChar(30)
-//   description  String
-//   bannerUrl    String
-//   authorId     Int
-//   categoryId   Int           @db.SmallInt
-//   isActive     Boolean       @default(true)
-//   creationDate DateTime      @default(now()) @db.Date
-//   updateDate   DateTime?     @db.Date
-//   author       user          @relation(fields: [authorId], references: [id])
-//   category     category      @relation(fields: [categoryId], references: [id])
-//   keywords     keyword[]
-//   comments     postComment[]
-//   reports      postReport[]
-// }
+  // course
+  courseId Int
+  course   course @relation(fields: [courseId], references: [id])
 
-// model adminMessage {
-//   id           Int      @id @default(autoincrement())
-//   title        String   @db.VarChar(30)
-//   description  String
-//   userId       Int
-//   isActive     Boolean  @default(true)
-//   isReaded     Boolean  @default(false)
-//   creationDate DateTime @default(now()) @db.Date
-//   user         user?    @relation(fields: [userId], references: [id])
-// }
+  // content
+  contentId String  @unique
+  content   content @relation(fields: [contentId], references: [id])
+}
 
-// //level four
+model paragraph {
+  id      Int    @id @default(autoincrement())
+  heading String
+  text    String
 
-// model courseComment {
-//   id           Int      @id @default(autoincrement())
-//   description  String
-//   subjectId    Int      @db.SmallInt
-//   userId       Int
-//   creationDate DateTime @default(now()) @db.Date
-//   course       course   @relation(fields: [subjectId], references: [id])
-//   user         user     @relation(fields: [userId], references: [id])
-//   isActive     Boolean  @default(true)
-// }
+  // post
+  postId Int?
+  post   post? @relation(fields: [postId], references: [id])
+}
 
-// model lessonComment {
-//   id           Int      @id @default(autoincrement())
-//   description  String
-//   subjectId    Int
-//   userId       Int
-//   creationDate DateTime @default(now()) @db.Date
-//   lesson       lesson   @relation(fields: [subjectId], references: [id])
-//   user         user     @relation(fields: [userId], references: [id])
-//   isActive     Boolean  @default(true)
-// }
+model post {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique @db.VarChar(30)
+  description String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
 
-// model postComment {
-//   id           Int      @id @default(autoincrement())
-//   description  String
-//   subjectId    Int
-//   userId       Int
-//   creationDate DateTime @default(now()) @db.Date
-//   post         post     @relation(fields: [subjectId], references: [id])
-//   user         user     @relation(fields: [userId], references: [id])
-//   isActive     Boolean  @default(true)
-// }
+  // paragraphs
+  paragraph paragraph[]
 
-// model postReport {
-//   id           Int      @id @default(autoincrement())
-//   description  String
-//   subjectId    Int
-//   userId       Int
-//   creationDate DateTime @default(now()) @db.Date
-//   post         post     @relation(fields: [subjectId], references: [id])
-//   user         user     @relation(fields: [userId], references: [id])
-//   isActive     Boolean  @default(true)
-// }
+  // author
+  authorId Int
+  author   user @relation(fields: [authorId], references: [id])
+
+  // category
+  categoryId Int      @db.SmallInt
+  category   category @relation(fields: [categoryId], references: [id])
+
+  // content
+  contentId String  @unique
+  content   content @relation(fields: [contentId], references: [id])
+}
+
+// content act
+model comment {
+  id          Int      @id @default(autoincrement())
+  description String
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  contentId String
+  content   content @relation(fields: [contentId], references: [id])
+
+  authorId Int
+  author   user @relation(fields: [authorId], references: [id])
+}
+
+model report {
+  id          Int      @id @default(autoincrement())
+  description String
+  createdAt   DateTime @default(now()) @db.Date
+  isActive    Boolean  @default(true)
+
+  contentId String
+  content   content @relation(fields: [contentId], references: [id])
+
+  authorId Int
+  author   user @relation(fields: [authorId], references: [id])
+}
+
+enum LikeType {
+  NONE
+  LIKE
+  DISLIKE
+}
+
+model like {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt
+  state     LikeType
+
+  contentId String
+  content   content @relation(fields: [contentId], references: [id])
+
+  authorId Int
+  author   user @relation(fields: [authorId], references: [id])
+}

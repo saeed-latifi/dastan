@@ -81,18 +81,16 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zCourseUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { id, title, description, categoryId, keywords } = validateData.data;
+			const { contentId, title, description, categoryId, keywords } = validateData.data;
 
 			// prisma check course author
-			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: id });
+			const author = await coursePrismaProvider.checkCourseAuthor({ contentId });
 			if (author === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
 
 			// unique check
-			const notUnique = await coursePrismaProvider.checkUniqueField({ title, courseId: id });
-			console.log({ base: { title, courseId: id }, unique: notUnique });
-
+			const notUnique = await coursePrismaProvider.checkUniqueField({ title, contentId });
 			if (notUnique === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
@@ -101,8 +99,14 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			}
 
 			// prisma
-			// TODO keywords
-			const course = await coursePrismaProvider.update(id, { title, description, categoryId });
+			const course = await coursePrismaProvider.update({
+				id: contentId,
+				title,
+				description,
+				categoryId,
+				keywords,
+				authorId: token.userId,
+			});
 			if (course === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 
 			// api

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zKeyword } from "./iKeyword";
+import { zKeyword, zKeywords } from "./iKeyword";
 
 const id = z.number();
 const authorId = z.number();
@@ -8,11 +8,13 @@ const description = z.string().min(5, "more than 5 character");
 const categoryId = z.number();
 
 // optional
-const keywords = z.array(zKeyword).max(5, "no more than 5 term").optional();
 
 // schema
-export const zCourseCreate = z.object({ title, description, categoryId, keywords });
-export const zCourseUpdate = z.object({ title, description, categoryId, keywords }).partial().merge(z.object({ id }));
+export const zCourseCreate = z.object({ title, description, categoryId, keywords: zKeywords });
+export const zCourseUpdate = z
+	.object({ title, description, categoryId, keywords: zKeywords })
+	.partial()
+	.merge(z.object({ contentId: z.string() }));
 export const zCourseCreateForm = z.object({ title, description });
 
 // types

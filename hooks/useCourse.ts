@@ -5,7 +5,7 @@ import useSWR from "swr";
 import { useRouter } from "next/router";
 import { fetchHandler } from "./useFetch";
 import { staticClientURL } from "statics/url";
-import { iCourseUpdate } from "@models/iCourse";
+import { iCourseCreate, iCourseUpdate } from "@models/iCourse";
 import { produce } from "immer";
 
 export function useCourse() {
@@ -30,7 +30,7 @@ export function useCourse() {
 		}
 	}
 
-	function onAddCourse(body: { title: string; description: string; categoryId: number }) {
+	function onAddCourse(body: iCourseCreate) {
 		fetchHandler({
 			fetcher: () => HTTPService.post("course", body),
 			onOK: (res) => {

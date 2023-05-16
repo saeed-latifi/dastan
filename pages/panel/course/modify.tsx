@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import ButtonBase from "@components/common/base-button";
+import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
@@ -20,6 +20,8 @@ import Select from "@components/common/select";
 import { selectOptionType } from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
 import CourseImage from "@components/images/course-image";
+import FormItemRow from "@components/forms/form-item-row";
+import { zKeyword, zKeywords } from "@models/iKeyword";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -28,8 +30,11 @@ export default function ModifyCourse() {
 	checkAccessRedirect();
 
 	const [selectedCategory, setSelectedCategory] = useState<iCategory>();
+	const [keyword, setKeyword] = useState<string>("");
+	const [keywords, setKeywords] = useState<string[]>([]);
 
 	const [course, setCourse] = useState<any>();
+
 	const router = useRouter();
 
 	const {
@@ -46,6 +51,9 @@ export default function ModifyCourse() {
 			const item = coursesInfo?.find((item) => item.id === parseInt(router.query.item as string));
 			if (item) {
 				setSelectedCategory(item.category);
+				if (item?.content?.keyword && Array.isArray(item.content.keyword)) {
+					setKeywords(item.content.keyword.map((item: any) => item.title));
+				}
 			}
 			setCourse(item);
 		}
@@ -54,15 +62,30 @@ export default function ModifyCourse() {
 	async function onSubmit(data: iCourseCreateForm) {
 		if (!selectedCategory) return toast.warn("select a category");
 		if (course) {
-			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, id: course.id });
+			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, contentId: course.contentId, keywords });
 		} else {
-			await onAddCourse({ ...data, categoryId: selectedCategory.id });
+			await onAddCourse({ ...data, categoryId: selectedCategory.id, keywords });
 		}
 	}
 
 	function onSelectCategory(option: selectOptionType) {
 		setSelectedCategory({ id: option.value, title: option.label });
 	}
+
+	const addKeyword = () => {
+		const word = zKeyword.safeParse(keyword);
+		if (!word.success) return toast.warn(word.error.issues[0].message);
+		const newArr = [...keywords, keyword];
+		const validate = zKeywords.safeParse(newArr);
+		if (!validate.success) return toast.warn(validate.error.issues[0].message);
+		setKeywords(newArr);
+		setKeyword("");
+	};
+
+	const removeKeyword = (index: number) => {
+		const newArr = keywords.filter((_, i) => index !== i);
+		setKeywords(newArr);
+	};
 
 	if (isLoading || !router.isReady) return <LoaderSpinner />;
 	if (router.query.item && !course) {
@@ -110,6 +133,16 @@ export default function ModifyCourse() {
 					options={categories?.map((category) => ({ value: category.id, label: category.title }))}
 					onChange={onSelectCategory}
 				/>
+			</FormSection>
+
+			<FormSection title="keywords">
+				<FormInput value={keyword} onChange={(e) => setKeyword(e.target.value)} />
+				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addKeyword}>
+					add new keyword
+				</ButtonBase>
+				{keywords.map((title, index) => (
+					<FormItemRow key={index} index={index} title={title} onClick={removeKeyword} />
+				))}
 			</FormSection>
 
 			<FormSection title={course ? "update" : "create"}>
