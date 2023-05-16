@@ -105,8 +105,11 @@ export default function ModifyCourse() {
 
 			{course && (
 				<FormSection title="course image">
-					<CourseImage id={course.id} />
-					<ButtonBase type="button" onClick={() => router.push(staticClientURL.panel.course.image({ courseId: course.id }))}>
+					<CourseImage id={course.contentId} />
+					<ButtonBase
+						type="button"
+						onClick={() => router.push(staticClientURL.panel.course.image({ courseId: course.contentId }))}
+					>
 						update your course image
 					</ButtonBase>
 				</FormSection>

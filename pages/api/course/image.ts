@@ -24,17 +24,17 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			}
 
 			const { files, fields } = await formParser(req);
-			if (!fields.id || !files.image) return res.json(onErrorResponse("incomplete course information"));
+			if (!fields.contentId || !files.image) return res.json(onErrorResponse("incomplete course information"));
 
 			// prisma check course manager
-			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: parseInt(fields.id) });
+			const author = await coursePrismaProvider.checkCourseAuthor({ contentId: fields.contentId });
 			if (author === "ERR") return res.json(onErrorResponse("error on course ORM"));
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.authorId !== token.userId) return res.json(onErrorResponse("course err : access denied!"));
 
 			// sharp
 			const buffer = await webpLandscapeBuffer({ path: files.image.filepath });
-			const fileName = fields.id + "." + buffer.info.format;
+			const fileName = fields.contentId + "." + buffer.info.format;
 
 			// aws
 			const awsRes = await courseImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
