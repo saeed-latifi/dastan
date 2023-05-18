@@ -1,25 +1,19 @@
 import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
+import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
+import { lessonReturnFields } from "./lessonPrisma";
 
-// const lessonSelect = {
-// 	Jobs: {
-// 		select: {
-// 			wageType: true,
-// 			benefits: true,
-// 			description: true,
-// 			id: true,
-// 			province: true,
-// 			requirements: true,
-// 			title: true,
-// 			updatedAt: true,
-// 			wage: true,
-// 			courseId: true,
-// 		},
-// 	},
-// };
-
-const courseReturnFields = { id: true, title: true, description: true, category: true, updatedAt: true, createdAt: true, contentId: true };
-type updateArgsType = { id: string; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
+const courseReturnFields = {
+	id: true,
+	title: true,
+	description: true,
+	category: true,
+	updatedAt: true,
+	createdAt: true,
+	contentId: true,
+	lesson: lessonReturnFields,
+};
+type updateArgsType = { contentId: string; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
 
 export default class CoursePrismaProvider implements iCRUD {
 	async getSome(userId: number) {
@@ -35,6 +29,7 @@ export default class CoursePrismaProvider implements iCRUD {
 					createdAt: true,
 					contentId: true,
 					content: { select: { keyword: { select: { title: true } } } },
+					lesson: lessonReturnFields,
 				},
 			});
 
@@ -48,66 +43,37 @@ export default class CoursePrismaProvider implements iCRUD {
 	async getOne(id: number) {
 		throw new Error("Method not implemented.");
 	}
-	// const  courses= {
-	//     id: number;
-	//     title: string;
-	//     description: string;
-	//     category: category;
-	//     updatedAt: Date;
-	//     createdAt: Date;
-	//     contentId: string;
-	//     content: {
-	//         keyword: keyword[];
-	//     };
 
 	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
 		const { authorId, categoryId, description, title, keywords } = body;
-		const keywordMapped = keywords?.map((keyword) => ({ where: { title: keyword }, create: { title: keyword, authorId } }));
 
 		try {
-			const course = await prismaProvider.content.create({
+			const content = await prismaProvider.content.create({
 				data: {
-					course: {
-						create: {
-							authorId,
-							categoryId,
-							description,
-							title,
-						},
-					},
-					keyword: { connectOrCreate: keywordMapped },
+					course: { create: { authorId, categoryId, description, title } },
+					keyword: prismaKeywordCreateHandler({ authorId, keywords }),
 				},
 				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
-				// include: lessonSelect,
 			});
 
-			return { ...course.course, content: { keyword: course.keyword } };
+			return { ...content.course, content: { keyword: content.keyword } };
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
 		}
 	}
 
-	async update({ id, authorId, description, title, categoryId, keywords }: updateArgsType) {
+	async update({ contentId, authorId, description, title, categoryId, keywords }: updateArgsType) {
 		try {
-			const keywordMapped = keywords?.map((keyword) => ({ where: { title: keyword }, create: { title: keyword, authorId } }));
-
-			const course = await prismaProvider.content.update({
+			const content = await prismaProvider.content.update({
 				data: {
-					course: {
-						update: {
-							categoryId,
-							description,
-							title,
-						},
-					},
-					keyword: { connectOrCreate: keywordMapped, set: keywords?.map((key) => ({ title: key })) },
+					course: { update: { categoryId, description, title } },
+					keyword: prismaKeywordUpdateHandler({ authorId, keywords }),
 				},
-				where: { id },
+				where: { id: contentId },
 				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
-				// TODO include: lessonSelect,
 			});
-			return { ...course.course, content: { keyword: course.keyword } };
+			return { ...content.course, content: { keyword: content.keyword } };
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
@@ -125,7 +91,7 @@ export default class CoursePrismaProvider implements iCRUD {
 					title: { equals: title },
 					NOT: { contentId: { equals: contentId } },
 				},
-				select: { title: true, id: true },
+				select: { title: true, contentId: true },
 			});
 			return course;
 		} catch (error) {

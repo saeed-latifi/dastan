@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import Navigation from "@components/navigation";
 import { useCourse } from "@hooks/useCourse";
 import { iCourseCreateForm, zCourseCreateForm } from "@models/iCourse";
-import { staticClientURL } from "statics/url";
+import { staticURLs } from "statics/url";
 import { useCategory } from "@hooks/useCategory";
 import Select from "@components/common/select";
 import { selectOptionType } from "@components/common/select-multi";
@@ -22,6 +22,8 @@ import { iCategory } from "@models/iCategory";
 import CourseImage from "@components/images/course-image";
 import FormItemRow from "@components/forms/form-item-row";
 import { zKeyword, zKeywords } from "@models/iKeyword";
+import Link from "next/link";
+import DateFormatter from "@components/dateFormatter";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -92,7 +94,7 @@ export default function ModifyCourse() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>bad address</p>
-				<ButtonBase type="button" onClick={() => router.push(staticClientURL.panel.course.all)}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.all)}>
 					back to your course list
 				</ButtonBase>
 			</div>
@@ -101,14 +103,14 @@ export default function ModifyCourse() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<Navigation label="" path={staticClientURL.panel.course.all} />
+			<Navigation label="" path={staticURLs.client.panel.course.all} />
 
 			{course && (
 				<FormSection title="course image">
 					<CourseImage id={course.contentId} />
 					<ButtonBase
 						type="button"
-						onClick={() => router.push(staticClientURL.panel.course.image({ courseId: course.contentId }))}
+						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.contentId }))}
 					>
 						update your course image
 					</ButtonBase>
@@ -154,18 +156,28 @@ export default function ModifyCourse() {
 			{course && (
 				<FormSection title="lessons">
 					{/* TODO lesson */}
-					<ButtonBase type="button" onClick={() => router.push("#")}>
+					<ButtonBase
+						type="button"
+						onClick={() => router.push(staticURLs.client.panel.course.lesson.add({ courseId: course.id }))}
+					>
 						add new lesson
 					</ButtonBase>
 
 					{/* TODO lessons */}
-					{/* {Array.isArray(course.jobs) &&
-						course.jobs.map((job: any, index: number) => (
+					{Array.isArray(course.lesson) &&
+						course.lesson.map((l: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
-								<Link href={`/job/${course.id}?item=${job.id}`}>{job.title}</Link>
-								<DateFormatter date={job.updatedAt} />
+								<Link
+									href={staticURLs.client.panel.course.lesson.update({
+										courseId: course.id,
+										lessonId: l.id,
+									})}
+								>
+									{l.title}
+								</Link>
+								<DateFormatter date={l.updatedAt} />
 							</div>
-						))} */}
+						))}
 				</FormSection>
 			)}
 		</Form>

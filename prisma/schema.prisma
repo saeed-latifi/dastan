@@ -159,13 +159,13 @@ model course {
 
 model lesson {
   id          Int      @id @default(autoincrement())
-  title       String   @db.VarChar(30)
+  title       String   @unique @db.VarChar(30)
   description String
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now()) @db.Date
   updatedAt   DateTime @updatedAt
   videoUrl    String
-  attached    String[]
+  attachments String[]
 
   // course
   courseId Int

@@ -3,7 +3,7 @@ import { responseState } from "@providers/apiResponseHandler";
 import { paramGenerator } from "@utilities/paramGenerator";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import { staticClientURL } from "statics/url";
+import { staticURLs } from "statics/url";
 import useSWR from "swr";
 
 export function useImage() {
@@ -56,7 +56,7 @@ export function useImage() {
 
 	async function onUpdateCourseImage({ formData }: { formData: FormData }) {
 		try {
-			const { data } = await HTTPService.post("/course/image", formData);
+			const { data } = await HTTPService.post(staticURLs.server.panel.course.image, formData);
 			if (data.resState === responseState.ok) {
 				imgParamMutate(paramGenerator, {
 					populateCache(result, _) {
@@ -64,7 +64,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
-				router.push(staticClientURL.panel.course.all);
+				router.push(staticURLs.client.panel.course.all);
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");

@@ -100,7 +100,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const course = await coursePrismaProvider.update({
-				id: contentId,
+				contentId,
 				title,
 				description,
 				categoryId,

@@ -6,7 +6,7 @@ import { useCourse } from "@hooks/useCourse";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
-import { staticClientURL } from "statics/url";
+import { staticURLs } from "statics/url";
 
 export default function Courses() {
 	const router = useRouter();
@@ -19,7 +19,7 @@ export default function Courses() {
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-md py-4">
-			<ButtonBase type="button" onClick={() => router.push(staticClientURL.panel.course.add)}>
+			<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.add)}>
 				add new course
 			</ButtonBase>
 
@@ -30,7 +30,7 @@ export default function Courses() {
 
 						return (
 							<div key={index} className="flex items-center justify-between gap-2">
-								<Link href={staticClientURL.panel.course.update({ courseId: course.id })}>
+								<Link href={staticURLs.client.panel.course.update({ courseId: course.id })}>
 									{course.title}
 								</Link>
 							</div>

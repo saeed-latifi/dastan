@@ -12,19 +12,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-
-//  redirects() {
-// 		// TODO sync it
-// 		return [
-// 			{
-// 				source: "/images/profile/:slug/:number.webp",
-// 				destination: process.env.BUCKET_URL + "/profile/:slug.webp",
-// 				permanent: false,
-// 			},
-// 			{
-// 				source: "/images/team/:id/:number.webp",
-// 				destination: process.env.BUCKET_URL + "/team/:id.webp",
-// 				permanent: false,
-// 			},
-// 		];
-// 	},
