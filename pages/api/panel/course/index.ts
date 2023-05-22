@@ -20,7 +20,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			}
 
 			// prisma
-			const courses = await coursePrismaProvider.getSome(token.userId);
+			const courses = await coursePrismaProvider.getByAuthor(token.userId);
 			if (courses === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 
 			// api

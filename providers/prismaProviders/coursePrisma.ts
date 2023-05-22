@@ -16,7 +16,7 @@ const courseReturnFields = {
 type updateArgsType = { contentId: string; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
 
 export default class CoursePrismaProvider implements iCRUD {
-	async getSome(userId: number) {
+	async getByAuthor(userId: number) {
 		try {
 			const courses = await prismaProvider.course.findMany({
 				where: { authorId: userId },
@@ -38,10 +38,6 @@ export default class CoursePrismaProvider implements iCRUD {
 			console.log("error :: ", error);
 			return "ERR";
 		}
-	}
-
-	async getOne(id: number) {
-		throw new Error("Method not implemented.");
 	}
 
 	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
@@ -80,10 +76,6 @@ export default class CoursePrismaProvider implements iCRUD {
 		}
 	}
 
-	async delete(id: number) {
-		throw new Error("Method not implemented.");
-	}
-
 	async checkUniqueField({ title, contentId }: { title?: string; contentId?: string }) {
 		try {
 			const course = await prismaProvider.course.findFirst({
@@ -111,5 +103,31 @@ export default class CoursePrismaProvider implements iCRUD {
 			console.log("error :: ", error);
 			return "ERR";
 		}
+	}
+
+	async getSome({ userId }: { userId?: number }) {
+		try {
+			const courses = await prismaProvider.content.findMany({
+				select: {
+					_count: { select: { like: true } },
+					like: { where: { authorId: userId }, select: { state: true } },
+					course: { select: courseReturnFields },
+					keyword: { select: { title: true } },
+					comment: { select: { authorId: true, id: true, description: true, createdAt: true, updatedAt: true } },
+				},
+				where: { course: { isActive: true } },
+			});
+			return courses;
+		} catch (error) {
+			console.log("error :: ", error);
+			return "ERR";
+		}
+	}
+
+	async getOne(id: number) {
+		throw new Error("Method not implemented.");
+	}
+	async delete(id: number) {
+		throw new Error("Method not implemented.");
 	}
 }
