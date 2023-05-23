@@ -6,7 +6,7 @@ import HeaderMain from "./HeaderMain";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="items-center flex flex-col h-max min-h-screen w-full z-0 bg-theme-light text-theme-dark">
+		<div className="flex flex-col h-max min-h-screen w-full z-0 bg-theme-light text-theme-dark">
 			<Head>
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -18,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			<HeaderMain />
 			<main className="flex flex-col items-center gap-3 p-4 flex-1 w-full max-w-7xl">{children}</main>
 			<FooterMain />
+			<footer className="text-right pr-10 py-1 bg-theme-dark-gray text-theme-white">تمامی حقوق این سایت متعلق به تیم GameDev می باشد.</footer>
 		</div>
 	);
 }

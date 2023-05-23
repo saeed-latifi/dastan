@@ -32,6 +32,12 @@ module.exports = {
 				"theme-input": `0 0 0.1rem  0rem ${colors["theme-select"]}`,
 			},
 		},
+		listStyleType: {
+			none: 'none',
+			disc: 'disc',
+			decimal: 'decimal',
+			square: 'square'
+		},
 	},
 	plugins: [],
 };
