@@ -1,7 +1,7 @@
 export default function FooterMain() {
 
 	return (
-		<div className="grow-0 w-full flex items-start justify-center sticky z-10 bottom-0 px-10 pt-6 pb-6 bg-theme-light-gray text-theme-white border-t border-theme-border ">
+		<div className="grow-0 w-full flex items-start justify-center z-10 bottom-0 px-10 pt-6 pb-6 bg-theme-light-gray text-theme-white border-t border-theme-border ">
 			<div className="basis-1/5">
 				<ul className="list-square list-inside">
 					<p className="pb-2">راه های ارتباطی</p>
