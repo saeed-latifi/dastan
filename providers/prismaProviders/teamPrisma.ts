@@ -2,7 +2,7 @@ import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 
 const jobSelect = {
-	Jobs: {
+	jobs: {
 		select: {
 			wageType: true,
 			benefits: true,

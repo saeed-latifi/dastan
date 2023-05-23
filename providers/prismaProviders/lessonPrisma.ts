@@ -3,34 +3,30 @@ import { iLessonCreate, iLessonUpdate } from "@models/iLesson";
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
 
-export const lessonReturnFields = {
-	select: {
-		attachments: true,
-		contentId: true,
-		description: true,
-		title: true,
-		videoUrl: true,
-		updatedAt: true,
-		createdAt: true,
-		id: true,
-		courseId: true,
-		content: { select: { keyword: { select: { title: true } } } },
-	},
-};
 export default class LessonPrismaProvider implements iCRUD {
 	async create({ body, authorId }: { body: iLessonCreate; authorId: number }) {
-		const { title, description, videoUrl, courseId, keywords, attachments } = body;
+		const { title, description, videoUrl, courseId, keywords, categoryId } = body;
 
 		try {
-			const content = await prismaProvider.content.create({
+			const content = await prismaProvider.lesson.create({
 				data: {
-					lesson: { create: { title, description, videoUrl, courseId, attachments } },
-					keyword: prismaKeywordCreateHandler({ authorId, keywords }),
+					content: {
+						create: {
+							title,
+							description,
+							authorId,
+							categoryId,
+							keywords: prismaKeywordCreateHandler({ keywords, authorId }),
+						},
+					},
+					videoUrl,
+					course: { connect: { id: courseId } },
 				},
-				select: { lesson: lessonReturnFields },
+
+				select: lessonSelectShape(),
 			});
 
-			return content.lesson;
+			return content;
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
@@ -38,30 +34,39 @@ export default class LessonPrismaProvider implements iCRUD {
 	}
 	async update({ body, authorId }: { body: iLessonUpdate; authorId: number }) {
 		try {
-			const { title, description, videoUrl, contentId, keywords, attachments } = body;
-			const content = await prismaProvider.content.update({
+			const { title, description, videoUrl, contentId, keywords, categoryId } = body;
+			const content = await prismaProvider.lesson.update({
 				data: {
-					lesson: { update: { title, videoUrl, description, attachments } },
-					keyword: prismaKeywordUpdateHandler({ authorId, keywords }),
+					content: {
+						update: {
+							title,
+							description,
+							categoryId,
+							keywords: prismaKeywordUpdateHandler({ keywords, authorId }),
+						},
+					},
+					videoUrl,
 				},
-				where: { id: contentId },
-				select: { lesson: lessonReturnFields },
+
+				select: lessonSelectShape(),
+				where: { contentId },
 			});
-			return content.lesson;
+			return content;
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
 		}
 	}
 
-	async checkUniqueField({ title, contentId }: { title?: string; contentId?: string }) {
+	async checkUniqueField({ title, contentId }: { title?: string; contentId?: number }) {
 		try {
 			const lesson = await prismaProvider.lesson.findFirst({
 				where: {
-					title: { equals: title },
-					NOT: { contentId: { equals: contentId } },
+					content: { title: { equals: title } },
+					NOT: { contentId },
 				},
-				select: { title: true, contentId: true },
+
+				select: { content: { select: { title: true } }, contentId: true },
 			});
 			return lesson;
 		} catch (error) {
@@ -70,11 +75,11 @@ export default class LessonPrismaProvider implements iCRUD {
 		}
 	}
 
-	async checkLessonAuthor({ contentId }: { contentId: string }) {
+	async checkLessonAuthor({ contentId }: { contentId: number }) {
 		try {
 			const lesson = await prismaProvider.lesson.findFirst({
 				where: { contentId },
-				select: { course: { select: { authorId: true } } },
+				select: { content: { select: { authorId: true } } },
 			});
 			return lesson;
 		} catch (error) {
@@ -94,4 +99,12 @@ export default class LessonPrismaProvider implements iCRUD {
 	delete(...body: any) {
 		throw new Error("Method not implemented.");
 	}
+}
+
+export function lessonSelectShape() {
+	return {
+		videoUrl: true,
+		courseId: true,
+		content: { select: { id: true, title: true, description: true, category: true, updatedAt: true, createdAt: true } },
+	};
 }

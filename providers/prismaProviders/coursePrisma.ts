@@ -1,36 +1,43 @@
 import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
-import { lessonReturnFields } from "./lessonPrisma";
+import { lessonSelectShape } from "./lessonPrisma";
 
-const courseReturnFields = {
-	id: true,
-	title: true,
-	description: true,
-	category: true,
-	updatedAt: true,
-	createdAt: true,
-	contentId: true,
-	lesson: lessonReturnFields,
+type updateArgsType = { contentId: number; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
+type categoryResType = { id: number; title: string };
+type lessonResType = {
+	videoUrl: string;
+	courseId: number;
+	content: {
+		id: number;
+		title: string;
+		description: string;
+		createdAt: Date;
+		updatedAt: Date;
+		category: categoryResType;
+	};
 };
-type updateArgsType = { contentId: string; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
+type courseResType = {
+	content: {
+		id: number;
+		title: string;
+		description: string;
+		createdAt: Date;
+		updatedAt: Date;
+		category: categoryResType;
+		keywords: {
+			title: string;
+		}[];
+	};
+	lessons: lessonResType[];
+};
 
 export default class CoursePrismaProvider implements iCRUD {
 	async getByAuthor(userId: number) {
 		try {
-			const courses = await prismaProvider.course.findMany({
-				where: { authorId: userId },
-				select: {
-					id: true,
-					title: true,
-					description: true,
-					category: true,
-					updatedAt: true,
-					createdAt: true,
-					contentId: true,
-					content: { select: { keyword: { select: { title: true } } } },
-					lesson: lessonReturnFields,
-				},
+			const courses: courseResType[] = await prismaProvider.course.findMany({
+				where: { content: { authorId: userId } },
+				select: courseSelectShape(),
 			});
 
 			return courses;
@@ -41,18 +48,24 @@ export default class CoursePrismaProvider implements iCRUD {
 	}
 
 	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
-		const { authorId, categoryId, description, title, keywords } = body;
-
 		try {
-			const content = await prismaProvider.content.create({
+			const { authorId, categoryId, description, title, keywords } = body;
+			const content: courseResType = await prismaProvider.course.create({
 				data: {
-					course: { create: { authorId, categoryId, description, title } },
-					keyword: prismaKeywordCreateHandler({ authorId, keywords }),
+					content: {
+						create: {
+							title,
+							description,
+							authorId,
+							categoryId,
+							keywords: prismaKeywordCreateHandler({ keywords, authorId }),
+						},
+					},
 				},
-				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
+				select: courseSelectShape(),
 			});
 
-			return { ...content.course, content: { keyword: content.keyword } };
+			return content;
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
@@ -61,29 +74,30 @@ export default class CoursePrismaProvider implements iCRUD {
 
 	async update({ contentId, authorId, description, title, categoryId, keywords }: updateArgsType) {
 		try {
-			const content = await prismaProvider.content.update({
+			const content: courseResType = await prismaProvider.course.update({
+				where: { contentId },
 				data: {
-					course: { update: { categoryId, description, title } },
-					keyword: prismaKeywordUpdateHandler({ authorId, keywords }),
+					content: {
+						update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) },
+					},
 				},
-				where: { id: contentId },
-				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
+				select: courseSelectShape(),
 			});
-			return { ...content.course, content: { keyword: content.keyword } };
+			return content;
 		} catch (error) {
 			console.log("error :: ", error);
 			return "ERR";
 		}
 	}
 
-	async checkUniqueField({ title, contentId }: { title?: string; contentId?: string }) {
+	async checkUniqueField({ title, contentId }: { title?: string; contentId?: number }) {
 		try {
 			const course = await prismaProvider.course.findFirst({
 				where: {
-					title: { equals: title },
-					NOT: { contentId: { equals: contentId } },
+					content: { title: { equals: title } },
+					NOT: { contentId },
 				},
-				select: { title: true, contentId: true },
+				select: { content: { select: { title: true } }, contentId: true },
 			});
 			return course;
 		} catch (error) {
@@ -92,11 +106,11 @@ export default class CoursePrismaProvider implements iCRUD {
 		}
 	}
 
-	async checkCourseAuthor({ contentId }: { contentId: string }) {
+	async checkCourseAuthor({ contentId }: { contentId: number }) {
 		try {
 			const course = await prismaProvider.course.findFirst({
 				where: { contentId },
-				select: { authorId: true },
+				select: { content: { select: { authorId: true } } },
 			});
 			return course;
 		} catch (error) {
@@ -107,15 +121,9 @@ export default class CoursePrismaProvider implements iCRUD {
 
 	async getSome({ userId }: { userId?: number }) {
 		try {
-			const courses = await prismaProvider.content.findMany({
-				select: {
-					_count: { select: { like: true } },
-					like: { where: { authorId: userId }, select: { state: true } },
-					course: { select: courseReturnFields },
-					keyword: { select: { title: true } },
-					comment: { select: { authorId: true, id: true, description: true, createdAt: true, updatedAt: true } },
-				},
-				where: { course: { isActive: true } },
+			const courses = await prismaProvider.course.findMany({
+				where: { content: { isActive: true } },
+				select: publicCourseSelect({ userId }),
 			});
 			return courses;
 		} catch (error) {
@@ -130,4 +138,51 @@ export default class CoursePrismaProvider implements iCRUD {
 	async delete(id: number) {
 		throw new Error("Method not implemented.");
 	}
+}
+
+function publicCourseSelect({ userId }: { userId?: number }) {
+	return {
+		content: {
+			select: {
+				title: true,
+				description: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				author: { select: { username: true, id: true, slug: true } },
+				keywords: { select: { title: true } },
+				likes: { where: { authorId: userId } },
+				_count: {
+					select: { likes: true },
+				},
+				comments: {
+					select: {
+						author: { select: { username: true, id: true, slug: true } },
+						id: true,
+						description: true,
+						createdAt: true,
+						updatedAt: true,
+					},
+				},
+			},
+		},
+		lessons: { select: lessonSelectShape() },
+	};
+}
+
+function courseSelectShape() {
+	return {
+		content: {
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				keywords: { select: { title: true } },
+			},
+		},
+		lessons: { select: lessonSelectShape() },
+	};
 }

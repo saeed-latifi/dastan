@@ -14,7 +14,7 @@ export const zCourseCreate = z.object({ title, description, categoryId, keywords
 export const zCourseUpdate = z
 	.object({ title, description, categoryId, keywords: zKeywords })
 	.partial()
-	.merge(z.object({ contentId: z.string() }));
+	.merge(z.object({ contentId: z.number() }));
 export const zCourseCreateForm = z.object({ title, description });
 
 // types

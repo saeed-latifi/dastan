@@ -31,7 +31,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			if (notUnique === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
-				if (title === notUnique.title) uniqueErrors.title = "this title already taken";
+				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
 				return res.json(onErrorResponse(uniqueErrors));
 			}
 
@@ -65,14 +65,14 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const author = await lessonPrismaProvider.checkLessonAuthor({ contentId });
 			if (author === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
-			if (author.course.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
+			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
 
 			// unique check
 			const notUnique = await lessonPrismaProvider.checkUniqueField({ title, contentId });
 			if (notUnique === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
-				if (title === notUnique.title) uniqueErrors.title = "this title already taken";
+				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
 				return res.json(onErrorResponse(uniqueErrors));
 			}
 

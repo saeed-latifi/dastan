@@ -5,17 +5,15 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 const coursePrismaProvider = new CoursePrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
-
 	if (req.method === "GET") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
 
+			// prisma
 			const courses = await coursePrismaProvider.getSome({ userId: token ? token.userId : undefined });
+
+			// ok res
 			return res.json(courses);
 		} catch (error) {}
 	}
