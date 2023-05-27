@@ -2,7 +2,7 @@ import HTTPService from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
 import { toast } from "react-toastify";
 import useSWR from "swr";
-import { fetchHandler } from "./useFetch";
+import { fetchHandler } from "../useFetch";
 import { useRouter } from "next/router";
 import { jobLimits, teamLimits } from "statics/measures";
 import { produce } from "immer";

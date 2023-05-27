@@ -13,7 +13,7 @@ import { iProvince } from "@models/iProvince";
 import SelectMulti from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
 import { iUserUpdate, zUserUpdate } from "@models/iUser";
-import { useProvince } from "@hooks/useProvince";
+import { useProvince } from "@hooks/public/useProvince";
 import { useCategory } from "@hooks/useCategory";
 import FormSection from "@components/forms/form-section";
 import { staticURLs } from "statics/url";

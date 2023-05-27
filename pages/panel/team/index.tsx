@@ -3,7 +3,7 @@ import LoaderSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
 import TeamLogo from "@components/images/team-logo";
 import { useAccount } from "@hooks/useAccount";
-import { useTeam } from "@hooks/useTeam";
+import { useTeam } from "@hooks/panel/useTeam";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";

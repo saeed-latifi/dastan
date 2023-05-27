@@ -9,7 +9,7 @@ import TextArea from "@components/forms/form-text-area";
 import TeamLogo, { logoImageTypes } from "@components/images/team-logo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
-import { useTeam } from "@hooks/useTeam";
+import { useTeam } from "@hooks/panel/useTeam";
 import { iTeamCreate, zTeamContact, zTeamCreate } from "@models/iTeam";
 import DateFormatter from "@components/dateFormatter";
 import Link from "next/link";

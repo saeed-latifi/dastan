@@ -4,7 +4,7 @@ import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import { FormEvent, useEffect, useState } from "react";
 import FormSection from "@components/forms/form-section";
 import Select from "@components/common/select";
-import { useProvince } from "@hooks/useProvince";
+import { useProvince } from "@hooks/public/useProvince";
 import { selectOptionType } from "@components/common/select-multi";
 import { iProvince } from "@models/iProvince";
 import { WageType } from "@prisma/client";
@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
-import { useTeam } from "@hooks/useTeam";
+import { useTeam } from "@hooks/panel/useTeam";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
 
