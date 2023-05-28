@@ -1,4 +1,3 @@
-import { iCRUD } from "@models/iCRUD";
 import { WageType } from "@prisma/client";
 import prismaProvider from "@providers/prismaProvider";
 
@@ -36,17 +35,7 @@ type updateBodyType = {
 	wage?: number;
 };
 
-export default class JobPrismaProvider implements iCRUD {
-	getSome(body: any) {
-		throw new Error("Method not implemented.");
-	}
-	getOne(id: number) {
-		throw new Error("Method not implemented.");
-	}
-	delete(id: number) {
-		throw new Error("Method not implemented.");
-	}
-
+export default class JobPrismaProvider {
 	async create(body: createBodyType) {
 		try {
 			const job = await prismaProvider.job.create({ data: body, select: jobSelectedData });

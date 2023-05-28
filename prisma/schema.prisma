@@ -41,17 +41,13 @@ enum PermissionType {
 
 model Account {
   id         String         @id @default(cuid())
-  email      String         @unique @db.VarChar(70)
-  phone      String?        @unique @db.VarChar(11)
   password   String         @db.VarChar(30)
   createdAt  DateTime       @default(now()) @db.Date
   isActive   Boolean        @default(false)
   isDeleted  Boolean        @default(false)
   permission PermissionType @default(GUEST)
+  user       User?
 
-  user User?
-
-  @@index([email])
   @@index([id, permission])
 }
 
@@ -62,6 +58,8 @@ model User {
   lastName  String? @db.VarChar(30)
   resume    Resume?
   image     String?
+  email     String  @unique @db.VarChar(70)
+  phone     String? @unique @db.VarChar(11)
 
   provinceId    Int?           @db.SmallInt
   province      Province?      @relation(fields: [provinceId], references: [id])

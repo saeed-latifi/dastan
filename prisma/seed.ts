@@ -1,8 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-export const categoriesSeed = [
+const categoriesSeed = [
 	{ id: 1, title: "Animate" },
 	{ id: 2, title: "Game Design" },
 	{ id: 3, title: "Character Design" },
@@ -53,7 +53,9 @@ const provincesSeed = [
 
 async function seed() {
 	const categories = await prisma.category.createMany({ data: categoriesSeed, skipDuplicates: true });
+	console.log("categories : ", categories);
 	const provinces = await prisma.province.createMany({ data: provincesSeed, skipDuplicates: true });
+	console.log(provinces);
 }
 
 seed();

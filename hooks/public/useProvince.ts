@@ -1,6 +1,7 @@
 import { iProvince } from "@models/iProvince";
 import HTTPService from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
+import { staticURLs } from "statics/url";
 import useSWR from "swr";
 
 export function useProvince() {
@@ -12,7 +13,7 @@ export function useProvince() {
 
 	async function getProvinces() {
 		try {
-			const { data }: { data: apiResponse<iProvince[]> } = await HTTPService.get("province");
+			const { data }: { data: apiResponse<iProvince[]> } = await HTTPService.get(staticURLs.server.public.province.base);
 			if (data.resState === responseState.ok) {
 				return data.data as iProvince[];
 			}

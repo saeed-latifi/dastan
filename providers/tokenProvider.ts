@@ -1,17 +1,17 @@
+import { PermissionType } from "@prisma/client";
 import { setCookie } from "cookies-next";
 import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 import { tokenStatics } from "statics/keys";
 
-type token = { userId: number; permissionLevel: number; username: string; slug: string };
+type token = { userId: number; permission: PermissionType; username: string };
 export function tokenValidator(token: string): token | false {
 	try {
 		const decoded = jwt.verify(token, process.env.TOKEN_KEY as string) as any;
 		return {
 			userId: parseInt(decoded.userId),
-			permissionLevel: parseInt(decoded.permissionLevel),
+			permission: decoded.permission,
 			username: decoded.username,
-			slug: decoded.slug,
 		};
 	} catch (error) {
 		return false;

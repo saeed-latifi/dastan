@@ -10,6 +10,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
 import { squareImage } from "statics/measures";
+import { staticURLs } from "statics/url";
 
 export default function ProfileImageCropper() {
 	const { checkAccessRedirect, isLoading } = useAccount();
@@ -57,7 +58,7 @@ export default function ProfileImageCropper() {
 
 	return (
 		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>
-			<Navigation label="" path="/profile" />
+			<Navigation label="" path={staticURLs.client.profile.base} />
 
 			<AvatarEditor
 				className="w-full aspect-square flex relative  bg-white bg-theme-profile border border-theme-border rounded-theme-border overflow-hidden"

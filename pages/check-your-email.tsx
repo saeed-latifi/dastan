@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ChangeRequestSend() {
+export default function CheckYourEmail() {
 	return (
 		<div>
 			<p>an activating email send to your new email!</p>

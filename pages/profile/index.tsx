@@ -14,9 +14,9 @@ import SelectMulti from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
 import { iUserUpdate, zUserUpdate } from "@models/iUser";
 import { useProvince } from "@hooks/public/useProvince";
-import { useCategory } from "@hooks/useCategory";
 import FormSection from "@components/forms/form-section";
 import { staticURLs } from "statics/url";
+import { useCategory } from "@hooks/public/useCategory";
 
 export default function Profile() {
 	const router = useRouter();
@@ -121,28 +121,28 @@ export default function Profile() {
 			</ButtonBase>
 
 			<div className="flex flex-col gap-4 max-w-sm w-full  mx-auto">
-				<ButtonBase type="button" onClick={() => router.push("/profile/add-image")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.addImage)}>
 					update profile image
 				</ButtonBase>
-				<ButtonBase type="button" onClick={() => router.push("/profile/change-password")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.changePassword)}>
 					change password
 				</ButtonBase>
 
 				<div className="w-full flex flex-col gap-1">
 					{userInfo.email && <p className="text-gray-500 select-none mx-auto">{userInfo.email}</p>}
-					<ButtonBase type="button" onClick={() => router.push("/profile/email-change/")}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.changeEmail)}>
 						change email
 					</ButtonBase>
 				</div>
 
 				<div className="w-full flex flex-col gap-1">
 					{userInfo.phone && <p className="text-gray-500 select-none mx-auto">{userInfo.phone}</p>}
-					<ButtonBase type="button" onClick={() => router.push("/profile/add-phone")}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.addPhone)}>
 						{userInfo.phone ? "change phone number" : " Add phone"}
 					</ButtonBase>
 				</div>
 				<div className="w-full flex flex-col gap-1">
-					<ButtonBase type="button" onClick={() => router.push("/team")}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.all)}>
 						your teams
 					</ButtonBase>
 				</div>

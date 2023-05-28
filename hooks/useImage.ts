@@ -16,7 +16,7 @@ export function useImage() {
 
 	async function onUpdateProfileImage({ formData }: { formData: FormData }) {
 		try {
-			const { data } = await HTTPService.post("/account/image", formData);
+			const { data } = await HTTPService.post(staticURLs.server.account.image, formData);
 			if (data.resState === responseState.ok) {
 				imgParamMutate(paramGenerator, {
 					populateCache(result, _) {
@@ -24,7 +24,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
-				router.push("/profile");
+				router.push(staticURLs.client.profile.base);
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");
@@ -36,7 +36,7 @@ export function useImage() {
 
 	async function onUpdateTeamLogo({ formData }: { formData: FormData }) {
 		try {
-			const { data } = await HTTPService.post("/team/logo", formData);
+			const { data } = await HTTPService.post(staticURLs.server.panel.team.image, formData);
 			if (data.resState === responseState.ok) {
 				imgParamMutate(paramGenerator, {
 					populateCache(result, _) {
@@ -44,7 +44,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
-				router.push("/team");
+				router.push(staticURLs.client.panel.team.all);
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");

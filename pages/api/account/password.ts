@@ -63,7 +63,7 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 			if (hasPassword === null) return res.json(onErrorResponse("your old password is not correct"));
 
 			// prisma
-			const user = await userPrismaProvider.update(token.userId, { password: validateUpdate.data.newPassword });
+			const user = await userPrismaProvider.changePassword({ userId: token.userId, password: validateUpdate.data.newPassword });
 			if (user === "ERR") return res.json(onErrorResponse("Error on update ORM"));
 
 			// api

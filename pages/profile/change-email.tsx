@@ -8,8 +8,9 @@ import { useAccount } from "@hooks/useAccount";
 import { zUserLogin } from "@models/iUser";
 import { iUserLogin } from "@models/iUser";
 import { useForm } from "react-hook-form";
+import { staticURLs } from "statics/url";
 
-export default function EmailChange() {
+export default function ChangeEmail() {
 	const { onRequestChangeEmail } = useAccount();
 
 	const {
@@ -22,7 +23,7 @@ export default function EmailChange() {
 
 	return (
 		<Form onSubmit={handleSubmit(onRequestChangeEmail)}>
-			<Navigation label="" path="/profile" />
+			<Navigation label="" path={staticURLs.client.profile.base} />
 			<FormSection title="email change">
 				<FormInput
 					labelText="your new email"

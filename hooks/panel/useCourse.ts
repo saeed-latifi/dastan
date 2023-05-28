@@ -3,11 +3,11 @@ import { apiResponse, responseState } from "@providers/apiResponseHandler";
 import { toast } from "react-toastify";
 import useSWR from "swr";
 import { useRouter } from "next/router";
-import { fetchHandler } from "./useFetch";
 import { iCourseCreate, iCourseUpdate } from "@models/iCourse";
 import { produce } from "immer";
 import { iLessonCreate, iLessonUpdate } from "@models/iLesson";
 import { staticURLs } from "statics/url";
+import { fetchHandler } from "@hooks/useFetch";
 
 export function useCourse() {
 	const router = useRouter();
@@ -24,18 +24,16 @@ export function useCourse() {
 
 	async function getCourses() {
 		try {
-			const { data }: { data: apiResponse<any[]> } = await HTTPService.get("panel/course");
+			const { data }: { data: apiResponse<any[]> } = await HTTPService.get(staticURLs.server.panel.course.base);
 			if (data.resState === responseState.ok) return data.data;
 		} catch (error: any) {
-			console.log("course Error", error);
-
 			toast.warn("bad connection");
 		}
 	}
 
 	function onAddCourse(body: iCourseCreate) {
 		fetchHandler({
-			fetcher: () => HTTPService.post("panel/course", body),
+			fetcher: () => HTTPService.post(staticURLs.server.panel.course.base, body),
 			onOK: (res) => {
 				coursesMutate(res.data, {
 					populateCache(result, baseState) {
@@ -54,7 +52,7 @@ export function useCourse() {
 
 	function onUpdateCourse(body: iCourseUpdate) {
 		fetchHandler({
-			fetcher: () => HTTPService.put("panel/course", body),
+			fetcher: () => HTTPService.put(staticURLs.server.panel.course.base, body),
 			onOK: (res) => {
 				coursesMutate(res.data, {
 					populateCache(result, baseState) {
@@ -74,7 +72,7 @@ export function useCourse() {
 
 	function onAddLesson(body: iLessonCreate) {
 		fetchHandler({
-			fetcher: () => HTTPService.post("panel/lesson", body),
+			fetcher: () => HTTPService.post(staticURLs.server.panel.lesson.base, body),
 			onOK: (res) => {
 				let pageId = 0;
 				coursesMutate(res.data, {
@@ -92,14 +90,14 @@ export function useCourse() {
 					},
 					revalidate: false,
 				});
-				router.push(staticURLs.client.panel.course.update({ courseId: pageId }));
+				router.push(staticURLs.client.panel.course.one({ courseId: pageId }));
 			},
 		});
 	}
 
 	function onUpdateLesson(body: iLessonUpdate) {
 		fetchHandler({
-			fetcher: () => HTTPService.put("panel/lesson", body),
+			fetcher: () => HTTPService.put(staticURLs.server.panel.lesson.base, body),
 			onOK: (res) => {
 				let pageId = 0;
 				coursesMutate(res.data, {
@@ -122,7 +120,7 @@ export function useCourse() {
 					},
 					revalidate: false,
 				});
-				router.push(staticURLs.client.panel.course.update({ courseId: pageId }));
+				router.push(staticURLs.client.panel.course.one({ courseId: pageId }));
 			},
 		});
 	}

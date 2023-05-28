@@ -41,14 +41,15 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const { email, username } = validateRegister.data;
 
 			// prisma
-			const notUnique = await userPrismaProvider.checkUniqueField({ email, username });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on register ORM"));
+
+			const notUniqueFields = await userPrismaProvider.checkUniqueField({ username, email });
+			if (notUniqueFields === "ERR") return res.json(onErrorResponse("Error on register ORM"));
 
 			// validation
-			if (notUnique) {
+			if (notUniqueFields) {
 				const uniqueErrors: errorType = {};
-				if (email === notUnique.email) uniqueErrors.email = "this email already taken";
-				if (username === notUnique.username) uniqueErrors.username = "this username already taken";
+				if (username === notUniqueFields.username) uniqueErrors.username = "this username already taken";
+				if (email === notUniqueFields.email) uniqueErrors.email = "this email already taken";
 				return res.json(onErrorResponse(uniqueErrors));
 			}
 
@@ -58,6 +59,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			delete validateRegister.data.confirm;
+
 			const user = await userPrismaProvider.create(validateRegister.data);
 			if (user === "ERR") return res.json(onErrorResponse("Error on register ORM"));
 
@@ -77,11 +79,12 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const user = await userPrismaProvider.checkEmailAuth(validateLogin.data);
+
 			if (user === "ERR") return res.json(onErrorResponse("Error on login ORM"));
 			if (user === null) return res.json(onErrorResponse("not valid login"));
 
 			// token
-			const token = tokenCreator({ userId: user.id, username: user.username, permissionLevel: user.permissionLevel, slug: user.slug });
+			const token = tokenCreator({ userId: user.id, username: user.username, permission: user.account.permission });
 
 			// api
 			setCookieToken({ req, res, token });
@@ -135,7 +138,8 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			};
 
 			if (validateUpdate.data.interests) {
-				body.interests = { set: validateUpdate.data.interests.map((cat) => ({ id: cat.id })) };
+				const interests = validateUpdate.data.interests.map((cat) => ({ id: cat.id }));
+				body.interests = interests;
 			}
 
 			// prisma

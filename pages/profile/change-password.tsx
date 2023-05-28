@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { iPasswordUpdate, zPasswordUpdate } from "@models/iUser";
 import { useForm } from "react-hook-form";
+import { staticURLs } from "statics/url";
 
 export default function ChangePassword() {
 	const { checkAccessRedirect, isLoading, onUpdatePassword } = useAccount();
@@ -25,7 +26,7 @@ export default function ChangePassword() {
 
 	return (
 		<Form onSubmit={handleSubmit(onUpdatePassword)}>
-			<Navigation label="" path="/profile" />
+			<Navigation label="" path={staticURLs.client.profile.base} />
 
 			<FormSection title="password change">
 				<FormInput

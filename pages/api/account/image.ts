@@ -20,11 +20,11 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				removeCookieToken({ req, res });
 				return res.json(onErrorResponse("bad profile request"));
 			}
-			const slug = token.slug;
+			const id = token.userId;
 			const { files } = await formParser(req);
 			if (files.image) {
 				const buffer = await webpSquareBuffer({ path: files.image.filepath });
-				const fileName = slug + "." + buffer.info.format;
+				const fileName = id + "." + buffer.info.format;
 
 				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 				if (awsRes) return res.json(onSuccessResponse("ok"));

@@ -1,4 +1,3 @@
-import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 
 const jobSelect = {
@@ -18,7 +17,7 @@ const jobSelect = {
 	},
 };
 
-export default class TeamPrismaProvider implements iCRUD {
+export default class TeamPrismaProvider {
 	async getSome(userId: number) {
 		try {
 			const teams = await prismaProvider.team.findMany({
@@ -29,10 +28,6 @@ export default class TeamPrismaProvider implements iCRUD {
 		} catch (error) {
 			return "ERR";
 		}
-	}
-
-	async getOne(id: number) {
-		throw new Error("Method not implemented.");
 	}
 
 	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }) {
@@ -54,10 +49,6 @@ export default class TeamPrismaProvider implements iCRUD {
 		} catch (error) {
 			return "ERR";
 		}
-	}
-
-	async delete(id: number) {
-		throw new Error("Method not implemented.");
 	}
 
 	async checkUniqueField({ title, teamId }: { title?: string; teamId?: number }) {

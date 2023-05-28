@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Navigation from "@components/navigation";
+import { staticURLs } from "statics/url";
 
 export default function ModifyTeam() {
 	const { userInfo, checkAccessRedirect } = useAccount();
@@ -74,7 +75,7 @@ export default function ModifyTeam() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>bad address</p>
-				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.all)}>
 					back to your teams list
 				</ButtonBase>
 			</div>
@@ -85,7 +86,7 @@ export default function ModifyTeam() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>You have reached your team limit</p>
-				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.all)}>
 					back to your teams list
 				</ButtonBase>
 			</div>
@@ -94,12 +95,12 @@ export default function ModifyTeam() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
-			<Navigation label="" path="/team" />
+			<Navigation label="" path={staticURLs.client.panel.team.all} />
 
 			{team && (
 				<FormSection title="team logo">
 					<TeamLogo id={team.id} logoType={logoImageTypes.full} />
-					<ButtonBase type="button" onClick={() => router.push(`/team/logo?item=${team.id}`)}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.image({ teamId: team.id }))}>
 						update your team logo
 					</ButtonBase>
 				</FormSection>
@@ -133,14 +134,19 @@ export default function ModifyTeam() {
 			{team && (
 				<FormSection title="jobs">
 					{allowMoreJob(team.id) && (
-						<ButtonBase type="button" onClick={() => router.push(`/job/${team.id}`)}>
+						<ButtonBase
+							type="button"
+							onClick={() => router.push(staticURLs.client.panel.team.job.add({ teamId: team.id }))}
+						>
 							open a new job
 						</ButtonBase>
 					)}
 					{Array.isArray(team.jobs) &&
 						team.jobs.map((job: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
-								<Link href={`/job/${team.id}?item=${job.id}`}>{job.title}</Link>
+								<Link href={staticURLs.client.panel.team.job.one({ jobId: job.id, teamId: team.id })}>
+									{job.title}
+								</Link>
 								<DateFormatter date={job.updatedAt} />
 							</div>
 						))}

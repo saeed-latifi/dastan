@@ -19,6 +19,7 @@ import { useRouter } from "next/router";
 import { useTeam } from "@hooks/panel/useTeam";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
+import { staticURLs } from "statics/url";
 
 export default function Jobs() {
 	const router = useRouter();
@@ -153,7 +154,7 @@ export default function Jobs() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>bad address</p>
-				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.all)}>
 					back to your teams list
 				</ButtonBase>
 			</div>
@@ -164,7 +165,7 @@ export default function Jobs() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>You have reached your jobs limit</p>
-				<ButtonBase type="button" onClick={() => router.push("/team/")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.all)}>
 					back to your teams list
 				</ButtonBase>
 			</div>
@@ -172,7 +173,7 @@ export default function Jobs() {
 	}
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Navigation label="" path={`/team/modify?item=${router.query.teamId}`} />
+			<Navigation label="" path={staticURLs.client.panel.team.one({ teamId: parseInt(router.query.teamId as string) })} />
 			<FormSection title="title">
 				<FormInput value={title} onChange={(e) => setTitle(e.target.value)} warnings={errors?.title} />
 			</FormSection>

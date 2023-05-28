@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { jobLimits, teamLimits } from "statics/measures";
 import { produce } from "immer";
 import { iJobCreate, iJobUpdate } from "@models/iJob";
+import { staticURLs } from "statics/url";
 
 export function useTeam() {
 	const router = useRouter();
@@ -23,7 +24,7 @@ export function useTeam() {
 
 	async function getTeams() {
 		try {
-			const { data }: { data: apiResponse<any[]> } = await HTTPService.get("team");
+			const { data }: { data: apiResponse<any[]> } = await HTTPService.get(staticURLs.server.panel.team.base);
 			if (data.resState === responseState.ok) return data.data;
 		} catch (error: any) {
 			toast.warn("bad connection");
@@ -32,7 +33,7 @@ export function useTeam() {
 
 	function onAddTeam(body: { title: string; description: string; userId: number; contactMethods?: string[] }) {
 		fetchHandler({
-			fetcher: () => HTTPService.post("team", body),
+			fetcher: () => HTTPService.post(staticURLs.server.panel.team.base, body),
 			onOK: (res) => {
 				teamsMutate(res.data, {
 					populateCache(result, baseState) {
@@ -44,14 +45,14 @@ export function useTeam() {
 					},
 					revalidate: false,
 				});
-				router.push("/team");
+				router.push(staticURLs.client.panel.team.all);
 			},
 		});
 	}
 
 	function onUpdateTeam(body: { id: number; title?: string; description?: string; contactMethods?: string[] }) {
 		fetchHandler({
-			fetcher: () => HTTPService.put("team", body),
+			fetcher: () => HTTPService.put(staticURLs.server.panel.team.base, body),
 			onOK: (res) => {
 				teamsMutate(res.data, {
 					populateCache(result, baseState) {
@@ -64,14 +65,14 @@ export function useTeam() {
 					},
 					revalidate: false,
 				});
-				router.push("/team");
+				router.push(staticURLs.client.panel.team.all);
 			},
 		});
 	}
 
 	function onAddJob(body: iJobCreate) {
 		fetchHandler({
-			fetcher: () => HTTPService.post("job", body),
+			fetcher: () => HTTPService.post(staticURLs.server.panel.job.base, body),
 			onOK: (res) => {
 				let itemId = 0;
 				teamsMutate(res.data, {
@@ -89,14 +90,14 @@ export function useTeam() {
 					},
 					revalidate: false,
 				});
-				router.push(`/team/modify?item=${itemId}`);
+				router.push(staticURLs.client.panel.team.one({ teamId: itemId }));
 			},
 		});
 	}
 
 	function onUpdateJob(body: iJobUpdate) {
 		fetchHandler({
-			fetcher: () => HTTPService.put("job", body),
+			fetcher: () => HTTPService.put(staticURLs.server.panel.job.base, body),
 			onOK: (res) => {
 				let itemId = 0;
 				teamsMutate(res.data, {
@@ -119,7 +120,7 @@ export function useTeam() {
 					},
 					revalidate: false,
 				});
-				router.push(`/team/modify?item=${itemId}`);
+				router.push(staticURLs.client.panel.team.one({ teamId: itemId }));
 			},
 		});
 	}

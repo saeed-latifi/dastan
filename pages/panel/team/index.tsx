@@ -7,6 +7,7 @@ import { useTeam } from "@hooks/panel/useTeam";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import { staticURLs } from "statics/url";
 
 export default function Team() {
 	const router = useRouter();
@@ -20,7 +21,7 @@ export default function Team() {
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-md py-4">
 			{allowMoreTeam() && (
-				<ButtonBase type="button" onClick={() => router.push("/team/modify")}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.add)}>
 					add new Team
 				</ButtonBase>
 			)}
@@ -29,7 +30,7 @@ export default function Team() {
 				<FormSection title="your Teams">
 					{teamsInfo.map((team, index) => (
 						<div key={index} className="flex items-center justify-between gap-2">
-							<Link href={"/team/modify?item=" + team.id}>{team.title}</Link>
+							<Link href={staticURLs.client.panel.team.one({ teamId: team.id })}>{team.title}</Link>
 							<TeamLogo id={team.id} />
 						</div>
 					))}

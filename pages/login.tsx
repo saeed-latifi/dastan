@@ -7,6 +7,7 @@ import FormInput from "@components/forms/form-input";
 import Form from "@components/forms/form";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import FormSection from "@components/forms/form-section";
+import { staticURLs } from "statics/url";
 
 export default function Login() {
 	const { onLogin } = useAccount();
@@ -33,13 +34,13 @@ export default function Login() {
 					log in
 				</ButtonBase>
 			</FormSection>
-			<Link className="link bold" href="/sign_up">
+			<Link className="link bold" href={staticURLs.client.signUp}>
 				<p>create your account</p>
 			</Link>
-			<Link className="link bold" href="/recover-password">
+			<Link className="link bold" href={staticURLs.client.recoverPassword}>
 				<p>forget your password</p>
 			</Link>
-			<Link className="link bold" href="/resend-activation">
+			<Link className="link bold" href={staticURLs.client.reSendActivationEmail}>
 				<p>resend Activation email</p>
 			</Link>
 		</Form>

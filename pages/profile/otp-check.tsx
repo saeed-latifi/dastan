@@ -5,8 +5,9 @@ import FormSection from "@components/forms/form-section";
 import { useAccount } from "@hooks/useAccount";
 import Link from "next/link";
 import { useState } from "react";
+import { staticURLs } from "statics/url";
 
-export default function CheckOtp() {
+export default function OTPCheck() {
 	const { onCheckOTP } = useAccount();
 	const [otp, setOtp] = useState("");
 
@@ -23,7 +24,7 @@ export default function CheckOtp() {
 				<ButtonBase>submit</ButtonBase>
 
 				<ButtonBase type="button">
-					<Link href="/profile/add-phone">change number</Link>
+					<Link href={staticURLs.client.profile.addPhone}>change number</Link>
 				</ButtonBase>
 			</FormSection>
 		</Form>

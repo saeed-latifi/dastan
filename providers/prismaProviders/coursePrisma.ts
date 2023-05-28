@@ -1,10 +1,9 @@
-import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
 import { lessonSelectShape } from "./lessonPrisma";
+import { categoryResType } from "./categoryPrisma";
 
 type updateArgsType = { contentId: number; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
-type categoryResType = { id: number; title: string };
 type lessonResType = {
 	videoUrl: string;
 	courseId: number;
@@ -32,7 +31,7 @@ type courseResType = {
 	lessons: lessonResType[];
 };
 
-export default class CoursePrismaProvider implements iCRUD {
+export default class CoursePrismaProvider {
 	async getByAuthor(userId: number) {
 		try {
 			const courses: courseResType[] = await prismaProvider.course.findMany({
@@ -130,13 +129,6 @@ export default class CoursePrismaProvider implements iCRUD {
 			console.log("error :: ", error);
 			return "ERR";
 		}
-	}
-
-	async getOne(id: number) {
-		throw new Error("Method not implemented.");
-	}
-	async delete(id: number) {
-		throw new Error("Method not implemented.");
 	}
 }
 

@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
 import { iPhone, zPhone } from "@models/iUser";
 import { useForm } from "react-hook-form";
+import { staticURLs } from "statics/url";
 
 export default function AddPhone() {
 	const { onSendOTP } = useAccount();
@@ -21,7 +22,7 @@ export default function AddPhone() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSendOTP)}>
-			<Navigation label="" path="/profile" />
+			<Navigation label="" path={staticURLs.client.profile.base} />
 
 			<FormSection title="add phone">
 				<FormInput

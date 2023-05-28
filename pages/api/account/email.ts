@@ -65,7 +65,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 
 			// check not repetitive
 			const notUnique = await userPrismaProvider.checkUniqueField({ email: emailToken.newEmail, userId: token.userId });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
+			if (notUnique === "ERR") return res.json(onErrorResponse("Error on change email ORM"));
 
 			// on repetitive
 			if (notUnique) {
@@ -94,8 +94,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 		const user = await userPrismaProvider.getByEmail(validateData.data);
 		if (user === "ERR") return res.json(onErrorResponse("Error on recover ORM"));
 		if (user === null) return res.json(onErrorResponse("this email is not registered"));
-		// TODO check isDeleted
-		if (user.isActive) return res.json(onErrorResponse("your account is already verified"));
+		if (user.account.isActive) return res.json(onErrorResponse("your account is already verified"));
 
 		// email
 		const emailRes = await authEmailSender({ email: user.email });
@@ -115,13 +114,13 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// prisma
 			const user = await userPrismaProvider.Activate(emailToken.email);
 			if (user === "ERR") return res.json(onErrorResponse("Error on active ORM"));
+			if (user === null) return res.json(onErrorResponse("Error on active bad userInfo"));
 
 			// token
 			const authToken = tokenCreator({
 				userId: user.id,
 				username: user.username,
-				permissionLevel: user.permissionLevel,
-				slug: user.slug,
+				permission: user.account.permission,
 			});
 
 			// api

@@ -6,7 +6,6 @@ import FormSection from "@components/forms/form-section";
 import { useRouter } from "next/router";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
-import { useCourse } from "@hooks/useCourse";
 import { zKeyword, zKeywords } from "@models/iKeyword";
 import { toast } from "react-toastify";
 import FormItemRow from "@components/forms/form-item-row";
@@ -16,6 +15,7 @@ import { zLessonCreate, zLessonUpdate } from "@models/iLesson";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import TextArea from "@components/forms/form-text-area";
 import { staticURLs } from "statics/url";
+import { useCourse } from "@hooks/panel/useCourse";
 
 export default function Jobs() {
 	const router = useRouter();
@@ -125,8 +125,8 @@ export default function Jobs() {
 		return (
 			<div className="flex flex-col items-center gap-4">
 				<p>bad address</p>
-				<ButtonBase type="button" onClick={() => router.push("/team/")}>
-					back to your teams list
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.all)}>
+					back to your courses list
 				</ButtonBase>
 			</div>
 		);
@@ -134,7 +134,7 @@ export default function Jobs() {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Navigation label="" path={staticURLs.client.panel.course.update({ courseId: parseInt(router.query.courseId as string) })} />
+			<Navigation label="" path={staticURLs.client.panel.course.one({ courseId: parseInt(router.query.courseId as string) })} />
 			<FormSection title="title">
 				<FormInput value={title} onChange={(e) => setTitle(e.target.value)} warnings={errors?.title} />
 			</FormSection>

@@ -1,9 +1,8 @@
-import { iCRUD } from "@models/iCRUD";
 import { iLessonCreate, iLessonUpdate } from "@models/iLesson";
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
 
-export default class LessonPrismaProvider implements iCRUD {
+export default class LessonPrismaProvider {
 	async create({ body, authorId }: { body: iLessonCreate; authorId: number }) {
 		const { title, description, videoUrl, courseId, keywords, categoryId } = body;
 
@@ -86,18 +85,6 @@ export default class LessonPrismaProvider implements iCRUD {
 			console.log("error :: ", error);
 			return "ERR";
 		}
-	}
-
-	getSome(...body: any) {
-		throw new Error("Method not implemented.");
-	}
-
-	getOne(...body: any) {
-		throw new Error("Method not implemented.");
-	}
-
-	delete(...body: any) {
-		throw new Error("Method not implemented.");
 	}
 }
 

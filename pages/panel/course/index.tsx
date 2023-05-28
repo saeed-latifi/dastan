@@ -1,8 +1,8 @@
 import ButtonBase from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
+import { useCourse } from "@hooks/panel/useCourse";
 import { useAccount } from "@hooks/useAccount";
-import { useCourse } from "@hooks/useCourse";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -30,7 +30,7 @@ export default function Courses() {
 
 						return (
 							<div key={index} className="flex items-center justify-between gap-2">
-								<Link href={staticURLs.client.panel.course.update({ courseId: course.id })}>
+								<Link href={staticURLs.client.panel.course.one({ courseId: course.id })}>
 									{course.title}
 								</Link>
 							</div>

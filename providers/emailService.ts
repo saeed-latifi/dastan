@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import { changeEmailTokenCreator, emailTokenCreator } from "./tokenProvider";
 import { emailDomain } from "statics/keys";
+import { staticURLs } from "statics/url";
 
 const emailStyle = `
 	<style>
@@ -18,7 +19,7 @@ const emailStyle = `
 	</style>`;
 
 const authHTMLGenerator = (link: string) => {
-	const domain = `${emailDomain}/profile/verify`;
+	const domain = `${emailDomain}${staticURLs.client.verify}`;
 	return `
 <html>
     <head>

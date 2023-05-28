@@ -12,10 +12,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Navigation from "@components/navigation";
-import { useCourse } from "@hooks/useCourse";
 import { iCourseCreateForm, zCourseCreateForm } from "@models/iCourse";
 import { staticURLs } from "statics/url";
-import { useCategory } from "@hooks/useCategory";
 import Select from "@components/common/select";
 import { selectOptionType } from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
@@ -24,6 +22,8 @@ import FormItemRow from "@components/forms/form-item-row";
 import { zKeyword, zKeywords } from "@models/iKeyword";
 import Link from "next/link";
 import DateFormatter from "@components/dateFormatter";
+import { useCategory } from "@hooks/public/useCategory";
+import { useCourse } from "@hooks/panel/useCourse";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -168,7 +168,7 @@ export default function ModifyCourse() {
 						course.lesson.map((l: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
 								<Link
-									href={staticURLs.client.panel.course.lesson.update({
+									href={staticURLs.client.panel.course.lesson.one({
 										courseId: course.id,
 										lessonId: l.id,
 									})}

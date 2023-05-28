@@ -9,6 +9,9 @@
 		"lint": "next lint",
 		"export": "next build && next export"
 	},
+	"prisma": {
+		"seed": "ts-node prisma/seed.ts"
+	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.1.0",
 		"@prisma/client": "^4.14.0",

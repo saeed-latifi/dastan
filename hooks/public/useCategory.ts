@@ -1,6 +1,7 @@
 import { iCategory } from "@models/iCategory";
 import HTTPService from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
+import { staticURLs } from "statics/url";
 import useSWR from "swr";
 
 export function useCategory() {
@@ -12,7 +13,7 @@ export function useCategory() {
 
 	async function getCategories() {
 		try {
-			const { data }: { data: apiResponse<iCategory[]> } = await HTTPService.get("category");
+			const { data }: { data: apiResponse<iCategory[]> } = await HTTPService.get(staticURLs.server.public.category.base);
 			if (data.resState === responseState.ok) {
 				return data.data as iCategory[];
 			}
