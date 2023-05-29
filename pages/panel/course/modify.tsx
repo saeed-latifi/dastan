@@ -24,6 +24,7 @@ import Link from "next/link";
 import DateFormatter from "@components/dateFormatter";
 import { useCategory } from "@hooks/public/useCategory";
 import { useCourse } from "@hooks/panel/useCourse";
+import FormRichText from "@components/forms/form-rich-text";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -128,6 +129,15 @@ export default function ModifyCourse() {
 					warnings={errors.description?.message}
 					register={register("description", { setValueAs: (v) => (v === "" ? undefined : v) })}
 					required
+				/>
+			</FormSection>
+
+			<FormSection title="context">
+				<FormRichText
+					value="adwdsd wfdgf eg eg"
+					onChange={(text) => {
+						console.log(text);
+					}}
 				/>
 			</FormSection>
 

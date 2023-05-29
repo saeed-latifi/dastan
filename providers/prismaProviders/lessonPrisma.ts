@@ -6,85 +6,56 @@ export default class LessonPrismaProvider {
 	async create({ body, authorId }: { body: iLessonCreate; authorId: number }) {
 		const { title, description, videoUrl, courseId, keywords, categoryId } = body;
 
-		try {
-			const content = await prismaProvider.lesson.create({
-				data: {
-					content: {
-						create: {
-							title,
-							description,
-							authorId,
-							categoryId,
-							keywords: prismaKeywordCreateHandler({ keywords, authorId }),
-						},
+		return await prismaProvider.lesson.create({
+			data: {
+				content: {
+					create: {
+						title,
+						description,
+						authorId,
+						categoryId,
+						keywords: prismaKeywordCreateHandler({ keywords, authorId }),
 					},
-					videoUrl,
-					course: { connect: { id: courseId } },
 				},
+				videoUrl,
+				course: { connect: { id: courseId } },
+			},
 
-				select: lessonSelectShape(),
-			});
-
-			return content;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+			select: lessonSelectShape(),
+		});
 	}
 	async update({ body, authorId }: { body: iLessonUpdate; authorId: number }) {
-		try {
-			const { title, description, videoUrl, contentId, keywords, categoryId } = body;
-			const content = await prismaProvider.lesson.update({
-				data: {
-					content: {
-						update: {
-							title,
-							description,
-							categoryId,
-							keywords: prismaKeywordUpdateHandler({ keywords, authorId }),
-						},
+		const { title, description, videoUrl, contentId, keywords, categoryId } = body;
+		return await prismaProvider.lesson.update({
+			data: {
+				content: {
+					update: {
+						title,
+						description,
+						categoryId,
+						keywords: prismaKeywordUpdateHandler({ keywords, authorId }),
 					},
-					videoUrl,
 				},
+				videoUrl,
+			},
 
-				select: lessonSelectShape(),
-				where: { contentId },
-			});
-			return content;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+			select: lessonSelectShape(),
+			where: { contentId },
+		});
 	}
 
 	async checkUniqueField({ title, contentId }: { title?: string; contentId?: number }) {
-		try {
-			const lesson = await prismaProvider.lesson.findFirst({
-				where: {
-					content: { title: { equals: title } },
-					NOT: { contentId },
-				},
-
-				select: { content: { select: { title: true } }, contentId: true },
-			});
-			return lesson;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.lesson.findFirst({
+			where: { content: { title: { equals: title } }, NOT: { contentId } },
+			select: { content: { select: { title: true } }, contentId: true },
+		});
 	}
 
 	async checkLessonAuthor({ contentId }: { contentId: number }) {
-		try {
-			const lesson = await prismaProvider.lesson.findFirst({
-				where: { contentId },
-				select: { content: { select: { authorId: true } } },
-			});
-			return lesson;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.lesson.findFirst({
+			where: { contentId },
+			select: { content: { select: { authorId: true } } },
+		});
 	}
 }
 

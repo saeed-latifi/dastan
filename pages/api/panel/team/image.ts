@@ -5,6 +5,7 @@ import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { teamLogoAWS } from "@providers/bucketsAWS/imageAWS";
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
+import { errorLogger } from "@utilities/apiLogger";
 
 export const config = {
 	api: {
@@ -28,7 +29,6 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 
 			// prisma check team manager
 			const manager = await teamPrismaProvider.checkTeamManager({ teamId: parseInt(fields.id) });
-			if (manager === "ERR") return res.json(onErrorResponse("error on team ORM"));
 			if (manager === null) return res.json(onErrorResponse("this team not exist"));
 			if (manager.managerId !== token.userId) return res.json(onErrorResponse("team err : access denied!"));
 
@@ -43,7 +43,7 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			// ok res
 			return res.json(onSuccessResponse("ok"));
 		} catch (error) {
-			return res.json(onErrorResponse("err team logo"));
+			return errorLogger({ error, res, name: "team" });
 		}
 	}
 

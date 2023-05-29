@@ -37,43 +37,22 @@ type updateBodyType = {
 
 export default class JobPrismaProvider {
 	async create(body: createBodyType) {
-		try {
-			const job = await prismaProvider.job.create({ data: body, select: jobSelectedData });
-			return job;
-		} catch (error) {
-			return "ERR";
-		}
+		return await prismaProvider.job.create({ data: body, select: jobSelectedData });
 	}
 
 	async update(id: number, body: updateBodyType) {
-		try {
-			const job = await prismaProvider.job.update({ where: { id }, data: body, select: jobSelectedData });
-			return job;
-		} catch (error) {
-			return "ERR";
-		}
+		return await prismaProvider.job.update({ where: { id }, data: body, select: jobSelectedData });
 	}
 
 	async checkJobCountLimit({ teamId }: { teamId: number }) {
-		try {
-			const jobs = await prismaProvider.job.findMany({ where: { teamId } });
-			return jobs.length;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		const jobs = await prismaProvider.job.findMany({ where: { teamId } });
+		return jobs.length;
 	}
 
 	async checkJobOwner({ jobId }: { jobId: number }) {
-		try {
-			const job = await prismaProvider.job.findFirst({
-				where: { id: jobId },
-				select: { team: { select: { id: true, managerId: true } } },
-			});
-			return job;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.job.findFirst({
+			where: { id: jobId },
+			select: { team: { select: { id: true, managerId: true } } },
+		});
 	}
 }

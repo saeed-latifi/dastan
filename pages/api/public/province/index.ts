@@ -9,7 +9,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// prisma
 			const provinces = await provincePrismaProvider.getSome();
-			if (provinces === "ERR") return res.json(onErrorResponse("err on provinces ORM"));
 
 			// api
 			return res.json(onSuccessResponse(provinces));

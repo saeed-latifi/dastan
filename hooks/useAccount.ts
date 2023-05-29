@@ -46,11 +46,7 @@ export function useAccount() {
 			fetcher: () => HTTPService.delete(staticURLs.server.account.base),
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
-				router.push(staticURLs.client.home);
-				// router.replace()
-
-				// TODO
-				router.reload();
+				window.location.replace(staticURLs.client.home);
 			},
 			okMessage: "logged out",
 		});

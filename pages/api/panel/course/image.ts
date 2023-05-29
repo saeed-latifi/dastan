@@ -5,6 +5,7 @@ import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import CoursePrismaProvider from "@providers/prismaProviders/coursePrisma";
 import webpLandscapeBuffer from "@providers/imageGenerators/webpLandscape";
 import { courseImageAWS } from "@providers/bucketsAWS/imageAWS";
+import { errorLogger } from "@utilities/apiLogger";
 
 export const config = {
 	api: {
@@ -26,7 +27,6 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			if (!fields.contentId || !files.image) return res.json(onErrorResponse("incomplete course information"));
 			// prisma check course manager
 			const author = await coursePrismaProvider.checkCourseAuthor({ contentId: fields.contentId });
-			if (author === "ERR") return res.json(onErrorResponse("error on course ORM"));
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("course err : access denied!"));
 			// sharp
@@ -38,7 +38,7 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			// ok res
 			return res.json(onSuccessResponse("ok"));
 		} catch (error) {
-			return res.json(onErrorResponse("err course logo"));
+			return errorLogger({ error, res, name: "course" });
 		}
 	}
 	// not supported method

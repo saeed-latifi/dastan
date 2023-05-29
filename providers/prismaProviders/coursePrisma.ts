@@ -16,6 +16,7 @@ type lessonResType = {
 		category: categoryResType;
 	};
 };
+
 type courseResType = {
 	content: {
 		id: number;
@@ -33,102 +34,57 @@ type courseResType = {
 
 export default class CoursePrismaProvider {
 	async getByAuthor(userId: number) {
-		try {
-			const courses: courseResType[] = await prismaProvider.course.findMany({
-				where: { content: { authorId: userId } },
-				select: courseSelectShape(),
-			});
-
-			return courses;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.course.findMany({
+			where: { content: { authorId: userId } },
+			select: courseSelectShape(),
+		});
 	}
 
 	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
-		try {
-			const { authorId, categoryId, description, title, keywords } = body;
-			const content: courseResType = await prismaProvider.course.create({
-				data: {
-					content: {
-						create: {
-							title,
-							description,
-							authorId,
-							categoryId,
-							keywords: prismaKeywordCreateHandler({ keywords, authorId }),
-						},
+		const { authorId, categoryId, description, title, keywords } = body;
+		return await prismaProvider.course.create({
+			data: {
+				content: {
+					create: {
+						title,
+						description,
+						authorId,
+						categoryId,
+						keywords: prismaKeywordCreateHandler({ keywords, authorId }),
 					},
 				},
-				select: courseSelectShape(),
-			});
-
-			return content;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+			},
+			select: courseSelectShape(),
+		});
 	}
 
 	async update({ contentId, authorId, description, title, categoryId, keywords }: updateArgsType) {
-		try {
-			const content: courseResType = await prismaProvider.course.update({
-				where: { contentId },
-				data: {
-					content: {
-						update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) },
-					},
-				},
-				select: courseSelectShape(),
-			});
-			return content;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.course.update({
+			where: { contentId },
+			data: { content: { update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) } } },
+			select: courseSelectShape(),
+		});
 	}
 
 	async checkUniqueField({ title, contentId }: { title?: string; contentId?: number }) {
-		try {
-			const course = await prismaProvider.course.findFirst({
-				where: {
-					content: { title: { equals: title } },
-					NOT: { contentId },
-				},
-				select: { content: { select: { title: true } }, contentId: true },
-			});
-			return course;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.course.findFirst({
+			where: { content: { title: { equals: title } }, NOT: { contentId } },
+			select: { content: { select: { title: true } }, contentId: true },
+		});
 	}
 
 	async checkCourseAuthor({ contentId }: { contentId: number }) {
-		try {
-			const course = await prismaProvider.course.findFirst({
-				where: { contentId },
-				select: { content: { select: { authorId: true } } },
-			});
-			return course;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.course.findFirst({
+			where: { contentId },
+			select: { content: { select: { authorId: true } } },
+		});
 	}
 
 	async getSome({ userId }: { userId?: number }) {
-		try {
-			const courses = await prismaProvider.course.findMany({
-				where: { content: { isActive: true } },
-				select: publicCourseSelect({ userId }),
-			});
-			return courses;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.course.findMany({
+			where: { content: { isActive: true } },
+			select: publicCourseSelect({ userId }),
+		});
 	}
 }
 

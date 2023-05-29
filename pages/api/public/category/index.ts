@@ -9,7 +9,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// prisma
 			const categories = await categoryPrismaProvider.getSome();
-			if (categories === "ERR") return res.json(onErrorResponse("err on categories ORM"));
 
 			// api
 			return res.json(onSuccessResponse(categories));

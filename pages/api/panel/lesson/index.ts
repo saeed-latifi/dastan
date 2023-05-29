@@ -2,6 +2,7 @@ import { zLessonCreate, zLessonUpdate } from "@models/iLesson";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import LessonPrismaProvider from "@providers/prismaProviders/lessonPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const lessonPrismaProvider = new LessonPrismaProvider();
@@ -28,7 +29,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma unique
 			const notUnique = await lessonPrismaProvider.checkUniqueField({ title });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
 				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
@@ -37,12 +37,11 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma create
 			const course = await lessonPrismaProvider.create({ body: validateData.data, authorId: token.userId });
-			if (course === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 
 			// api
 			return res.json(onSuccessResponse(course));
 		} catch (error) {
-			return res.json(onErrorResponse("err on create course"));
+			return errorLogger({ error, res, name: "lesson" });
 		}
 	}
 
@@ -63,13 +62,11 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma check course author
 			const author = await lessonPrismaProvider.checkLessonAuthor({ contentId });
-			if (author === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
 
 			// unique check
 			const notUnique = await lessonPrismaProvider.checkUniqueField({ title, contentId });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
 				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
@@ -78,12 +75,11 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const course = await lessonPrismaProvider.update({ body: validateData.data, authorId: token.userId });
-			if (course === "ERR") return res.json(onErrorResponse("Error on course ORM"));
 
 			// api
 			return res.json(onSuccessResponse(course));
 		} catch (error) {
-			return res.json(onErrorResponse("err on update course"));
+			return errorLogger({ error, res, name: "lesson" });
 		}
 	}
 

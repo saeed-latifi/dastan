@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
+import { errorLogger } from "@utilities/apiLogger";
 
 export const config = {
 	api: {
@@ -33,7 +34,7 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				return res.json(onErrorResponse("no image file"));
 			}
 		} catch (error) {
-			return res.json(onErrorResponse("err profile image"));
+			return errorLogger({ error, res, name: "image" });
 		}
 	}
 

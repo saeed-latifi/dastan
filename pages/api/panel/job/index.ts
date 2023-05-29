@@ -2,6 +2,7 @@ import { zJobCreate, zJobUpdate } from "@models/iJob";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import JobPrismaProvider from "@providers/prismaProviders/jobPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 import { jobLimits } from "statics/measures";
 
@@ -24,18 +25,16 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma job count limit
 			const jobsCount = await jobPrismaProvider.checkJobCountLimit({ teamId });
-			if (jobsCount === "ERR") return res.json(onErrorResponse("Error on job ORM"));
 			if (jobsCount >= jobLimits.number) return res.json(onErrorResponse("Error reached to limit of your jobs number"));
 
 			// prisma create
 
 			const team = await jobPrismaProvider.create(validateData.data);
-			if (team === "ERR") return res.json(onErrorResponse("Error on team ORM"));
 
 			// api
 			return res.json(onSuccessResponse(team));
 		} catch (error) {
-			return res.json(onErrorResponse("err on create team"));
+			return errorLogger({ error, res, name: "job" });
 		}
 	}
 
@@ -56,18 +55,16 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma check team manager
 			const teamInfo = await jobPrismaProvider.checkJobOwner({ jobId: id });
-			if (teamInfo === "ERR") return res.json(onErrorResponse("Error on job ORM"));
 			if (teamInfo === null) return res.json(onErrorResponse("this job not exist"));
 			if (teamInfo.team.managerId !== token.userId) return res.json(onErrorResponse("Error job access denied!"));
 
 			// prisma
 			const job = await jobPrismaProvider.update(id, { title, description, benefits, provinceId, requirements, wage, wageType });
-			if (job === "ERR") return res.json(onErrorResponse("Error on team ORM"));
 
 			// api
 			return res.json(onSuccessResponse(job));
 		} catch (error) {
-			return res.json(onErrorResponse("err on update team"));
+			return errorLogger({ error, res, name: "job" });
 		}
 	}
 
