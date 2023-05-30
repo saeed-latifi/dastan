@@ -31,7 +31,7 @@ export default function Courses() {
 						return (
 							<div key={index} className="flex items-center justify-between gap-2">
 								<Link href={staticURLs.client.panel.course.one({ courseId: course.id })}>
-									{course.title}
+									{course.content.title}
 								</Link>
 							</div>
 						);

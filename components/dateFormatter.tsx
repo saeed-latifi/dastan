@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function DateFormatter({ date }: { date: string }) {
+export default function DateFormatter({ date }: { date: Date | string }) {
 	const d = new Date(date).toLocaleDateString("fa-IR", {
 		day: "numeric",
 		month: "long",

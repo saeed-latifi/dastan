@@ -11,10 +11,7 @@ const categoryId = z.number();
 
 // schema
 export const zCourseCreate = z.object({ title, description, categoryId, keywords: zKeywords });
-export const zCourseUpdate = z
-	.object({ title, description, categoryId, keywords: zKeywords })
-	.partial()
-	.merge(z.object({ contentId: z.number() }));
+export const zCourseUpdate = z.object({ title, description, categoryId, keywords: zKeywords }).partial().merge(z.object({ id }));
 export const zCourseCreateForm = z.object({ title, description });
 
 // types

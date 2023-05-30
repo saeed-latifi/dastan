@@ -25,6 +25,7 @@ import DateFormatter from "@components/dateFormatter";
 import { useCategory } from "@hooks/public/useCategory";
 import { useCourse } from "@hooks/panel/useCourse";
 import FormRichText from "@components/forms/form-rich-text";
+import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
@@ -36,7 +37,7 @@ export default function ModifyCourse() {
 	const [keyword, setKeyword] = useState<string>("");
 	const [keywords, setKeywords] = useState<string[]>([]);
 
-	const [course, setCourse] = useState<any>();
+	const [course, setCourse] = useState<coursePanelResType | undefined>();
 
 	const router = useRouter();
 
@@ -46,16 +47,16 @@ export default function ModifyCourse() {
 		handleSubmit,
 	} = useForm<iCourseCreateForm>({
 		resolver: zodResolver(zCourseCreateForm),
-		values: course,
+		values: course?.content,
 	});
 
 	useEffect(() => {
 		if (router.isReady) {
 			const item = coursesInfo?.find((item) => item.id === parseInt(router.query.item as string));
 			if (item) {
-				setSelectedCategory(item.category);
-				if (item?.content?.keyword && Array.isArray(item.content.keyword)) {
-					setKeywords(item.content.keyword.map((item: any) => item.title));
+				setSelectedCategory(item.content.category);
+				if (item.content.keywords && Array.isArray(item.content.keywords)) {
+					setKeywords(item.content.keywords.map((item: any) => item.title));
 				}
 			}
 			setCourse(item);
@@ -65,7 +66,7 @@ export default function ModifyCourse() {
 	async function onSubmit(data: iCourseCreateForm) {
 		if (!selectedCategory) return toast.warn("select a category");
 		if (course) {
-			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, contentId: course.contentId, keywords });
+			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, id: course.id, keywords });
 		} else {
 			await onAddCourse({ ...data, categoryId: selectedCategory.id, keywords });
 		}
@@ -108,10 +109,10 @@ export default function ModifyCourse() {
 
 			{course && (
 				<FormSection title="course image">
-					<CourseImage id={course.contentId} />
+					<CourseImage id={course.id} />
 					<ButtonBase
 						type="button"
-						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.contentId }))}
+						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.id }))}
 					>
 						update your course image
 					</ButtonBase>
@@ -144,7 +145,9 @@ export default function ModifyCourse() {
 			<FormSection title="category">
 				<Select
 					selectId="profileProvinces"
-					preSelect={course?.category && { label: course?.category?.title, value: course?.category?.id }}
+					preSelect={
+						course?.content.category && { label: course?.content.category?.title, value: course?.content.category?.id }
+					}
 					options={categories?.map((category) => ({ value: category.id, label: category.title }))}
 					onChange={onSelectCategory}
 				/>
@@ -174,18 +177,18 @@ export default function ModifyCourse() {
 					</ButtonBase>
 
 					{/* TODO lessons */}
-					{Array.isArray(course.lesson) &&
-						course.lesson.map((l: any, index: number) => (
+					{Array.isArray(course.lessons) &&
+						course.lessons.map((lesson, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
 								<Link
 									href={staticURLs.client.panel.course.lesson.one({
 										courseId: course.id,
-										lessonId: l.id,
+										lessonId: lesson.id,
 									})}
 								>
-									{l.title}
+									{lesson.content.title}
 								</Link>
-								<DateFormatter date={l.updatedAt} />
+								<DateFormatter date={lesson.content.updatedAt} />
 							</div>
 						))}
 				</FormSection>

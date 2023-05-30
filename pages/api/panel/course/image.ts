@@ -24,14 +24,14 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 				return res.json(onErrorResponse("bad profile request"));
 			}
 			const { files, fields } = await formParser(req);
-			if (!fields.contentId || !files.image) return res.json(onErrorResponse("incomplete course information"));
+			if (!fields.courseId || !files.image) return res.json(onErrorResponse("incomplete course information"));
 			// prisma check course manager
-			const author = await coursePrismaProvider.checkCourseAuthor({ contentId: fields.contentId });
+			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: fields.courseId });
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("course err : access denied!"));
 			// sharp
 			const buffer = await webpLandscapeBuffer({ path: files.image.filepath });
-			const fileName = fields.contentId + "." + buffer.info.format;
+			const fileName = fields.courseId + "." + buffer.info.format;
 			// aws
 			const awsRes = await courseImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 			if (!awsRes) return res.json(onErrorResponse("error on aws"));

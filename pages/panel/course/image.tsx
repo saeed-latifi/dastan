@@ -34,7 +34,7 @@ export default function TeamLogoCropper() {
 			const blob = await base64ToBlob(dataUrl);
 			const form = new FormData();
 			form.append("image", blob);
-			form.append("contentId", router.query.item as string);
+			form.append("courseId", router.query.item as string);
 			await onUpdateCourseImage({ formData: form });
 			setWaiter(false);
 		} catch (error) {}

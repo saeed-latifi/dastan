@@ -58,15 +58,15 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zLessonUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { contentId, title } = validateData.data;
+			const { id, title } = validateData.data;
 
 			// prisma check course author
-			const author = await lessonPrismaProvider.checkLessonAuthor({ contentId });
+			const author = await lessonPrismaProvider.checkLessonAuthor({ lessonId: id });
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
 
 			// unique check
-			const notUnique = await lessonPrismaProvider.checkUniqueField({ title, contentId });
+			const notUnique = await lessonPrismaProvider.checkUniqueField({ title, lessonId: id });
 			if (notUnique) {
 				const uniqueErrors: errorType = {};
 				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";

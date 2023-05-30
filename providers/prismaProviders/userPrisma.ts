@@ -1,8 +1,7 @@
 import { iUserLogin } from "@models/iUser";
 import prismaProvider from "@providers/prismaProvider";
 import { categoryResType } from "./categoryPrisma";
-import { provinceResType } from "./provincePrisma";
-import { PermissionType } from "@prisma/client";
+import { PermissionType, Province } from "@prisma/client";
 
 type userUniqueResType = {
 	id: number;
@@ -20,7 +19,7 @@ type userResType = {
 	lastName: string | null;
 	username: string;
 	interests: categoryResType[];
-	province: provinceResType | null;
+	province: Province | null;
 	email: string;
 	phone: string | null;
 	account: {

@@ -1,27 +1,18 @@
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
-import { lessonSelectShape } from "./lessonPrisma";
+import { lessonPanelResType, lessonPanelSelect, lessonPublicResType, lessonPublicSelect } from "./lessonPrisma";
 import { categoryResType } from "./categoryPrisma";
+import { Category, Like } from "@prisma/client";
 
-type updateArgsType = { contentId: number; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
-type lessonResType = {
-	videoUrl: string;
-	courseId: number;
+type updateArgsType = { courseId: number; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
+
+export type coursePanelResType = {
+	id: number;
 	content: {
 		id: number;
 		title: string;
 		description: string;
-		createdAt: Date;
-		updatedAt: Date;
-		category: categoryResType;
-	};
-};
-
-type courseResType = {
-	content: {
-		id: number;
-		title: string;
-		description: string;
+		context: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: categoryResType;
@@ -29,18 +20,94 @@ type courseResType = {
 			title: string;
 		}[];
 	};
-	lessons: lessonResType[];
+	lessons: lessonPanelResType[];
 };
 
+export type coursePublicResType = {
+	id: number;
+	content: {
+		title: string;
+		description: string;
+		context: string | null;
+		createdAt: Date;
+		updatedAt: Date;
+		category: Category;
+		author: {
+			id: number;
+			username: string;
+		};
+		_count: {
+			likes: number;
+		};
+		likes: Like[];
+		keywords: {
+			title: string;
+		}[];
+	};
+	lessons: lessonPublicResType[];
+};
+
+function publicCourseSelect({ userId }: { userId?: number }) {
+	return {
+		id: true,
+		content: {
+			select: {
+				title: true,
+				description: true,
+				context: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				keywords: { select: { title: true } },
+				author: { select: { username: true, id: true } },
+				likes: { where: { authorId: userId } },
+				_count: {
+					select: { likes: true },
+				},
+			},
+		},
+		lessons: { select: lessonPublicSelect({ userId }) },
+	};
+}
+
+function coursePanelSelect() {
+	return {
+		id: true,
+		content: {
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				context: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				keywords: { select: { title: true } },
+				_count: {
+					select: { likes: true },
+				},
+			},
+		},
+		lessons: { select: lessonPanelSelect() },
+	};
+}
+
 export default class CoursePrismaProvider {
-	async getByAuthor(userId: number) {
+	// panel
+	async getByAuthor(userId: number): Promise<coursePanelResType[]> {
 		return await prismaProvider.course.findMany({
 			where: { content: { authorId: userId } },
-			select: courseSelectShape(),
+			select: coursePanelSelect(),
 		});
 	}
 
-	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
+	async create(body: {
+		description: string;
+		title: string;
+		authorId: number;
+		categoryId: number;
+		keywords?: string[];
+	}): Promise<coursePanelResType> {
 		const { authorId, categoryId, description, title, keywords } = body;
 		return await prismaProvider.course.create({
 			data: {
@@ -54,83 +121,41 @@ export default class CoursePrismaProvider {
 					},
 				},
 			},
-			select: courseSelectShape(),
+			select: coursePanelSelect(),
 		});
 	}
 
-	async update({ contentId, authorId, description, title, categoryId, keywords }: updateArgsType) {
+	async update({ courseId, authorId, description, title, categoryId, keywords }: updateArgsType): Promise<coursePanelResType> {
 		return await prismaProvider.course.update({
-			where: { contentId },
-			data: { content: { update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) } } },
-			select: courseSelectShape(),
+			where: { id: courseId },
+			data: {
+				content: { update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) } },
+				lessons: { update: { data: { content: { update: { categoryId } } }, where: { courseId } } },
+			},
+			select: coursePanelSelect(),
 		});
 	}
 
-	async checkUniqueField({ title, contentId }: { title?: string; contentId?: number }) {
-		return await prismaProvider.course.findFirst({
-			where: { content: { title: { equals: title } }, NOT: { contentId } },
-			select: { content: { select: { title: true } }, contentId: true },
-		});
-	}
-
-	async checkCourseAuthor({ contentId }: { contentId: number }) {
-		return await prismaProvider.course.findFirst({
-			where: { contentId },
-			select: { content: { select: { authorId: true } } },
-		});
-	}
-
-	async getSome({ userId }: { userId?: number }) {
+	// public
+	async getSome({ userId }: { userId?: number }): Promise<coursePublicResType[]> {
 		return await prismaProvider.course.findMany({
 			where: { content: { isActive: true } },
 			select: publicCourseSelect({ userId }),
 		});
 	}
-}
 
-function publicCourseSelect({ userId }: { userId?: number }) {
-	return {
-		content: {
-			select: {
-				title: true,
-				description: true,
-				category: true,
-				updatedAt: true,
-				createdAt: true,
-				author: { select: { username: true, id: true, slug: true } },
-				keywords: { select: { title: true } },
-				likes: { where: { authorId: userId } },
-				_count: {
-					select: { likes: true },
-				},
-				comments: {
-					select: {
-						author: { select: { username: true, id: true, slug: true } },
-						id: true,
-						description: true,
-						createdAt: true,
-						updatedAt: true,
-					},
-				},
-			},
-		},
-		lessons: { select: lessonSelectShape() },
-	};
-}
+	// internals
+	async checkUniqueField({ title, courseId }: { title?: string; courseId?: number }) {
+		return await prismaProvider.course.findFirst({
+			where: { content: { title: { equals: title } }, NOT: { id: courseId } },
+			select: { content: { select: { title: true } }, id: true },
+		});
+	}
 
-function courseSelectShape() {
-	return {
-		content: {
-			select: {
-				id: true,
-				title: true,
-				description: true,
-				category: true,
-				updatedAt: true,
-				createdAt: true,
-				keywords: { select: { title: true } },
-			},
-		},
-		lessons: { select: lessonSelectShape() },
-	};
+	async checkCourseAuthor({ courseId }: { courseId: number }) {
+		return await prismaProvider.course.findFirst({
+			where: { id: courseId },
+			select: { content: { select: { authorId: true } } },
+		});
+	}
 }

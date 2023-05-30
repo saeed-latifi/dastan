@@ -1,7 +1,7 @@
 import { useImage } from "@hooks/useImage";
 import { bucketUrl } from "statics/keys";
 
-export default function CourseImage({ id }: { id: string }) {
+export default function CourseImage({ id }: { id: number }) {
 	const { forceImageParam } = useImage();
 	const src = `${bucketUrl}/course/${id}.webp?v=${forceImageParam}`;
 

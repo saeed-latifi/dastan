@@ -9,42 +9,41 @@ import Navigation from "@components/navigation";
 import { zKeyword, zKeywords } from "@models/iKeyword";
 import { toast } from "react-toastify";
 import FormItemRow from "@components/forms/form-item-row";
-import { zAttachment, zAttachments } from "@models/iAttachment";
 import { emptyPurger } from "@utilities/nullPurger";
 import { zLessonCreate, zLessonUpdate } from "@models/iLesson";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import TextArea from "@components/forms/form-text-area";
 import { staticURLs } from "statics/url";
 import { useCourse } from "@hooks/panel/useCourse";
+import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
 
 export default function Jobs() {
 	const router = useRouter();
-	const [lesson, setLesson] = useState<any>();
+	const [lesson, setLesson] = useState<lessonPanelResType | undefined>();
 	const { coursesInfo, isLoading, onUpdateLesson, onAddLesson } = useCourse();
 
 	const [title, setTitle] = useState<string>();
 	const [description, setDescription] = useState<string>();
 	const [videoUrl, setVideoUrl] = useState<string>("");
-	const [attachments, setAttachments] = useState<string[]>([]);
 	const [keywords, setKeywords] = useState<string[]>([]);
+	const [categoryId, setCategoryId] = useState<number>();
 
 	const [keyword, setKeyword] = useState<string>("");
-	const [attachment, setAttachment] = useState<string>("");
 	const [errors, setErrors] = useState<errorType>();
 
 	useEffect(() => {
 		if (router.isReady) {
 			const course = coursesInfo?.find((item) => item.id === parseInt(router.query.courseId as string));
 			if (course) {
-				const item = course.lesson?.find((item: any) => item.id === parseInt(router.query.item as string));
+				setCategoryId(course.content.category.id);
+				const item = course.lessons?.find((item: any) => item.id === parseInt(router.query.item as string));
 				if (item) {
 					setLesson(item);
-					setTitle(item.title);
-					setDescription(item.description);
-					setAttachments(item.attachments);
+					setTitle(item.content.title);
+					setDescription(item.content.description);
 					setVideoUrl(item.videoUrl);
-					if (item?.content?.keyword && Array.isArray(item.content.keyword)) {
-						setKeywords(item.content.keyword.map((item: any) => item.title));
+					if (item?.content?.keywords && Array.isArray(item.content.keywords)) {
+						setKeywords(item.content.keywords.map((item: any) => item.title));
 					}
 				}
 			}
@@ -57,14 +56,14 @@ export default function Jobs() {
 			const body = {
 				title,
 				description,
-				attachments,
 				keywords,
 				videoUrl,
+				categoryId,
 				courseId: parseInt(router.query.courseId as string),
 			};
 			const purged = emptyPurger(body);
 			if (lesson) {
-				purged.contentId = lesson.contentId;
+				purged.id = lesson.id;
 				const validJob = zLessonUpdate.safeParse(purged);
 				if (!validJob.success) {
 					console.log(zodErrorMapper(validJob.error.issues));
@@ -103,23 +102,6 @@ export default function Jobs() {
 		setKeywords(newArr);
 	};
 
-	const addAttachment = () => {
-		if (attachment) {
-			const item = zAttachment.safeParse(attachment);
-			if (!item.success) return toast.warn(item.error.issues[0].message);
-			const newArr = [...attachments, attachment];
-			const validate = zAttachments.safeParse(newArr);
-			if (!validate.success) return toast.warn(validate.error.issues[0].message);
-			setAttachments(newArr);
-			setAttachment("");
-		}
-	};
-
-	const removeAttachment = (index: number) => {
-		const newArr = attachments.filter((_, i) => index !== i);
-		setAttachments(newArr);
-	};
-
 	if (isLoading || !router.isReady) return <LoaderSpinner />;
 	if (router.query.item && !lesson) {
 		return (
@@ -153,16 +135,6 @@ export default function Jobs() {
 				</ButtonBase>
 				{keywords.map((title, index) => (
 					<FormItemRow key={index} index={index} title={title} onClick={removeKeyword} />
-				))}
-			</FormSection>
-
-			<FormSection title="attachments">
-				<FormInput value={attachment} onChange={(e) => setAttachment(e.target.value)} />
-				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addAttachment}>
-					add new attachment
-				</ButtonBase>
-				{attachments.map((title, index) => (
-					<FormItemRow key={index} index={index} title={title} onClick={removeAttachment} />
 				))}
 			</FormSection>
 

@@ -8,6 +8,7 @@ const courseId = z.number();
 const attachments = z.array(z.string());
 const contentId = z.number();
 const categoryId = z.number();
+const id = z.number();
 
 // schema
 export const zLessonCreate = z.object({
@@ -28,7 +29,7 @@ export const zLessonUpdate = z.object({
 	attachments: attachments.optional(),
 	categoryId: categoryId.optional(),
 	keywords: zKeywords.optional(),
-	contentId,
+	id,
 });
 
 // types
