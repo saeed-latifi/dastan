@@ -6,12 +6,13 @@ const authorId = z.number();
 const title = z.string().min(5, "more than 5 character");
 const description = z.string().min(5, "more than 5 character");
 const categoryId = z.number();
+const context = z.string();
 
 // optional
 
 // schema
-export const zCourseCreate = z.object({ title, description, categoryId, keywords: zKeywords });
-export const zCourseUpdate = z.object({ title, description, categoryId, keywords: zKeywords }).partial().merge(z.object({ id }));
+export const zCourseCreate = z.object({ title, description, categoryId, context, keywords: zKeywords });
+export const zCourseUpdate = z.object({ title, description, categoryId, context, keywords: zKeywords }).partial().merge(z.object({ id }));
 export const zCourseCreateForm = z.object({ title, description });
 
 // types

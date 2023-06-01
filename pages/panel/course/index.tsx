@@ -1,7 +1,7 @@
 import ButtonBase from "@components/common/base-button";
 import LoaderSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
-import { useCourse } from "@hooks/panel/useCourse";
+import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import { useAccount } from "@hooks/useAccount";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -13,7 +13,7 @@ export default function Courses() {
 	const { checkAccessRedirect } = useAccount();
 	checkAccessRedirect();
 
-	const { coursesInfo, isLoading } = useCourse();
+	const { coursesInfo, isLoading } = useCoursePanel();
 
 	if (isLoading) return <LoaderSpinner />;
 

@@ -5,7 +5,7 @@ export enum logoImageTypes {
 	full,
 	thumb,
 }
-export default function TeamLogo({ id, logoType = logoImageTypes.thumb }: { id: string; logoType?: logoImageTypes }) {
+export default function TeamLogo({ id, logoType = logoImageTypes.thumb }: { id: number; logoType?: logoImageTypes }) {
 	const { forceImageParam } = useImage();
 	const src = `${bucketUrl}/team/${id}.webp?v=${forceImageParam}`;
 

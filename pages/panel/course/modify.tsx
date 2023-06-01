@@ -23,16 +23,17 @@ import { zKeyword, zKeywords } from "@models/iKeyword";
 import Link from "next/link";
 import DateFormatter from "@components/dateFormatter";
 import { useCategory } from "@hooks/public/useCategory";
-import { useCourse } from "@hooks/panel/useCourse";
+import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import FormRichText from "@components/forms/form-rich-text";
 import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 
 export default function ModifyCourse() {
 	const { checkAccessRedirect } = useAccount();
-	const { coursesInfo, onAddCourse, onUpdateCourse, isLoading } = useCourse();
+	const { coursesInfo, onAddCourse, onUpdateCourse, isLoading } = useCoursePanel();
 	const { categories } = useCategory();
 	checkAccessRedirect();
 
+	const [context, setContext] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<iCategory>();
 	const [keyword, setKeyword] = useState<string>("");
 	const [keywords, setKeywords] = useState<string[]>([]);
@@ -55,6 +56,7 @@ export default function ModifyCourse() {
 			const item = coursesInfo?.find((item) => item.id === parseInt(router.query.item as string));
 			if (item) {
 				setSelectedCategory(item.content.category);
+				setContext(item.content.context || "");
 				if (item.content.keywords && Array.isArray(item.content.keywords)) {
 					setKeywords(item.content.keywords.map((item: any) => item.title));
 				}
@@ -66,9 +68,9 @@ export default function ModifyCourse() {
 	async function onSubmit(data: iCourseCreateForm) {
 		if (!selectedCategory) return toast.warn("select a category");
 		if (course) {
-			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, id: course.id, keywords });
+			await onUpdateCourse({ ...data, context, categoryId: selectedCategory.id, id: course.id, keywords });
 		} else {
-			await onAddCourse({ ...data, categoryId: selectedCategory.id, keywords });
+			await onAddCourse({ ...data, context, categoryId: selectedCategory.id, keywords });
 		}
 	}
 
@@ -134,12 +136,7 @@ export default function ModifyCourse() {
 			</FormSection>
 
 			<FormSection title="context">
-				<FormRichText
-					value="adwdsd wfdgf eg eg"
-					onChange={(text) => {
-						console.log(text);
-					}}
-				/>
+				<FormRichText value={context} onChange={setContext} />
 			</FormSection>
 
 			<FormSection title="category">

@@ -22,7 +22,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			}
 
 			// prisma
-			const teams = await teamPrismaProvider.getSome(token.userId);
+			const teams = await teamPrismaProvider.getByManager(token.userId);
 
 			// api
 			return res.json(onSuccessResponse(teams));
@@ -47,6 +47,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const { title } = validateData.data;
 
 			// prisma team count limit
+			// TODO
 			const teamsCount = await teamPrismaProvider.checkTeamCountLimit({ managerId: token.userId });
 
 			// prisma unique

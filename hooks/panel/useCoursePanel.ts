@@ -11,7 +11,7 @@ import { fetchHandler } from "@hooks/useFetch";
 import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
 
-export function useCourse() {
+export function useCoursePanel() {
 	const router = useRouter();
 
 	const {

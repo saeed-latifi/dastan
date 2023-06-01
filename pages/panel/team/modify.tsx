@@ -9,7 +9,7 @@ import TextArea from "@components/forms/form-text-area";
 import TeamLogo, { logoImageTypes } from "@components/images/team-logo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAccount } from "@hooks/useAccount";
-import { useTeam } from "@hooks/panel/useTeam";
+import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import { iTeamCreate, zTeamContact, zTeamCreate } from "@models/iTeam";
 import DateFormatter from "@components/dateFormatter";
 import Link from "next/link";
@@ -29,7 +29,7 @@ export default function ModifyTeam() {
 	const [team, setTeam] = useState<any>();
 	const router = useRouter();
 
-	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam, allowMoreJob } = useTeam();
+	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam, allowMoreJob } = useTeamPanel();
 
 	const {
 		register,

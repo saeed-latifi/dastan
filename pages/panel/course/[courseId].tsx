@@ -14,13 +14,13 @@ import { zLessonCreate, zLessonUpdate } from "@models/iLesson";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import TextArea from "@components/forms/form-text-area";
 import { staticURLs } from "statics/url";
-import { useCourse } from "@hooks/panel/useCourse";
+import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
 
 export default function Jobs() {
 	const router = useRouter();
 	const [lesson, setLesson] = useState<lessonPanelResType | undefined>();
-	const { coursesInfo, isLoading, onUpdateLesson, onAddLesson } = useCourse();
+	const { coursesInfo, isLoading, onUpdateLesson, onAddLesson } = useCoursePanel();
 
 	const [title, setTitle] = useState<string>();
 	const [description, setDescription] = useState<string>();

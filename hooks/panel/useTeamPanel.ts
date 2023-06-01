@@ -8,8 +8,10 @@ import { jobLimits, teamLimits } from "statics/measures";
 import { produce } from "immer";
 import { iJobCreate, iJobUpdate } from "@models/iJob";
 import { staticURLs } from "statics/url";
+import { teamPanelResType } from "@providers/prismaProviders/teamPrisma";
+import { jobPanelResType } from "@providers/prismaProviders/jobPrisma";
 
-export function useTeam() {
+export function useTeamPanel() {
 	const router = useRouter();
 
 	const {
@@ -24,7 +26,7 @@ export function useTeam() {
 
 	async function getTeams() {
 		try {
-			const { data }: { data: apiResponse<any[]> } = await HTTPService.get(staticURLs.server.panel.team.base);
+			const { data }: { data: apiResponse<teamPanelResType[]> } = await HTTPService.get(staticURLs.server.panel.team.base);
 			if (data.resState === responseState.ok) return data.data;
 		} catch (error: any) {
 			toast.warn("bad connection");
@@ -32,14 +34,14 @@ export function useTeam() {
 	}
 
 	function onAddTeam(body: { title: string; description: string; userId: number; contactMethods?: string[] }) {
-		fetchHandler({
+		fetchHandler<teamPanelResType>({
 			fetcher: () => HTTPService.post(staticURLs.server.panel.team.base, body),
 			onOK: (res) => {
-				teamsMutate(res.data, {
-					populateCache(result, baseState) {
+				teamsMutate(undefined, {
+					populateCache(_result, baseState) {
 						const mutated = produce(baseState, (draft) => {
-							if (Array.isArray(draft)) draft.push(result);
-							else draft = [result];
+							if (Array.isArray(draft)) draft.push(res);
+							else draft = [res];
 						});
 						return mutated;
 					},
@@ -51,14 +53,14 @@ export function useTeam() {
 	}
 
 	function onUpdateTeam(body: { id: number; title?: string; description?: string; contactMethods?: string[] }) {
-		fetchHandler({
+		fetchHandler<teamPanelResType>({
 			fetcher: () => HTTPService.put(staticURLs.server.panel.team.base, body),
 			onOK: (res) => {
-				teamsMutate(res.data, {
-					populateCache(result, baseState) {
+				teamsMutate(undefined, {
+					populateCache(_result, baseState) {
 						const mutated = produce(baseState, (draft) => {
 							draft?.forEach((item, index) => {
-								if (item.id === result.id) draft[index] = { ...result };
+								if (item.id === res.id) draft[index] = { ...res };
 							});
 						});
 						return mutated;
@@ -71,18 +73,18 @@ export function useTeam() {
 	}
 
 	function onAddJob(body: iJobCreate) {
-		fetchHandler({
+		fetchHandler<jobPanelResType>({
 			fetcher: () => HTTPService.post(staticURLs.server.panel.job.base, body),
 			onOK: (res) => {
 				let itemId = 0;
-				teamsMutate(res.data, {
-					populateCache(result, baseState) {
+				teamsMutate(undefined, {
+					populateCache(_result, baseState) {
 						const mutated = produce(baseState, (draft) => {
 							draft?.forEach((team) => {
-								if (team.id === result.teamId) {
-									itemId = result.teamId;
-									if (Array.isArray(team.jobs)) team.jobs.push(result);
-									else team.jobs = [result];
+								if (team.id === res.teamId) {
+									itemId = res.teamId;
+									if (Array.isArray(team.jobs)) team.jobs.push(res);
+									else team.jobs = [res];
 								}
 							});
 						});
@@ -96,20 +98,20 @@ export function useTeam() {
 	}
 
 	function onUpdateJob(body: iJobUpdate) {
-		fetchHandler({
+		fetchHandler<jobPanelResType>({
 			fetcher: () => HTTPService.put(staticURLs.server.panel.job.base, body),
 			onOK: (res) => {
 				let itemId = 0;
-				teamsMutate(res.data, {
-					populateCache(result, baseState) {
+				teamsMutate(undefined, {
+					populateCache(_result, baseState) {
 						const mutated = produce(baseState, (draft) => {
 							draft?.forEach((team) => {
-								if (team.id === result.teamId) {
+								if (team.id === res.teamId) {
 									if (Array.isArray(team.jobs)) {
 										team.jobs.forEach((job: any, index: number) => {
-											if (job.id === result.id) {
-												itemId = result.teamId;
-												team.jobs[index] = { ...result };
+											if (job.id === res.id) {
+												itemId = res.teamId;
+												team.jobs[index] = { ...res };
 											}
 										});
 									}
@@ -135,7 +137,7 @@ export function useTeam() {
 		if (isLoading) return false;
 		let allow = true;
 		teamsInfo?.forEach((item) => {
-			if (item.id === teamId && item?.Jobs.length >= jobLimits.number) {
+			if (item.id === teamId && item?.jobs.length >= jobLimits.number) {
 				allow = false;
 			}
 		});

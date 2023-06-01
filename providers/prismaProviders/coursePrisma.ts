@@ -4,7 +4,15 @@ import { lessonPanelResType, lessonPanelSelect, lessonPublicResType, lessonPubli
 import { categoryResType } from "./categoryPrisma";
 import { Category, Like } from "@prisma/client";
 
-type updateArgsType = { courseId: number; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
+type updateArgsType = {
+	courseId: number;
+	authorId: number;
+	description?: string;
+	title?: string;
+	categoryId?: number;
+	keywords?: string[];
+	context?: string;
+};
 
 export type coursePanelResType = {
 	id: number;
@@ -26,12 +34,14 @@ export type coursePanelResType = {
 export type coursePublicResType = {
 	id: number;
 	content: {
+		id: number;
 		title: string;
 		description: string;
 		context: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: Category;
+		image: string | null;
 		author: {
 			id: number;
 			username: string;
@@ -52,6 +62,7 @@ function publicCourseSelect({ userId }: { userId?: number }) {
 		id: true,
 		content: {
 			select: {
+				id: true,
 				title: true,
 				description: true,
 				context: true,
@@ -61,6 +72,7 @@ function publicCourseSelect({ userId }: { userId?: number }) {
 				keywords: { select: { title: true } },
 				author: { select: { username: true, id: true } },
 				likes: { where: { authorId: userId } },
+				image: true,
 				_count: {
 					select: { likes: true },
 				},
@@ -107,8 +119,9 @@ export default class CoursePrismaProvider {
 		authorId: number;
 		categoryId: number;
 		keywords?: string[];
+		context?: string;
 	}): Promise<coursePanelResType> {
-		const { authorId, categoryId, description, title, keywords } = body;
+		const { authorId, categoryId, description, title, keywords, context } = body;
 		return await prismaProvider.course.create({
 			data: {
 				content: {
@@ -117,6 +130,7 @@ export default class CoursePrismaProvider {
 						description,
 						authorId,
 						categoryId,
+						context,
 						keywords: prismaKeywordCreateHandler({ keywords, authorId }),
 					},
 				},
@@ -125,23 +139,28 @@ export default class CoursePrismaProvider {
 		});
 	}
 
-	async update({ courseId, authorId, description, title, categoryId, keywords }: updateArgsType): Promise<coursePanelResType> {
+	// : Promise<coursePanelResType>
+	async update({ courseId, authorId, description, title, categoryId, keywords, context }: updateArgsType) {
 		return await prismaProvider.course.update({
 			where: { id: courseId },
 			data: {
-				content: { update: { description, title, categoryId, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) } },
-				lessons: { update: { data: { content: { update: { categoryId } } }, where: { courseId } } },
+				content: {
+					update: { description, title, categoryId, context, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) },
+				},
+				// TODO ERR
+				// lessons: { update: { data: { content: { update: { categoryId } } }, where: { courseId } } },
 			},
 			select: coursePanelSelect(),
 		});
 	}
 
 	// public
-	async getSome({ userId }: { userId?: number }): Promise<coursePublicResType[]> {
-		return await prismaProvider.course.findMany({
+	async getFeed({ userId }: { userId?: number }): Promise<coursePublicResType[]> {
+		const feed = await prismaProvider.course.findMany({
 			where: { content: { isActive: true } },
 			select: publicCourseSelect({ userId }),
 		});
+		return feed;
 	}
 
 	// internals

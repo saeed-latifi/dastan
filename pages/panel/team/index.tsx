@@ -3,7 +3,7 @@ import LoaderSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
 import TeamLogo from "@components/images/team-logo";
 import { useAccount } from "@hooks/useAccount";
-import { useTeam } from "@hooks/panel/useTeam";
+import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -14,7 +14,7 @@ export default function Team() {
 	const { checkAccessRedirect } = useAccount();
 	checkAccessRedirect();
 
-	const { teamsInfo, isLoading, allowMoreTeam } = useTeam();
+	const { teamsInfo, isLoading, allowMoreTeam } = useTeamPanel();
 
 	if (isLoading) return <LoaderSpinner />;
 

@@ -58,6 +58,7 @@ export const staticURLs = {
 			team: { base: "panel/team", image: "panel/team/image" },
 			job: { base: "panel/job" },
 		},
+
 		account: {
 			base: "account",
 			password: "account/password",
@@ -73,6 +74,13 @@ export const staticURLs = {
 			category: {
 				base: "public/category",
 			},
+		},
+
+		feed: {
+			course: {
+				all: "feed/course",
+			},
+			like: "feed/like",
 		},
 	},
 };

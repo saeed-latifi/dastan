@@ -75,7 +75,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zCourseUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { id, title, description, categoryId, keywords } = validateData.data;
+			const { id, title, description, categoryId, keywords, context } = validateData.data;
 
 			// prisma check course author
 			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: id });
@@ -97,6 +97,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 				description,
 				categoryId,
 				keywords,
+				context,
 				authorId: token.userId,
 			});
 

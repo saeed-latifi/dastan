@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
-import { useTeam } from "@hooks/panel/useTeam";
+import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import LoaderSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
@@ -24,7 +24,7 @@ import { staticURLs } from "statics/url";
 export default function Jobs() {
 	const router = useRouter();
 	const { provinces } = useProvince();
-	const { onAddJob, teamsInfo, isLoading, allowMoreJob, onUpdateJob } = useTeam();
+	const { onAddJob, teamsInfo, isLoading, allowMoreJob, onUpdateJob } = useTeamPanel();
 	const [job, setJob] = useState<any>();
 
 	useEffect(() => {
@@ -41,7 +41,7 @@ export default function Jobs() {
 					setRequirements(item.requirements);
 					setBenefits(item.benefits);
 					setWageType(item.wageType);
-					setWage(item.wage);
+					setWage(item.wage || 0);
 					item.province && setSelectedProvince(item.province);
 				}
 			}

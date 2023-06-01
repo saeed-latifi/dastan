@@ -1,36 +1,47 @@
 import prismaProvider from "@providers/prismaProvider";
+import { jobPanelResType, jobPanelSelect } from "./jobPrisma";
 
-const jobSelect = {
-	jobs: {
-		select: {
-			wageType: true,
-			benefits: true,
-			description: true,
-			id: true,
-			province: true,
-			requirements: true,
-			title: true,
-			updatedAt: true,
-			wage: true,
-			teamId: true,
-		},
-	},
+export type teamPanelResType = {
+	id: number;
+	title: string;
+	description: string;
+	context: string | null;
+	image: string | null;
+	contactMethods: string[];
+	jobs: jobPanelResType[];
+	members: { id: number; username: string }[];
+	managerId: number;
 };
 
+function teamPanelSelect() {
+	return {
+		id: true,
+		title: true,
+		description: true,
+		context: true,
+		contactMethods: true,
+		image: true,
+		managerId: true,
+		members: { select: { username: true, id: true } },
+		jobs: { select: jobPanelSelect() },
+	};
+}
+
 export default class TeamPrismaProvider {
-	async getSome(userId: number) {
-		return await prismaProvider.team.findMany({ where: { managerId: userId }, include: jobSelect });
+	// panel
+	async getByManager(managerId: number): Promise<teamPanelResType[]> {
+		return await prismaProvider.team.findMany({ where: { managerId }, select: teamPanelSelect() });
 	}
 
-	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }) {
-		const team = await prismaProvider.team.create({ data: body, include: jobSelect });
-		return team;
+	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }): Promise<teamPanelResType> {
+		return await prismaProvider.team.create({ data: body, select: teamPanelSelect() });
 	}
 
-	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }) {
-		return await prismaProvider.team.update({ data: body, where: { id }, include: jobSelect });
+	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }): Promise<teamPanelResType> {
+		return await prismaProvider.team.update({ data: body, where: { id }, select: teamPanelSelect() });
 	}
 
+	// internal
 	async checkUniqueField({ title, teamId }: { title?: string; teamId?: number }) {
 		return await prismaProvider.team.findFirst({
 			where: { OR: [{ title: { equals: title } }], NOT: { id: { equals: teamId } } },
@@ -43,6 +54,6 @@ export default class TeamPrismaProvider {
 	}
 
 	async checkTeamCountLimit({ managerId }: { managerId: number }) {
-		return await prismaProvider.team.findMany({ where: { managerId } });
+		return await prismaProvider.team.count({ where: { managerId } });
 	}
 }
