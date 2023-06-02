@@ -11,13 +11,15 @@ export const staticURLs = {
 		recoverPassword: "/recover-password",
 		reSendActivationEmail: "/resend-activation-email",
 
-		profile: {
-			base: "/profile",
-			OTPCheck: "/profile/otp-check",
-			addImage: "/profile/add-image",
-			changePassword: "/profile/change-password",
-			changeEmail: "/profile/change-email/",
-			addPhone: "/profile/add-phone",
+		account: {
+			base: "/account",
+			OTPCheck: "/account/otp-check",
+			addImage: "/account/add-image",
+			changePassword: "/account/change-password",
+			changeEmail: "/account/change-email/",
+			addPhone: "/account/add-phone",
+			resetPassword: "/account/reset-password",
+			confirmNewEmail: "/account/confirm-new-email",
 		},
 
 		panel: {

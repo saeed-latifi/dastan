@@ -38,7 +38,7 @@ const authHTMLGenerator = (link: string) => {
 };
 
 const recoverPasswordHTMLGenerator = (link: string) => {
-	const domain = `${emailDomain}/profile/reset-password`;
+	const domain = `${emailDomain}${staticURLs.client.account.resetPassword}`;
 	return `
 <html>
     <head>
@@ -57,7 +57,7 @@ const recoverPasswordHTMLGenerator = (link: string) => {
 };
 
 const changeEmailNewHTMLGenerator = (link: string) => {
-	const domain = `${emailDomain}/profile/confirm-new-email`;
+	const domain = `${emailDomain}${staticURLs.client.account.confirmNewEmail}`;
 	return `
 <html>
     <head>

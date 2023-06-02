@@ -56,7 +56,6 @@ model User {
   username  String  @unique @db.VarChar(30)
   firstName String? @db.VarChar(30)
   lastName  String? @db.VarChar(30)
-  resume    Resume?
   image     String?
   email     String  @unique @db.VarChar(70)
   phone     String? @unique @db.VarChar(11)
@@ -70,7 +69,8 @@ model User {
   reports       Report[]
   adminMessages AdminMessage[]
 
-  teams       Team[] @relation("manager")
+  resume      Resume?
+  teams       Team[]  @relation("manager")
   memberships Team[]
 
   contents        Content[] @relation("composed")
@@ -295,9 +295,10 @@ model Resume {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  context   String?
-  skills    String[]
-  portfolio String[]
+  context        String?
+  skills         String[]
+  portfolio      String[]
+  contactMethods String[]
 
   linkedIn String?
   discord  String?

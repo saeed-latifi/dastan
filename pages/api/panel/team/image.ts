@@ -21,7 +21,7 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) {
 				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad profile request"));
+				return res.json(onErrorResponse("bad team request"));
 			}
 
 			const { files, fields } = await formParser(req);

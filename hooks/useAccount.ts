@@ -130,7 +130,7 @@ export function useAccount() {
 	async function onSendOTP(body: iPhone) {
 		fetchHandler({
 			fetcher: () => HTTPService.post(staticURLs.server.account.phone, body),
-			onOK: () => router.push(staticURLs.client.profile.OTPCheck),
+			onOK: () => router.push(staticURLs.client.account.OTPCheck),
 		});
 	}
 

@@ -21,7 +21,7 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) {
 				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad profile request"));
+				return res.json(onErrorResponse("bad course request"));
 			}
 			const { files, fields } = await formParser(req);
 			if (!fields.courseId || !files.image) return res.json(onErrorResponse("incomplete course information"));

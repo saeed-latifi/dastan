@@ -24,7 +24,7 @@ export function useImage() {
 					},
 					revalidate: false,
 				});
-				router.push(staticURLs.client.profile.base);
+				router.push(staticURLs.client.account.base);
 				return toast.success("image uploaded.");
 			} else {
 				return toast.warn("image upload failed!");
