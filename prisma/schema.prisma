@@ -295,14 +295,8 @@ model Resume {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  context        String?
-  skills         String[]
-  portfolio      String[]
-  contactMethods String[]
-
-  linkedIn String?
-  discord  String?
-  github   String?
+  portfolio String[]
+  context   String   @default("")
 
   @@index([userId])
 }

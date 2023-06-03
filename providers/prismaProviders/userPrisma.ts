@@ -44,7 +44,25 @@ const userReturnField = {
 	account: { select: { permission: true } },
 };
 
+export type userFeedResType = {
+	id: number;
+	username: string;
+	image: string | null;
+	followers: {
+		id: number;
+	}[];
+	_count: {
+		followers: number;
+		follows: number;
+	};
+	resume: {
+		context: string;
+		portfolio: string[];
+	} | null;
+} | null;
+
 export default class UserPrismaProvider {
+	// account
 	async getOne(userId: number) {
 		return await prismaProvider.user.findUnique({ where: { id: userId }, select: userReturnField });
 	}

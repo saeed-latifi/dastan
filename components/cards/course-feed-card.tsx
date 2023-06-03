@@ -3,8 +3,10 @@ import HeartIcon from "@components/icons/heart-icon";
 import { useCourseFeed } from "@hooks/feed/useCourseFeed";
 import { useAccount } from "@hooks/useAccount";
 import { coursePublicResType } from "@providers/prismaProviders/coursePrisma";
+import Link from "next/link";
 import { useState } from "react";
 import { bucketUrl } from "statics/keys";
+import { staticURLs } from "statics/url";
 
 export default function CourseFeedCard({ course }: { course: coursePublicResType }) {
 	const { userInfo } = useAccount();
@@ -45,7 +47,7 @@ export default function CourseFeedCard({ course }: { course: coursePublicResType
 				{(isValidating || isLoading) && <span className="text-3xl">isValidating</span>}
 				<h2> {title}</h2>
 				<p>{description}</p>
-				<span>{authorName}</span>
+				<Link href={staticURLs.client.feed.resume({ username: authorName })}>{authorName}</Link>
 				<div className="flex items-center w-full justify-between">
 					<span className="flex items-center gap-1">
 						<span className="flex w-5">

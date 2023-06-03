@@ -1,30 +1,28 @@
-import { zLike } from "@models/iLike";
+import { zResumeFeed } from "@models/iResume";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
-import ContentPrismaProvider from "@providers/prismaProviders/contentPrisma";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import ResumePrismaProvider from "@providers/prismaProviders/resumePrisma";
+import { tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const contentPrismaProvider = new ContentPrismaProvider();
+const resumePrismaProvider = new ResumePrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	if (req.method === "POST") {
+	// resume
+	if (req.method === "GET") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			const viewerId = token ? token.userId : undefined;
 
-			const validateData = zLike.safeParse(req.body);
+			const validateData = zResumeFeed.safeParse(req.query);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { isLike, contentId } = validateData.data;
+			const { username } = validateData.data;
 
 			// prisma
-			const courses = await contentPrismaProvider.onLike({ isLike, contentId, authorId: token.userId });
+			const resume = await resumePrismaProvider.getResumeFeed({ username, viewerId });
 
 			// api
-			return res.json(onSuccessResponse(courses));
+			return res.json(onSuccessResponse(resume));
 		} catch (error) {
 			return errorLogger({ error, res, name: "course" });
 		}

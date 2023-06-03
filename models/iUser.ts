@@ -23,7 +23,6 @@ const permissionLevel = z.number().optional();
 const RegisterDate = z.date().optional();
 
 // schema
-
 export const zPhone = z.object({ phone });
 export const zUserEmail = z.object({ email });
 export const zUserLogin = z.object({ email, password });

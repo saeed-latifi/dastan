@@ -1,6 +1,8 @@
 export const staticURLs = {
 	client: {
 		home: "/",
+		course: "/course",
+
 		welcome: "/welcome",
 		login: "/login",
 		checkYourEmail: "/check-your-email",
@@ -46,6 +48,11 @@ export const staticURLs = {
 				},
 			},
 		},
+
+		feed: {
+			course: "/course",
+			resume: ({ username }: { username: string }) => `/resume/${username}`,
+		},
 	},
 
 	server: {
@@ -82,7 +89,9 @@ export const staticURLs = {
 			course: {
 				all: "feed/course",
 			},
+			resume: "feed/resume",
 			like: "feed/like",
+			follow: "feed/follow",
 		},
 	},
 };
