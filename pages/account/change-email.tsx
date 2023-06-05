@@ -23,7 +23,7 @@ export default function ChangeEmail() {
 
 	return (
 		<Form onSubmit={handleSubmit(onRequestChangeEmail)}>
-			<Navigation label="" path={staticURLs.client.profile.base} />
+			<Navigation label="" path={staticURLs.client.account.base} />
 			<FormSection title="email change">
 				<FormInput
 					labelText="your new email"

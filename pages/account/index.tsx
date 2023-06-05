@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,7 +58,7 @@ export default function Profile() {
 		onUpdateUser(body);
 	}
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
@@ -121,23 +121,23 @@ export default function Profile() {
 			</ButtonBase>
 
 			<div className="flex flex-col gap-4 max-w-sm w-full  mx-auto">
-				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.addImage)}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.account.addImage)}>
 					update profile image
 				</ButtonBase>
-				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.changePassword)}>
+				<ButtonBase type="button" onClick={() => router.push(staticURLs.client.account.changePassword)}>
 					change password
 				</ButtonBase>
 
 				<div className="w-full flex flex-col gap-1">
 					{userInfo.email && <p className="text-gray-500 select-none mx-auto">{userInfo.email}</p>}
-					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.changeEmail)}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.account.changeEmail)}>
 						change email
 					</ButtonBase>
 				</div>
 
 				<div className="w-full flex flex-col gap-1">
 					{userInfo.phone && <p className="text-gray-500 select-none mx-auto">{userInfo.phone}</p>}
-					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.profile.addPhone)}>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.account.addPhone)}>
 						{userInfo.phone ? "change phone number" : " Add phone"}
 					</ButtonBase>
 				</div>

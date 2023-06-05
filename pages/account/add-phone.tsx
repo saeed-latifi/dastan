@@ -22,7 +22,7 @@ export default function AddPhone() {
 
 	return (
 		<Form onSubmit={handleSubmit(onSendOTP)}>
-			<Navigation label="" path={staticURLs.client.profile.base} />
+			<Navigation label="" path={staticURLs.client.account.base} />
 
 			<FormSection title="add phone">
 				<FormInput

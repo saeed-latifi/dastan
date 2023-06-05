@@ -1,5 +1,5 @@
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormSection from "@components/forms/form-section";
@@ -22,11 +22,11 @@ export default function ChangePassword() {
 		resolver: zodResolver(zPasswordUpdate),
 	});
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 
 	return (
 		<Form onSubmit={handleSubmit(onUpdatePassword)}>
-			<Navigation label="" path={staticURLs.client.profile.base} />
+			<Navigation label="" path={staticURLs.client.account.base} />
 
 			<FormSection title="password change">
 				<FormInput

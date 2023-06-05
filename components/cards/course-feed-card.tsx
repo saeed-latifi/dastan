@@ -38,14 +38,18 @@ export default function CourseFeedCard({ course }: { course: coursePublicResType
 
 	return (
 		<article className="flex-1 min-w-[30%] flex flex-col border border-theme-border rounded-theme-border overflow-hidden ">
-			{image ? (
-				<img className="aspect-video overflow-hidden  object-cover w-full" src={imageSrc} alt={title} />
-			) : (
-				<img className="aspect-video overflow-hidden  object-contain w-full" src="/images/course.svg" alt={title} />
-			)}
+			<Link href={staticURLs.client.feed.course({ courseName: title })}>
+				{image ? (
+					<img className="aspect-video overflow-hidden  object-cover w-full" src={imageSrc} alt={title} />
+				) : (
+					<img className="aspect-video overflow-hidden  object-contain w-full" src="/images/course.svg" alt={title} />
+				)}
+			</Link>
 			<div className="flex flex-col p-2 gap-2 w-full border-t border-theme-border">
 				{(isValidating || isLoading) && <span className="text-3xl">isValidating</span>}
-				<h2> {title}</h2>
+				<Link href={staticURLs.client.feed.course({ courseName: title })}>
+					<h2> {title}</h2>
+				</Link>
 				<p>{description}</p>
 				<Link href={staticURLs.client.feed.resume({ username: authorName })}>{authorName}</Link>
 				<div className="flex items-center w-full justify-between">

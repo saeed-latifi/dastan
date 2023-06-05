@@ -17,7 +17,7 @@ import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
 import { useTeamPanel } from "@hooks/panel/useTeamPanel";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
 
@@ -149,7 +149,7 @@ export default function Jobs() {
 		return options;
 	}
 
-	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (isLoading || !router.isReady) return <LoadingSpinner />;
 	if (router.query.item && !job) {
 		return (
 			<div className="flex flex-col items-center gap-4">

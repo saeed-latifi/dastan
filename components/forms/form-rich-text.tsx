@@ -1,9 +1,9 @@
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import dynamic from "next/dynamic";
 
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
 	ssr: false,
-	loading: () => <LoaderSpinner />,
+	loading: () => <LoadingSpinner />,
 });
 
 export default function FormRichText({ value, onChange }: { value: string; onChange: (text: string) => void }) {

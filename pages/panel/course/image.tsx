@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import { useAccount } from "@hooks/useAccount";
 import { useImage } from "@hooks/useImage";
@@ -56,7 +56,7 @@ export default function TeamLogoCropper() {
 		}
 	};
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 
 	return (
 		<Form onSubmit={onSubmit} style={{ maxWidth: "32rem" }}>

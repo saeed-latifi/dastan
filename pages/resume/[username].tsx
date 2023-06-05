@@ -1,5 +1,5 @@
 import ButtonBase from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import { useResumeFeed } from "@hooks/feed/useResumeFeed";
 import { useAccount } from "@hooks/useAccount";
 import React, { useEffect, useState } from "react";
@@ -9,7 +9,7 @@ export default function Resume() {
 	const { userInfo } = useAccount();
 	const [freeze, setFreeze] = useState(false);
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 	if (!resumeInfo) return <p>not valid!</p>;
 
 	const followedByMe = resumeInfo.followers[0]?.id === userInfo.id;

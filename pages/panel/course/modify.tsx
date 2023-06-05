@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormSection from "@components/forms/form-section";
@@ -93,7 +93,7 @@ export default function ModifyCourse() {
 		setKeywords(newArr);
 	};
 
-	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (isLoading || !router.isReady) return <LoadingSpinner />;
 	if (router.query.item && !course) {
 		return (
 			<div className="flex flex-col items-center gap-4">

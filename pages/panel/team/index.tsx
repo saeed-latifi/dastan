@@ -1,5 +1,5 @@
 import ButtonBase from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
 import TeamLogo from "@components/images/team-logo";
 import { useAccount } from "@hooks/useAccount";
@@ -16,7 +16,7 @@ export default function Team() {
 
 	const { teamsInfo, isLoading, allowMoreTeam } = useTeamPanel();
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-md py-4">

@@ -1,10 +1,12 @@
-import { onErrorResponse } from "@providers/apiResponseHandler";
+import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
 import { tokenValidator } from "@providers/tokenProvider";
 import type { NextApiRequest, NextApiResponse } from "next";
 import busboy from "busboy";
 import fs from "fs";
 import { AWSProfileConfig } from "statics/keys";
 import AWS from "aws-sdk";
+import { formParser } from "@utilities/formParser";
+import { errorLogger } from "@utilities/apiLogger";
 
 export const config = {
 	api: {
@@ -34,7 +36,10 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 		bb.on("file", (_, file, info) => {
 			// auth-api.mp4
-			const fileName = info.filename;
+			const fileName = `${req.query.lessonId}.mp4`;
+			console.log(" info : ", info);
+
+			// const fileName = info.filename;
 			const filePath = `./videos/${fileName}`;
 
 			const stream = fs.createWriteStream(filePath);

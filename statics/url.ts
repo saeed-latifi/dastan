@@ -34,6 +34,10 @@ export const staticURLs = {
 					add: ({ courseId }: { courseId: number }) => `/panel/course/${courseId}`,
 					one: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
 						`/panel/course/${courseId}?item=${lessonId}`,
+					addVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
+						`/panel/course/${courseId}/${lessonId}`,
+					showVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
+						`/panel/course/${courseId}/${lessonId}/video`,
 				},
 			},
 
@@ -50,7 +54,10 @@ export const staticURLs = {
 		},
 
 		feed: {
-			course: "/course",
+			courses: "/courses",
+			course: ({ courseName }: { courseName: string }) => `/courses/${courseName}`,
+			lesson: ({ courseName, lessonName }: { courseName: string; lessonName: string }) => `/courses/${courseName}/${lessonName}`,
+
 			resume: ({ username }: { username: string }) => `/resume/${username}`,
 		},
 	},
@@ -63,6 +70,7 @@ export const staticURLs = {
 			},
 			lesson: {
 				base: "panel/lesson",
+				video: "panel/lesson/video",
 			},
 			team: { base: "panel/team", image: "panel/team/image" },
 			job: { base: "panel/job" },

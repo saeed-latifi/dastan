@@ -24,7 +24,7 @@ export default function OTPCheck() {
 				<ButtonBase>submit</ButtonBase>
 
 				<ButtonBase type="button">
-					<Link href={staticURLs.client.profile.addPhone}>change number</Link>
+					<Link href={staticURLs.client.account.addPhone}>change number</Link>
 				</ButtonBase>
 			</FormSection>
 		</Form>

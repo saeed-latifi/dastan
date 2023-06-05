@@ -4,7 +4,7 @@ import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import { FormEvent, useEffect, useState } from "react";
 import FormSection from "@components/forms/form-section";
 import { useRouter } from "next/router";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
 import { zKeyword, zKeywords } from "@models/iKeyword";
 import { toast } from "react-toastify";
@@ -16,6 +16,7 @@ import TextArea from "@components/forms/form-text-area";
 import { staticURLs } from "statics/url";
 import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
+import Link from "next/link";
 
 export default function Jobs() {
 	const router = useRouter();
@@ -102,7 +103,7 @@ export default function Jobs() {
 		setKeywords(newArr);
 	};
 
-	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (isLoading || !router.isReady) return <LoadingSpinner />;
 	if (router.query.item && !lesson) {
 		return (
 			<div className="flex flex-col items-center gap-4">
@@ -141,6 +142,12 @@ export default function Jobs() {
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
 				{lesson ? "update" : "create"}
 			</ButtonBase>
+
+			{lesson && (
+				<Link href={staticURLs.client.panel.course.lesson.addVideo({ lessonId: lesson.id, courseId: lesson.courseId })}>
+					add video
+				</Link>
+			)}
 		</Form>
 	);
 }
