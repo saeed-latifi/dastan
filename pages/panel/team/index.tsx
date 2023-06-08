@@ -31,7 +31,7 @@ export default function Team() {
 					{teamsInfo.map((team, index) => (
 						<div key={index} className="flex items-center justify-between gap-2">
 							<Link href={staticURLs.client.panel.team.one({ teamId: team.id })}>{team.title}</Link>
-							<TeamLogo id={team.id} />
+							<TeamLogo image={team.image} />
 						</div>
 					))}
 				</FormSection>

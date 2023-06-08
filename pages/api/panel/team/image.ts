@@ -40,6 +40,9 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			const awsRes = await teamLogoAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 			if (!awsRes) return res.json(onErrorResponse("error on aws"));
 
+			const image = await teamPrismaProvider.addImage({ imageName: fileName, teamId: parseInt(fields.id) });
+			if (!image) return res.json(onErrorResponse("error on create image"));
+
 			// ok res
 			return res.json(onSuccessResponse("ok"));
 		} catch (error) {

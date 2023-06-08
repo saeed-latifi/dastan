@@ -163,4 +163,8 @@ export default class UserPrismaProvider {
 			select: { id: true, email: true, account: { select: { isActive: true } } },
 		});
 	}
+
+	async addImage({ userId, imageName }: { userId: number; imageName: string }) {
+		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
+	}
 }

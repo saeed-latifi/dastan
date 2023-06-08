@@ -26,7 +26,7 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			const { files, fields } = await formParser(req);
 			if (!fields.courseId || !files.image) return res.json(onErrorResponse("incomplete course information"));
 			// prisma check course manager
-			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: fields.courseId });
+			const author = await coursePrismaProvider.checkCourseAuthor({ courseId: parseInt(fields.courseId) });
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
 			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("course err : access denied!"));
 			// sharp
@@ -35,6 +35,10 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 			// aws
 			const awsRes = await courseImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 			if (!awsRes) return res.json(onErrorResponse("error on aws"));
+
+			const image = await coursePrismaProvider.addImage({ imageName: fileName, courseId: parseInt(fields.courseId) });
+			if (!image) return res.json(onErrorResponse("error on create image"));
+
 			// ok res
 			return res.json(onSuccessResponse("ok"));
 		} catch (error) {

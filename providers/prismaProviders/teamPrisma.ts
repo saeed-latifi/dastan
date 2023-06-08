@@ -56,4 +56,8 @@ export default class TeamPrismaProvider {
 	async checkTeamCountLimit({ managerId }: { managerId: number }) {
 		return await prismaProvider.team.count({ where: { managerId } });
 	}
+
+	async addImage({ teamId, imageName }: { teamId: number; imageName: string }) {
+		return await prismaProvider.team.update({ where: { id: teamId }, data: { image: imageName }, select: { image: true } });
+	}
 }

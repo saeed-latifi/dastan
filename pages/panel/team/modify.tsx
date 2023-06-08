@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
+import { teamPanelResType } from "@providers/prismaProviders/teamPrisma";
 
 export default function ModifyTeam() {
 	const { userInfo, checkAccessAndRedirect } = useAccount();
@@ -26,7 +27,7 @@ export default function ModifyTeam() {
 
 	const [contactMethod, setContactMethod] = useState<string>();
 	const [contactMethods, setContactMethods] = useState<string[]>([]);
-	const [team, setTeam] = useState<any>();
+	const [team, setTeam] = useState<teamPanelResType>();
 	const router = useRouter();
 
 	const { onAddTeam, onUpdateTeam, teamsInfo, isLoading, allowMoreTeam, allowMoreJob } = useTeamPanel();
@@ -101,7 +102,7 @@ export default function ModifyTeam() {
 
 			{team && (
 				<FormSection title="team logo">
-					<TeamLogo id={team.id} logoType={logoImageTypes.full} />
+					<TeamLogo image={team.image} logoType={logoImageTypes.full} />
 					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.image({ teamId: team.id }))}>
 						update your team logo
 					</ButtonBase>

@@ -8,7 +8,11 @@ import useSWR from "swr";
 
 export function useImage() {
 	const router = useRouter();
-	const { data: forceImageParam, mutate: imgParamMutate } = useSWR("forceChangeImageParam", paramGenerator, {
+	const {
+		data: forceImageParam,
+		mutate: imgParamMutate,
+		isLoading,
+	} = useSWR("forceChangeImageParam", paramGenerator, {
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
@@ -75,5 +79,5 @@ export function useImage() {
 	}
 
 	// TODO fix return to number shape
-	return { onUpdateProfileImage, onUpdateTeamLogo, onUpdateCourseImage, forceImageParam: forceImageParam?.value };
+	return { onUpdateProfileImage, onUpdateTeamLogo, onUpdateCourseImage, forceImageParam: forceImageParam?.value, isLoading };
 }

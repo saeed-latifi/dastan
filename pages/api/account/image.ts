@@ -5,12 +5,15 @@ import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
 import { errorLogger } from "@utilities/apiLogger";
+import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 
 export const config = {
 	api: {
 		bodyParser: false,
 	},
 };
+
+const userPrismaProvider = new UserPrismaProvider();
 
 export default async function profileImageApi(req: NextApiRequest, res: NextApiResponse) {
 	// add image
@@ -28,8 +31,13 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				const fileName = id + "." + buffer.info.format;
 
 				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
-				if (awsRes) return res.json(onSuccessResponse("ok"));
-				else return res.json(onErrorResponse("error on aws"));
+				if (!awsRes) return res.json(onErrorResponse("error on aws"));
+
+				const image = await userPrismaProvider.addImage({ imageName: fileName, userId: id });
+				if (!image) return res.json(onErrorResponse("error on create image"));
+
+				// ok res
+				return res.json(onSuccessResponse({ image }));
 			} else {
 				return res.json(onErrorResponse("no image file"));
 			}

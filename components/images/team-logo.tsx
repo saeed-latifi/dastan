@@ -5,16 +5,24 @@ export enum logoImageTypes {
 	full,
 	thumb,
 }
-export default function TeamLogo({ id, logoType = logoImageTypes.thumb }: { id: number; logoType?: logoImageTypes }) {
-	const { forceImageParam } = useImage();
-	const src = `${bucketUrl}/team/${id}.webp?v=${forceImageParam}`;
+export default function TeamLogo({ image, logoType = logoImageTypes.thumb }: { image: string | null; logoType?: logoImageTypes }) {
+	const { forceImageParam, isLoading } = useImage();
+	const src = image ? `${bucketUrl}/team/${image}?v=${forceImageParam}` : "/images/team.svg";
+
+	if (isLoading)
+		return (
+			<img
+				className="aspect-video overflow-hidden border rounded-theme-border border-theme-border object-cover w-full"
+				src="/images/team.svg"
+				alt=""
+			/>
+		);
 
 	return (
 		<img
 			className={`
 			aspect-square overflow-hidden border rounded-theme-border  border-theme-border object-cover ${logoType === logoImageTypes.full ? "w-full  " : "w-12 "} `}
 			src={src}
-			onError={(e: any) => (e?.target?.src?.includes(src) ? (e.target.src = "/images/team.svg") : "")}
 			alt=""
 		/>
 	);

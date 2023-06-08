@@ -77,7 +77,6 @@ export function useAccount() {
 			fetcher: () => HTTPService.patch(staticURLs.server.account.base, body),
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
-				router.push(staticURLs.client.home);
 			},
 			onError: (error) => errorMutateHandler({ error, mutator: userMutate }),
 		});

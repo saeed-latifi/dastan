@@ -21,6 +21,7 @@ export type coursePanelResType = {
 		title: string;
 		description: string;
 		context: string | null;
+		image: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		category: categoryResType;
@@ -91,6 +92,7 @@ function coursePanelSelect() {
 				title: true,
 				description: true,
 				context: true,
+				image: true,
 				category: true,
 				updatedAt: true,
 				createdAt: true,
@@ -175,6 +177,16 @@ export default class CoursePrismaProvider {
 		return await prismaProvider.course.findFirst({
 			where: { id: courseId },
 			select: { content: { select: { authorId: true } } },
+		});
+	}
+
+	async addImage({ courseId, imageName }: { courseId: number; imageName: string }) {
+		console.log("courseId : ", courseId);
+
+		return await prismaProvider.course.update({
+			where: { id: courseId },
+			data: { content: { update: { image: imageName } } },
+			select: { content: { select: { image: true } } },
 		});
 	}
 }
