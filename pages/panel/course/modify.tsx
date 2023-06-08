@@ -28,10 +28,10 @@ import FormRichText from "@components/forms/form-rich-text";
 import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 
 export default function ModifyCourse() {
-	const { checkAccessRedirect } = useAccount();
+	const { checkAccessAndRedirect } = useAccount();
 	const { coursesInfo, onAddCourse, onUpdateCourse, isLoading } = useCoursePanel();
 	const { categories } = useCategory();
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
 	const [context, setContext] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<iCategory>();

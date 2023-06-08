@@ -29,14 +29,14 @@ export const fetchHandler = async <T>({ fetcher, onOK, onError, okMessage, error
 	}
 };
 
-export const okMutateHandler = ({ data, mutator }: { data: any; mutator: KeyedMutator<any> }) => {
-	mutator(data, {
-		populateCache(result, _) {
-			return result;
+export function okMutateHandler<T>({ data, mutator }: { data: T; mutator: KeyedMutator<any> }) {
+	mutator(undefined, {
+		populateCache(_r, _) {
+			return data;
 		},
 		revalidate: false,
 	});
-};
+}
 
 export const errorMutateHandler = ({ error, mutator }: { error: any; mutator: KeyedMutator<any> }) => {
 	mutator("", {

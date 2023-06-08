@@ -21,8 +21,8 @@ import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
 
 export default function ModifyTeam() {
-	const { userInfo, checkAccessRedirect } = useAccount();
-	checkAccessRedirect();
+	const { userInfo, checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect();
 
 	const [contactMethod, setContactMethod] = useState<string>();
 	const [contactMethods, setContactMethods] = useState<string[]>([]);
@@ -49,6 +49,8 @@ export default function ModifyTeam() {
 	}, [router, teamsInfo]);
 
 	async function onSubmit(data: iTeamCreate) {
+		if (!userInfo) return;
+
 		if (team) {
 			await onUpdateTeam({ ...data, id: team.id, contactMethods });
 		} else {

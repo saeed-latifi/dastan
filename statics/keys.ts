@@ -18,9 +18,6 @@ export const AWSProfileConfig = {
 	region: "default",
 };
 
-// permission levels definition
-export const permissionLevels = { phoneSubmit: 2 };
-
 // sms
 export const smsKey = process.env.SMS_KEY;
 export const smsTemplate = process.env.SMS_TEMPLATE;

@@ -13,7 +13,7 @@ type userUniqueResType = {
 	};
 };
 
-type userResType = {
+export type userResType = {
 	id: number;
 	firstName: string | null;
 	lastName: string | null;
@@ -22,6 +22,7 @@ type userResType = {
 	province: Province | null;
 	email: string;
 	phone: string | null;
+	image: string | null;
 	account: {
 		permission: PermissionType;
 	};
@@ -41,6 +42,7 @@ const userReturnField = {
 	province: true,
 	email: true,
 	phone: true,
+	image: true,
 	account: { select: { permission: true } },
 };
 
@@ -63,11 +65,11 @@ export type userFeedResType = {
 
 export default class UserPrismaProvider {
 	// account
-	async getOne(userId: number) {
+	async getOne(userId: number): Promise<userResType | null> {
 		return await prismaProvider.user.findUnique({ where: { id: userId }, select: userReturnField });
 	}
 
-	async create(body: UserCreateArgs) {
+	async create(body: UserCreateArgs): Promise<userResType> {
 		const { username, firstName, lastName, email, password } = body;
 		return await prismaProvider.user.create({
 			data: { username, firstName, lastName, email, account: { create: { password } } },
@@ -75,7 +77,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async update(userId: number, body: userUpdateArgs) {
+	async update(userId: number, body: userUpdateArgs): Promise<userResType> {
 		const { username, firstName, lastName, interests, provinceId } = body;
 		return await prismaProvider.user.update({
 			where: { id: userId },
@@ -84,7 +86,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async Activate(email: string) {
+	async Activate(email: string): Promise<userResType> {
 		return await prismaProvider.user.update({
 			where: { email },
 			data: { account: { update: { isActive: true, permission: "USER" } } },
@@ -92,14 +94,14 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async checkPassword({ password, id }: { password: string; id: number }) {
+	async checkPassword({ password, id }: { password: string; id: number }): Promise<userUniqueResType | null> {
 		return await prismaProvider.user.findFirst({
 			where: { AND: [{ account: { password: { equals: password } } }, { id: { equals: id } }] },
 			select: userUniqueReturnField,
 		});
 	}
 
-	async changePassword({ userId, password }: { userId: number; password: string }) {
+	async changePassword({ userId, password }: { userId: number; password: string }): Promise<userResType> {
 		return await prismaProvider.user.update({
 			where: { id: userId },
 			data: { account: { update: { password } } },
@@ -107,7 +109,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async resetPassword({ email, password }: { email: string; password: string }) {
+	async resetPassword({ email, password }: { email: string; password: string }): Promise<userUniqueResType> {
 		return await prismaProvider.user.update({
 			where: { email },
 			data: { account: { update: { password } } },
@@ -115,7 +117,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async changeEmail({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }) {
+	async changeEmail({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }): Promise<userResType> {
 		return await prismaProvider.user.update({
 			where: { email: oldEmail },
 			data: { email: newEmail },
@@ -123,7 +125,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	async addPhone({ phone, id }: { phone: string; id: number }) {
+	async addPhone({ phone, id }: { phone: string; id: number }): Promise<userResType> {
 		return await prismaProvider.user.update({
 			where: { id },
 			data: { phone },
@@ -131,8 +133,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	// TODO
-	async checkEmailAuth({ email, password }: iUserLogin) {
+	async checkEmailAuth({ email, password }: iUserLogin): Promise<userResType | null> {
 		return await prismaProvider.user.findFirst({
 			where: {
 				AND: [
@@ -145,7 +146,7 @@ export default class UserPrismaProvider {
 		});
 	}
 
-	//
+	//internal
 	async checkUniqueField({ email, phone, username, userId }: uniqueFieldArgs) {
 		return await prismaProvider.user.findFirst({
 			where: {

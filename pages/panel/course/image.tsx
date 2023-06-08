@@ -12,9 +12,9 @@ import { toast } from "react-toastify";
 import { landscapeImage } from "statics/measures";
 
 export default function TeamLogoCropper() {
-	const { checkAccessRedirect, isLoading } = useAccount();
+	const { checkAccessAndRedirect, isLoading } = useAccount();
 	const { onUpdateCourseImage } = useImage();
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
 	const router = useRouter();
 

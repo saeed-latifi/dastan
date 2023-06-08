@@ -54,6 +54,7 @@ export function useResumeFeed() {
 	async function onFollow(followedByMe: boolean) {
 		if (!resumeInfo) return;
 		const body: iFollow = { userId: resumeInfo.id };
+		if (!userInfo) return toast.warn("please log in first");
 		await resumeMutate(
 			async () => {
 				try {

@@ -10,8 +10,8 @@ import { staticURLs } from "statics/url";
 
 export default function Courses() {
 	const router = useRouter();
-	const { checkAccessRedirect } = useAccount();
-	checkAccessRedirect();
+	const { checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect();
 
 	const { coursesInfo, isLoading } = useCoursePanel();
 

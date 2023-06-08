@@ -5,6 +5,7 @@ import { useAccount } from "@hooks/useAccount";
 import { coursePublicResType } from "@providers/prismaProviders/coursePrisma";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { bucketUrl } from "statics/keys";
 import { staticURLs } from "statics/url";
 
@@ -27,9 +28,10 @@ export default function CourseFeedCard({ course }: { course: coursePublicResType
 	} = course;
 
 	async function onLike() {
+		if (!userInfo) return toast.warn("please log in first");
 		if (freeze) return;
 		setFreeze(true);
-		const isLike = likes[0]?.authorId !== userInfo.id;
+		const isLike = likes[0]?.authorId !== userInfo?.id;
 		await onLikeCourse({ body: { isLike, contentId }, userId: userInfo.id });
 		setFreeze(false);
 	}
@@ -55,7 +57,7 @@ export default function CourseFeedCard({ course }: { course: coursePublicResType
 				<div className="flex items-center w-full justify-between">
 					<span className="flex items-center gap-1">
 						<span className="flex w-5">
-							<HeartIcon isLike={likes[0]?.authorId === userInfo.id} onClick={onLike} />
+							<HeartIcon isLike={userInfo ? likes[0]?.authorId === userInfo?.id : false} onClick={onLike} />
 						</span>
 						<span>{likesCount}</span>
 					</span>

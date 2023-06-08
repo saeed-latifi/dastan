@@ -12,9 +12,9 @@ import { toast } from "react-toastify";
 import { squareImage } from "statics/measures";
 
 export default function TeamLogoCropper() {
-	const { checkAccessRedirect, isLoading, userInfo } = useAccount();
+	const { checkAccessAndRedirect, isLoading, userInfo } = useAccount();
 	const { onUpdateTeamLogo, forceImageParam } = useImage();
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
 	const router = useRouter();
 

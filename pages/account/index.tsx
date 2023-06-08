@@ -23,7 +23,7 @@ export default function Profile() {
 	const [selectedProvince, setSelectedProvince] = useState<iProvince>();
 	const [selectedCategories, setSelectedCategories] = useState<iCategory[]>();
 
-	const { userInfo, isLoading, checkAccessRedirect, onUpdateUser, onErrorPurge, error } = useAccount();
+	const { userInfo, isLoading, checkAccessAndRedirect, onUpdateUser, onErrorPurge, error } = useAccount();
 	const { provinces } = useProvince();
 	const { categories } = useCategory();
 
@@ -33,9 +33,15 @@ export default function Profile() {
 		handleSubmit,
 	} = useForm<iUserUpdate>({
 		resolver: zodResolver(zUserUpdate),
-		values: userInfo,
+		values: {
+			firstName: userInfo?.firstName || undefined,
+			lastName: userInfo?.lastName || undefined,
+			username: userInfo?.username || undefined,
+			provinceId: userInfo?.province?.id || undefined,
+			interests: userInfo?.interests || [],
+		},
 	});
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
 	useEffect(() => {
 		if (!isLoading && userInfo) {
@@ -60,6 +66,7 @@ export default function Profile() {
 
 	if (isLoading) return <LoadingSpinner />;
 
+	if (!userInfo) return <span>no access</span>;
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
 			<FormSection title="info">
@@ -89,7 +96,9 @@ export default function Profile() {
 					<p className="px-2">select your province help for local events </p>
 					<Select
 						selectId="profileProvinces"
-						preSelect={userInfo?.province && { label: userInfo?.province?.title, value: userInfo?.province?.id }}
+						preSelect={
+							userInfo.province ? { label: userInfo?.province?.title, value: userInfo?.province?.id } : undefined
+						}
 						options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
 						onChange={onSelectProvince}
 					/>
@@ -101,7 +110,7 @@ export default function Profile() {
 					<p className="px-2">select your interest filed help for better content </p>
 					<SelectMulti
 						preSelect={
-							userInfo?.interests &&
+							userInfo.interests &&
 							(userInfo.interests as iCategory[]).map((interest) => ({
 								label: interest.title,
 								value: interest.id,

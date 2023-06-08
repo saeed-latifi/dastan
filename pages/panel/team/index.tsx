@@ -11,8 +11,8 @@ import { staticURLs } from "statics/url";
 
 export default function Team() {
 	const router = useRouter();
-	const { checkAccessRedirect } = useAccount();
-	checkAccessRedirect();
+	const { checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect();
 
 	const { teamsInfo, isLoading, allowMoreTeam } = useTeamPanel();
 

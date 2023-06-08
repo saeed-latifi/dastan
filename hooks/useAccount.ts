@@ -2,10 +2,13 @@ import { useRouter } from "next/router";
 import useSWR from "swr";
 import HTTPService from "@providers/HTTPService";
 import { iPasswordUpdate, iPhone, iResetPassword, iUserCreate, iUserEmail, iUserLogin, iUserUpdate } from "@models/iUser";
-import nullPurger from "@utilities/nullPurger";
 import { toast } from "react-toastify";
 import { errorMutateHandler, errorPurgerMutateHandler, fetchHandler, okMutateHandler } from "./useFetch";
 import { staticURLs } from "statics/url";
+import { apiResponse, responseState } from "@providers/apiResponseHandler";
+import { userResType } from "@providers/prismaProviders/userPrisma";
+import { PermissionType } from "@prisma/client";
+import { permissionHasAccess } from "@providers/permissionChecker";
 
 export function useAccount() {
 	const router = useRouter();
@@ -23,16 +26,22 @@ export function useAccount() {
 
 	async function onIdentify() {
 		try {
-			const { data } = await HTTPService.get(staticURLs.server.account.base);
-			return data;
+			const { data }: { data: apiResponse<userResType> } = await HTTPService.get(staticURLs.server.account.base);
+			if (data.resState === responseState.ok) return data.data;
+			else {
+				throw data.errors;
+			}
 		} catch (error: any) {
-			toast.warn("bad connection");
+			toast.warn("some connection error");
+
+			throw error;
 		}
 	}
 
 	function onLogin({ email, password }: iUserLogin) {
-		fetchHandler({
+		fetchHandler<userResType>({
 			fetcher: () => HTTPService.put(staticURLs.server.account.base, { email, password }),
+
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
 				router.push(staticURLs.client.home);
@@ -44,16 +53,17 @@ export function useAccount() {
 	function onLogout() {
 		fetchHandler({
 			fetcher: () => HTTPService.delete(staticURLs.server.account.base),
-			onOK: (data) => {
-				okMutateHandler({ data, mutator: userMutate });
+			onOK: (_res) => {
+				userMutate(undefined, { revalidate: false });
 				window.location.replace(staticURLs.client.home);
 			},
+
 			okMessage: "logged out",
 		});
 	}
 
 	async function onActiveUser({ token }: any) {
-		fetchHandler({
+		fetchHandler<userResType>({
 			fetcher: () => HTTPService.put(staticURLs.server.account.email, { token }),
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
@@ -63,9 +73,12 @@ export function useAccount() {
 	}
 
 	async function onUpdateUser(body: iUserUpdate) {
-		fetchHandler({
+		fetchHandler<userResType>({
 			fetcher: () => HTTPService.patch(staticURLs.server.account.base, body),
-			onOK: (data) => okMutateHandler({ data, mutator: userMutate }),
+			onOK: (data) => {
+				okMutateHandler({ data, mutator: userMutate });
+				router.push(staticURLs.client.home);
+			},
 			onError: (error) => errorMutateHandler({ error, mutator: userMutate }),
 		});
 	}
@@ -117,7 +130,7 @@ export function useAccount() {
 	}
 
 	async function onValidateChangeEmail({ token }: any) {
-		fetchHandler({
+		fetchHandler<userResType>({
 			fetcher: () => HTTPService.patch(staticURLs.server.account.email, { token }),
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
@@ -135,7 +148,7 @@ export function useAccount() {
 	}
 
 	async function onCheckOTP(otp: any) {
-		fetchHandler({
+		fetchHandler<userResType>({
 			fetcher: () => HTTPService.patch(staticURLs.server.account.phone, { otp }),
 			onOK: (data) => {
 				okMutateHandler({ data, mutator: userMutate });
@@ -145,15 +158,18 @@ export function useAccount() {
 	}
 
 	// access
-	function checkAccessRedirect(permissionLevel = 0) {
-		if (!isLoading && !userInfo?.data) return router.push(staticURLs.client.login);
-		if (userInfo?.data?.permissionLevel < permissionLevel) return router.push(staticURLs.client.Forbidden);
+	function checkAccessAndRedirect(requirePermissionLevel = PermissionType.USER) {
+		if (isLoading) return;
+		if (!userInfo) return router.push(staticURLs.client.login);
+
+		const hasAccess = permissionHasAccess({ require: requirePermissionLevel, current: userInfo?.account.permission || "GUEST" });
+		if (!hasAccess) return router.push(staticURLs.client.Forbidden);
 	}
 
-	function hasAccess(requirePermissionLevel: number) {
-		const hasAccess = userInfo?.data?.permissionLevel < requirePermissionLevel ? false : true;
-		return hasAccess;
+	function hasAccess(requirePermissionLevel: PermissionType) {
+		return permissionHasAccess({ require: requirePermissionLevel, current: userInfo?.account.permission || "GUEST" });
 	}
+
 	function onErrorPurge(errorKey: string) {
 		errorPurgerMutateHandler({ errorKey, mutator: userMutate });
 	}
@@ -163,7 +179,7 @@ export function useAccount() {
 		onLogout,
 		onRegister,
 		onActiveUser,
-		checkAccessRedirect,
+		checkAccessAndRedirect,
 		hasAccess,
 		onUpdateUser,
 		onUpdatePassword,
@@ -175,10 +191,8 @@ export function useAccount() {
 		onSendOTP,
 		onCheckOTP,
 		onErrorPurge,
-		userInfo: userInfo?.data ? nullPurger(userInfo.data) : false,
+		userInfo: userInfo,
 		isLoading: isLoading,
-		isLoggedIn: userInfo?.data,
-		permissionLevel: userInfo?.data?.permissionLevel || 0,
-		error: userInfo?.error || userErr,
+		error: userErr,
 	};
 }

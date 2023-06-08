@@ -1,58 +1,39 @@
-import axios, { AxiosRequestConfig } from "axios";
+import ButtonBase from "@components/common/base-button";
+import { PermissionType } from "@prisma/client";
+import { permissionHasAccess } from "@providers/permissionChecker";
 import { useState } from "react";
 
 export default function VideoUpload() {
-	const [file, setFile] = useState<File | undefined>();
-	const [progress, setProgress] = useState(0);
-	const [error, setError] = useState(null);
-	const [submitting, setSubmitting] = useState(false);
+	const [require, setRequire] = useState<PermissionType>(PermissionType.GUEST);
+	const [current, setCurrent] = useState<PermissionType>(PermissionType.GUEST);
 
-	async function handleSubmit() {
-		const data = new FormData();
-
-		if (!file) return;
-
-		setSubmitting(true);
-
-		data.append("file", file);
-
-		const config: AxiosRequestConfig = {
-			onUploadProgress: function (progressEvent) {
-				const total = progressEvent.total ? progressEvent.total : 100;
-				const percentComplete = Math.round((progressEvent.loaded * 100) / total);
-				setProgress(percentComplete);
-			},
-		};
-
-		try {
-			await axios.put("/api/test", data, config);
-		} catch (e: any) {
-			setError(e.message);
-		} finally {
-			setSubmitting(false);
-			setProgress(0);
-		}
-	}
-
-	function handleSetFile(event: React.ChangeEvent<HTMLInputElement>) {
-		const files = event.target.files;
-
-		if (files?.length) {
-			setFile(files[0]);
-		}
+	function onCheck() {
+		console.log(permissionHasAccess({ current, require }));
 	}
 
 	return (
-		<div>
-			{error && <p>{error}</p>}
-			{submitting && <p>{progress}%</p>}
-			<form action="POST">
-				<div>
-					<label htmlFor="file">File</label>
-					<input type="file" id="file" accept=".mp4" onChange={handleSetFile} />
-				</div>
-			</form>
-			<button onClick={handleSubmit}>Upload video</button>
+		<div className="flex gap-4">
+			<div className="flex flex-col gap-4">
+				<span>require</span>
+				<select value={require} name="permission" id="permission" onChange={(e) => setRequire(e.target.value as PermissionType)}>
+					<option value={PermissionType.GUEST}>{PermissionType.GUEST}</option>
+					<option value={PermissionType.USER}>{PermissionType.USER}</option>
+					<option value={PermissionType.AUTHOR}>{PermissionType.AUTHOR}</option>
+					<option value={PermissionType.SUPERVISOR}>{PermissionType.SUPERVISOR}</option>
+					<option value={PermissionType.ADMIN}>{PermissionType.ADMIN}</option>
+				</select>
+			</div>
+			<div className="flex flex-col gap-4">
+				<span>current</span>
+				<select value={current} name="permission" id="permission" onChange={(e) => setCurrent(e.target.value as PermissionType)}>
+					<option value={PermissionType.GUEST}>{PermissionType.GUEST}</option>
+					<option value={PermissionType.USER}>{PermissionType.USER}</option>
+					<option value={PermissionType.AUTHOR}>{PermissionType.AUTHOR}</option>
+					<option value={PermissionType.SUPERVISOR}>{PermissionType.SUPERVISOR}</option>
+					<option value={PermissionType.ADMIN}>{PermissionType.ADMIN}</option>
+				</select>
+			</div>
+			<ButtonBase onClick={onCheck}>check</ButtonBase>
 		</div>
 	);
 }

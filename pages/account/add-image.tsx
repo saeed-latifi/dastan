@@ -13,9 +13,9 @@ import { squareImage } from "statics/measures";
 import { staticURLs } from "statics/url";
 
 export default function ProfileImageCropper() {
-	const { checkAccessRedirect, isLoading } = useAccount();
+	const { checkAccessAndRedirect, isLoading } = useAccount();
 	const { onUpdateProfileImage } = useImage();
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
 	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });
 	const [scale, setScale] = useState<number>(1.0);

@@ -6,14 +6,16 @@ import React, { useEffect, useState } from "react";
 
 export default function Resume() {
 	const { resumeInfo, isLoading, onFollow } = useResumeFeed();
-	const { userInfo } = useAccount();
+
+	const { userInfo, checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect();
 	const [freeze, setFreeze] = useState(false);
 
 	if (isLoading) return <LoadingSpinner />;
 	if (!resumeInfo) return <p>not valid!</p>;
 
-	const followedByMe = resumeInfo.followers[0]?.id === userInfo.id;
-	const isMyProfile = resumeInfo.id === userInfo.id;
+	const followedByMe = userInfo ? resumeInfo.followers[0]?.id === userInfo.id : false;
+	const isMyProfile = userInfo ? resumeInfo.id === userInfo.id : false;
 	async function handleOnFollow() {
 		if (freeze) return;
 		setFreeze(true);
@@ -44,7 +46,7 @@ export default function Resume() {
 					<span>{resumeInfo._count.follows}</span>
 				</span>
 
-				{!isMyProfile && (
+				{!isMyProfile && userInfo && (
 					<ButtonBase onClick={handleOnFollow}>
 						{resumeInfo.followers[0]?.id === userInfo.id ? "unfollow" : "follow"}
 					</ButtonBase>

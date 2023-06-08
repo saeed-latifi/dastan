@@ -11,8 +11,8 @@ import { useForm } from "react-hook-form";
 import { staticURLs } from "statics/url";
 
 export default function ChangePassword() {
-	const { checkAccessRedirect, isLoading, onUpdatePassword } = useAccount();
-	checkAccessRedirect();
+	const { checkAccessAndRedirect, isLoading, onUpdatePassword } = useAccount();
+	checkAccessAndRedirect();
 
 	const {
 		register,

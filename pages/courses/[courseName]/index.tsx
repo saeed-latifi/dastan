@@ -7,6 +7,7 @@ import { coursePublicResType } from "@providers/prismaProviders/coursePrisma";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
 
 export default function CourseName() {
@@ -31,6 +32,7 @@ export default function CourseName() {
 	}, [coursesInfo, router]);
 
 	async function onLike() {
+		if (!userInfo) return toast.warn("please log in first");
 		if (freeze) return;
 		setFreeze(true);
 		const isLike = likes[0]?.authorId !== userInfo.id;
@@ -77,7 +79,7 @@ export default function CourseName() {
 				<p className="flex items-center gap-2 w-full justify-between">
 					<span className="flex items-center gap-2">
 						<span className="flex w-5">
-							<HeartIcon isLike={likes[0]?.authorId === userInfo.id} onClick={onLike} />
+							<HeartIcon isLike={userInfo ? likes[0]?.authorId === userInfo.id : false} onClick={onLike} />
 						</span>
 						<span>{likesCount}</span>
 					</span>
