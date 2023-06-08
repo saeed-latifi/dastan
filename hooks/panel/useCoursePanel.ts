@@ -8,11 +8,13 @@ import { produce } from "immer";
 import { iLessonCreate, iLessonUpdate } from "@models/iLesson";
 import { staticURLs } from "statics/url";
 import { fetchHandler } from "@hooks/useFetch";
-import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
+import { courseImageRes, coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
+import { useImage } from "@hooks/useImage";
 
 export function useCoursePanel() {
 	const router = useRouter();
+	const { forceImageParam, onIncrease } = useImage();
 
 	const {
 		data: coursesInfo,
@@ -127,5 +129,35 @@ export function useCoursePanel() {
 		});
 	}
 
-	return { isLoading, coursesInfo, onAddCourse, onUpdateCourse, onAddLesson, onUpdateLesson };
+	async function onUpdateCourseImage({ formData }: { formData: FormData }) {
+		try {
+			const { data }: { data: apiResponse<courseImageRes> } = await HTTPService.post(staticURLs.server.panel.course.image, formData);
+			if (data.resState === responseState.ok) {
+				onIncrease();
+				coursesMutate(undefined, {
+					populateCache(_result, baseState) {
+						const mutated = produce(baseState, (draft) => {
+							if (draft) {
+								draft.forEach((course) => {
+									if (course.id === data.data.id) {
+										course.content.image = data.data.content.image;
+									}
+								});
+							}
+						});
+						return mutated;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.panel.course.all);
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
+	}
+
+	return { isLoading, coursesInfo, onAddCourse, onUpdateCourse, onAddLesson, onUpdateLesson, onUpdateCourseImage };
 }

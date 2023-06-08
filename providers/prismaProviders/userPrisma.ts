@@ -63,6 +63,10 @@ export type userFeedResType = {
 	} | null;
 } | null;
 
+export type uerImageRes = {
+	image: string | null;
+};
+
 export default class UserPrismaProvider {
 	// account
 	async getOne(userId: number): Promise<userResType | null> {
@@ -146,6 +150,10 @@ export default class UserPrismaProvider {
 		});
 	}
 
+	async addImage({ userId, imageName }: { userId: number; imageName: string }): Promise<uerImageRes> {
+		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
+	}
+
 	//internal
 	async checkUniqueField({ email, phone, username, userId }: uniqueFieldArgs) {
 		return await prismaProvider.user.findFirst({
@@ -162,9 +170,5 @@ export default class UserPrismaProvider {
 			where: { email },
 			select: { id: true, email: true, account: { select: { isActive: true } } },
 		});
-	}
-
-	async addImage({ userId, imageName }: { userId: number; imageName: string }) {
-		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
 	}
 }

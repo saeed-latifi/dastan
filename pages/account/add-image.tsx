@@ -4,7 +4,6 @@ import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import Navigation from "@components/navigation";
 import { useAccount } from "@hooks/useAccount";
-import { useImage } from "@hooks/useImage";
 import base64ToBlob from "@utilities/base64ToBlob";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
@@ -13,8 +12,7 @@ import { squareImage } from "statics/measures";
 import { staticURLs } from "statics/url";
 
 export default function ProfileImageCropper() {
-	const { checkAccessAndRedirect, isLoading } = useAccount();
-	const { onUpdateProfileImage } = useImage();
+	const { checkAccessAndRedirect, isLoading, onUpdateProfileImage } = useAccount();
 	checkAccessAndRedirect();
 
 	const [position, sePosition] = useState({ x: 0.5, y: 0.5 });

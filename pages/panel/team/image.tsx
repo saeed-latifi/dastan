@@ -1,19 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
+import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import { useAccount } from "@hooks/useAccount";
-import { useImage } from "@hooks/useImage";
 import base64ToBlob from "@utilities/base64ToBlob";
 import { useRouter } from "next/router";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import AvatarEditor, { Position } from "react-avatar-editor";
 import { toast } from "react-toastify";
 import { squareImage } from "statics/measures";
 
 export default function TeamLogoCropper() {
 	const { checkAccessAndRedirect, isLoading, userInfo } = useAccount();
-	const { onUpdateTeamLogo, forceImageParam } = useImage();
+	const { onUpdateTeamLogo } = useTeamPanel();
 	checkAccessAndRedirect();
 
 	const router = useRouter();

@@ -27,6 +27,11 @@ function teamPanelSelect() {
 	};
 }
 
+export type teamImageRes = {
+	image: string | null;
+	id: number;
+};
+
 export default class TeamPrismaProvider {
 	// panel
 	async getByManager(managerId: number): Promise<teamPanelResType[]> {
@@ -39,6 +44,10 @@ export default class TeamPrismaProvider {
 
 	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }): Promise<teamPanelResType> {
 		return await prismaProvider.team.update({ data: body, where: { id }, select: teamPanelSelect() });
+	}
+
+	async addImage({ teamId, imageName }: { teamId: number; imageName: string }): Promise<teamImageRes> {
+		return await prismaProvider.team.update({ where: { id: teamId }, data: { image: imageName }, select: { image: true, id: true } });
 	}
 
 	// internal
@@ -55,9 +64,5 @@ export default class TeamPrismaProvider {
 
 	async checkTeamCountLimit({ managerId }: { managerId: number }) {
 		return await prismaProvider.team.count({ where: { managerId } });
-	}
-
-	async addImage({ teamId, imageName }: { teamId: number; imageName: string }) {
-		return await prismaProvider.team.update({ where: { id: teamId }, data: { image: imageName }, select: { image: true } });
 	}
 }

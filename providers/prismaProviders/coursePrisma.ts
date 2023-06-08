@@ -58,6 +58,13 @@ export type coursePublicResType = {
 	lessons: lessonPublicResType[];
 };
 
+export type courseImageRes = {
+	content: {
+		image: string | null;
+	};
+	id: number;
+};
+
 function publicCourseSelect({ userId }: { userId?: number }) {
 	return {
 		id: true,
@@ -165,6 +172,16 @@ export default class CoursePrismaProvider {
 		return feed;
 	}
 
+	async addImage({ courseId, imageName }: { courseId: number; imageName: string }): Promise<courseImageRes> {
+		console.log("courseId : ", courseId);
+
+		return await prismaProvider.course.update({
+			where: { id: courseId },
+			data: { content: { update: { image: imageName } } },
+			select: { content: { select: { image: true } }, id: true },
+		});
+	}
+
 	// internals
 	async checkUniqueField({ title, courseId }: { title?: string; courseId?: number }) {
 		return await prismaProvider.course.findFirst({
@@ -177,16 +194,6 @@ export default class CoursePrismaProvider {
 		return await prismaProvider.course.findFirst({
 			where: { id: courseId },
 			select: { content: { select: { authorId: true } } },
-		});
-	}
-
-	async addImage({ courseId, imageName }: { courseId: number; imageName: string }) {
-		console.log("courseId : ", courseId);
-
-		return await prismaProvider.course.update({
-			where: { id: courseId },
-			data: { content: { update: { image: imageName } } },
-			select: { content: { select: { image: true } } },
 		});
 	}
 }

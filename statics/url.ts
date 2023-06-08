@@ -5,7 +5,7 @@ export const staticURLs = {
 
 		welcome: "/welcome",
 		login: "/login",
-		checkYourEmail: "/check-your-email",
+		EmailCheck: "/check-email",
 		Forbidden: "/403",
 		Unauthorized: "/401",
 		verify: "/verify",

@@ -6,12 +6,15 @@ import { toast } from "react-toastify";
 import { errorMutateHandler, errorPurgerMutateHandler, fetchHandler, okMutateHandler } from "./useFetch";
 import { staticURLs } from "statics/url";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
-import { userResType } from "@providers/prismaProviders/userPrisma";
+import { uerImageRes, userResType } from "@providers/prismaProviders/userPrisma";
 import { PermissionType } from "@prisma/client";
 import { permissionHasAccess } from "@providers/permissionChecker";
+import { useImage } from "./useImage";
+import { produce } from "immer";
 
 export function useAccount() {
 	const router = useRouter();
+	const { forceImageParam, onIncrease } = useImage();
 
 	const {
 		data: userInfo,
@@ -101,7 +104,7 @@ export function useAccount() {
 	async function onRecoverPasswordRequest(body: iUserEmail) {
 		fetchHandler({
 			fetcher: () => HTTPService.post(staticURLs.server.account.password, body),
-			onOK: () => router.push(staticURLs.client.home),
+			onOK: () => router.push(staticURLs.client.EmailCheck),
 		});
 	}
 
@@ -117,14 +120,14 @@ export function useAccount() {
 	async function onResendActivationEmail(body: iUserEmail) {
 		fetchHandler({
 			fetcher: () => HTTPService.get(staticURLs.server.account.email, { params: body }),
-			onOK: () => router.push(staticURLs.client.home),
+			onOK: () => router.push(staticURLs.client.EmailCheck),
 		});
 	}
 
 	async function onRequestChangeEmail(body: iUserLogin) {
 		fetchHandler({
 			fetcher: () => HTTPService.post(staticURLs.server.account.email, body),
-			onOK: () => router.push(staticURLs.client.checkYourEmail),
+			onOK: () => router.push(staticURLs.client.EmailCheck),
 		});
 	}
 
@@ -154,6 +157,30 @@ export function useAccount() {
 				router.push(staticURLs.client.home);
 			},
 		});
+	}
+
+	async function onUpdateProfileImage({ formData }: { formData: FormData }) {
+		try {
+			const { data }: { data: apiResponse<uerImageRes> } = await HTTPService.post(staticURLs.server.account.image, formData);
+			if (data.resState === responseState.ok && userInfo) {
+				onIncrease();
+				userMutate(undefined, {
+					populateCache(_result, _baseState) {
+						const mutated = produce(userInfo, (draft) => {
+							if (draft) draft.image = data.data.image;
+						});
+						return mutated;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.account.base);
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
 	}
 
 	// access
@@ -190,6 +217,7 @@ export function useAccount() {
 		onSendOTP,
 		onCheckOTP,
 		onErrorPurge,
+		onUpdateProfileImage,
 		userInfo: userInfo,
 		isLoading: isLoading,
 		error: userErr,

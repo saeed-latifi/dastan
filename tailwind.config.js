@@ -9,6 +9,7 @@ module.exports = {
 			backgroundImage: {
 				"theme-profile": "url('/images/profile.svg')",
 				"theme-team-logo": "url('/images/team.svg')",
+				"theme-course-image": "url('/images/course.svg')",
 			},
 
 			fontFamily: {

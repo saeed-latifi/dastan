@@ -44,7 +44,7 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			if (!image) return res.json(onErrorResponse("error on create image"));
 
 			// ok res
-			return res.json(onSuccessResponse("ok"));
+			return res.json(onSuccessResponse(image));
 		} catch (error) {
 			return errorLogger({ error, res, name: "team" });
 		}

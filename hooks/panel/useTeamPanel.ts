@@ -8,11 +8,13 @@ import { jobLimits, teamLimits } from "statics/measures";
 import { produce } from "immer";
 import { iJobCreate, iJobUpdate } from "@models/iJob";
 import { staticURLs } from "statics/url";
-import { teamPanelResType } from "@providers/prismaProviders/teamPrisma";
+import { teamImageRes, teamPanelResType } from "@providers/prismaProviders/teamPrisma";
 import { jobPanelResType } from "@providers/prismaProviders/jobPrisma";
+import { useImage } from "@hooks/useImage";
 
 export function useTeamPanel() {
 	const router = useRouter();
+	const { forceImageParam, onIncrease } = useImage();
 
 	const {
 		data: teamsInfo,
@@ -127,6 +129,36 @@ export function useTeamPanel() {
 		});
 	}
 
+	async function onUpdateTeamLogo({ formData }: { formData: FormData }) {
+		try {
+			const { data }: { data: apiResponse<teamImageRes> } = await HTTPService.post(staticURLs.server.panel.team.image, formData);
+			if (data.resState === responseState.ok) {
+				onIncrease();
+				teamsMutate(undefined, {
+					populateCache(_result, baseState) {
+						const mutated = produce(baseState, (draft) => {
+							if (draft) {
+								draft.forEach((team) => {
+									if (team.id === data.data.id) {
+										team.image = data.data.image;
+									}
+								});
+							}
+						});
+						return mutated;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.panel.team.all);
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
+	}
+
 	const allowMoreTeam = () => {
 		if (isLoading) return false;
 		if (teamsInfo && teamsInfo.length >= teamLimits.number) return false;
@@ -144,5 +176,5 @@ export function useTeamPanel() {
 		return allow;
 	};
 
-	return { isLoading, teamsInfo, onAddTeam, onUpdateTeam, allowMoreTeam, onAddJob, onUpdateJob, allowMoreJob };
+	return { isLoading, teamsInfo, onAddTeam, onUpdateTeam, allowMoreTeam, onAddJob, onUpdateJob, allowMoreJob, onUpdateTeamLogo };
 }

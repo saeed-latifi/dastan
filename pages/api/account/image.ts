@@ -37,7 +37,7 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				if (!image) return res.json(onErrorResponse("error on create image"));
 
 				// ok res
-				return res.json(onSuccessResponse({ image }));
+				return res.json(onSuccessResponse(image));
 			} else {
 				return res.json(onErrorResponse("no image file"));
 			}
