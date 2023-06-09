@@ -1,8 +1,17 @@
+import DarkSection from "@components/sections/dark-section";
+import GallerySection from "@components/sections/gallery";
+import HeroSection from "@components/sections/hero"
+import LightSection from "@components/sections/light-section";
+import MasonSection from "@components/sections/mason";
+
 export default function Home() {
 	return (
-		<div className="m-auto flex items-center flex-col gap-2">
-			<p>welcome to dastan game community</p>
-			<p> please log in and visit your profile</p>
+		<div>
+			<HeroSection></HeroSection>
+			<MasonSection></MasonSection>
+			<GallerySection></GallerySection>
+			<DarkSection></DarkSection>
+			<LightSection></LightSection>
 		</div>
 	);
 }
