@@ -12,7 +12,7 @@ export default function Account() {
 			<div className="flex gap-2 items-center justify-between w-full px-4">
 				<div className="flex items-center gap-2">
 					<ProfileImage slug={userInfo.slug} />
-					<Link href="/profile">profile</Link>
+					<Link href="/profile">پروفایل</Link>
 				</div>
 				<span
 					className="cursor-pointer"
@@ -28,7 +28,7 @@ export default function Account() {
 
 	return (
 		<Link href="/login" className="btn">
-			log in
+			ورود
 		</Link>
 	);
 }
