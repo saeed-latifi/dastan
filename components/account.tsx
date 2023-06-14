@@ -13,7 +13,7 @@ export default function Account() {
 			<div className="flex gap-2 items-center justify-between w-full px-4">
 				<div className="flex items-center gap-2">
 					<ProfileImage image={userInfo.image} />
-					<Link href={staticURLs.client.account.base}>profile</Link>
+					<Link href={staticURLs.client.account.base}>پروفایل</Link>
 				</div>
 				<span
 					className="cursor-pointer"
@@ -29,7 +29,7 @@ export default function Account() {
 
 	return (
 		<Link href={staticURLs.client.login} className="btn">
-			log in
+			ورود
 		</Link>
 	);
 }

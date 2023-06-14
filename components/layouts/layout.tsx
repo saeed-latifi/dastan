@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 				<title>dastan game Community</title>
 			</Head>
 			<HeaderMain />
-			<main className="flex flex-col items-center p-1 flex-1 w-full max-w-7xl">{children}</main>
+			<main className="flex flex-col items-center flex-1 w-full">{children}</main>
 			<FooterMain />
 		</div>
 	);
