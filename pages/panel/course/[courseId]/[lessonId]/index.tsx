@@ -23,7 +23,7 @@ export default function VideoUpload() {
 
 		setSubmitting(true);
 		const data = new FormData();
-		data.append("file", file);
+		data.append("video", file);
 
 		const config: AxiosRequestConfig = {
 			onUploadProgress: function (progressEvent) {
@@ -36,7 +36,7 @@ export default function VideoUpload() {
 
 		try {
 			await HTTPService.post(staticURLs.server.panel.lesson.video, data, config);
-			router.push(staticURLs.client.panel.course.lesson.showVideo({ courseId: parseInt(courseId), lessonId: parseInt(lessonId) }));
+			// router.push(staticURLs.client.panel.course.lesson.showVideo({ courseId: parseInt(courseId), lessonId: parseInt(lessonId) }));
 		} catch (e: any) {
 			setError(e.message);
 		} finally {

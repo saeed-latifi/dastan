@@ -6,6 +6,7 @@ import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { teamLogoAWS } from "@providers/bucketsAWS/imageAWS";
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
 import { errorLogger } from "@utilities/apiLogger";
+import formidable from "formidable";
 
 export const config = {
 	api: {
@@ -27,20 +28,23 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 			const { files, fields } = await formParser(req);
 			if (!fields.id || !files.image) return res.json(onErrorResponse("incomplete team information"));
 
+			const teamId = parseInt(fields.id as string);
+			const reqImage = files.image as formidable.File;
+
 			// prisma check team manager
-			const manager = await teamPrismaProvider.checkTeamManager({ teamId: parseInt(fields.id) });
+			const manager = await teamPrismaProvider.checkTeamManager({ teamId });
 			if (manager === null) return res.json(onErrorResponse("this team not exist"));
 			if (manager.managerId !== token.userId) return res.json(onErrorResponse("team err : access denied!"));
 
 			// sharp
-			const buffer = await webpSquareBuffer({ path: files.image.filepath });
+			const buffer = await webpSquareBuffer({ path: reqImage.filepath });
 			const fileName = fields.id + "." + buffer.info.format;
 
 			// aws
 			const awsRes = await teamLogoAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
 			if (!awsRes) return res.json(onErrorResponse("error on aws"));
 
-			const image = await teamPrismaProvider.addImage({ imageName: fileName, teamId: parseInt(fields.id) });
+			const image = await teamPrismaProvider.addImage({ imageName: fileName, teamId });
 			if (!image) return res.json(onErrorResponse("error on create image"));
 
 			// ok res

@@ -10,7 +10,9 @@ export const emailDomain = emailDomainLocal;
 
 // external media
 export const bucketUrl = "https://dastan.storage.iran.liara.space";
-export const bucketName = "dastan";
+export const imageBucketName = "dastan";
+export const videoBucketName = "vom";
+
 export const AWSProfileConfig = {
 	endpoint: "storage.iran.liara.space",
 	accessKeyId: process.env.BUCKET_ACCESS_KEY,

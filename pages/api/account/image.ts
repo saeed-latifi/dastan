@@ -6,6 +6,7 @@ import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
 import { errorLogger } from "@utilities/apiLogger";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
+import formidable from "formidable";
 
 export const config = {
 	api: {
@@ -26,21 +27,20 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 			}
 			const id = token.userId;
 			const { files } = await formParser(req);
-			if (files.image) {
-				const buffer = await webpSquareBuffer({ path: files.image.filepath });
-				const fileName = id + "." + buffer.info.format;
+			const reqImage = files.image as formidable.File;
+			if (!reqImage) return res.json(onErrorResponse("no image file"));
 
-				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
-				if (!awsRes) return res.json(onErrorResponse("error on aws"));
+			const buffer = await webpSquareBuffer({ path: reqImage.filepath });
+			const fileName = id + "." + buffer.info.format;
 
-				const image = await userPrismaProvider.addImage({ imageName: fileName, userId: id });
-				if (!image) return res.json(onErrorResponse("error on create image"));
+			const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
+			if (!awsRes) return res.json(onErrorResponse("error on aws"));
 
-				// ok res
-				return res.json(onSuccessResponse(image));
-			} else {
-				return res.json(onErrorResponse("no image file"));
-			}
+			const image = await userPrismaProvider.addImage({ imageName: fileName, userId: id });
+			if (!image) return res.json(onErrorResponse("error on create image"));
+
+			// ok res
+			return res.json(onSuccessResponse(image));
 		} catch (error) {
 			return errorLogger({ error, res, name: "image" });
 		}

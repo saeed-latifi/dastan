@@ -98,6 +98,7 @@ export function useAccount() {
 	async function onUpdatePassword(body: iPasswordUpdate) {
 		fetchHandler({
 			fetcher: () => HTTPService.patch(staticURLs.server.account.password, body),
+			onOK: () => router.push(staticURLs.client.account.base),
 		});
 	}
 

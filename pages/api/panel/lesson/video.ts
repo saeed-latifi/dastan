@@ -1,12 +1,9 @@
 import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
-import { tokenValidator } from "@providers/tokenProvider";
-import type { NextApiRequest, NextApiResponse } from "next";
-import busboy from "busboy";
-import fs from "fs";
-import { AWSProfileConfig } from "statics/keys";
-import AWS from "aws-sdk";
-import { formParser } from "@utilities/formParser";
 import { errorLogger } from "@utilities/apiLogger";
+import { formParser } from "@utilities/formParser";
+import formidable from "formidable";
+import { createReadStream } from "fs";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export const config = {
 	api: {
@@ -15,81 +12,27 @@ export const config = {
 };
 
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	const S3 = new AWS.S3(AWSProfileConfig);
-	const method = req.method;
+	// create new video
+	if (req.method === "POST") {
+		try {
+			const { files, fields } = await formParser(req);
+			if (!files.video) return res.json(onErrorResponse("incomplete video information"));
+			const video = files.video as formidable.File;
 
-	if (method === "GET") {
-		return getVideoStream(req, res);
-	}
+			const stream = createReadStream(video.filepath);
 
-	if (method === "POST") {
-		return uploadVideoStream(req, res);
+			stream.on("data", (chunk) => console.log(chunk));
+			stream.on("end", () => console.log("end"));
+
+			// api
+			return res.json(onSuccessResponse("ok"));
+		} catch (error) {
+			return errorLogger({ error, res, name: "lesson" });
+		}
 	}
 
 	// not supported method
 	else {
 		return res.json(onErrorResponse("not supported method"));
-	}
-
-	function uploadVideoStream(req: NextApiRequest, res: NextApiResponse) {
-		const bb = busboy({ headers: req.headers });
-
-		bb.on("file", (_, file, info) => {
-			// auth-api.mp4
-			const fileName = `${req.query.lessonId}.mp4`;
-			console.log(" info : ", info);
-
-			// const fileName = info.filename;
-			const filePath = `./videos/${fileName}`;
-
-			const stream = fs.createWriteStream(filePath);
-
-			file.pipe(stream);
-		});
-
-		bb.on("close", () => {
-			res.writeHead(200, { Connection: "close" });
-			res.end(`That's the end`);
-		});
-
-		req.pipe(bb);
-		return;
-	}
-
-	function getVideoStream(req: NextApiRequest, res: NextApiResponse) {
-		const CHUNK_SIZE_IN_BYTES = 1000000;
-
-		const range = req.headers.range;
-
-		if (!range) {
-			return res.status(400).send("Rang must be provided");
-		}
-
-		const videoId = req.query.videoId;
-
-		const videoPath = `./videos/${videoId}.mp4`;
-
-		const videoSizeInBytes = fs.statSync(videoPath).size;
-
-		const chunkStart = Number(range.replace(/\D/g, ""));
-
-		const chunkEnd = Math.min(chunkStart + CHUNK_SIZE_IN_BYTES, videoSizeInBytes - 1);
-
-		const contentLength = chunkEnd - chunkStart + 1;
-
-		const headers = {
-			"Content-Range": `bytes ${chunkStart}-${chunkEnd}/${videoSizeInBytes}`,
-			"Accept-Ranges": "bytes",
-			"Content-Length": contentLength,
-			"Content-Type": "video/mp4",
-		};
-
-		res.writeHead(206, headers);
-		const videoStream = fs.createReadStream(videoPath, {
-			start: chunkStart,
-			end: chunkEnd,
-		});
-
-		videoStream.pipe(res);
 	}
 }
