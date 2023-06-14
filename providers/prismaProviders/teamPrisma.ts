@@ -1,101 +1,68 @@
-import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
+import { jobPanelResType, jobPanelSelect } from "./jobPrisma";
 
-const jobSelect = {
-	Jobs: {
-		select: {
-			wageType: true,
-			benefits: true,
-			description: true,
-			id: true,
-			province: true,
-			requirements: true,
-			title: true,
-			updatedAt: true,
-			wage: true,
-			teamId: true,
-		},
-	},
+export type teamPanelResType = {
+	id: number;
+	title: string;
+	description: string;
+	context: string | null;
+	image: string | null;
+	contactMethods: string[];
+	jobs: jobPanelResType[];
+	members: { id: number; username: string }[];
+	managerId: number;
 };
 
-export default class TeamPrismaProvider implements iCRUD {
-	async getSome(userId: number) {
-		try {
-			const teams = await prismaProvider.team.findMany({
-				where: { managerId: userId },
-				include: jobSelect,
-			});
-			return teams;
-		} catch (error) {
-			return "ERR";
-		}
+function teamPanelSelect() {
+	return {
+		id: true,
+		title: true,
+		description: true,
+		context: true,
+		contactMethods: true,
+		image: true,
+		managerId: true,
+		members: { select: { username: true, id: true } },
+		jobs: { select: jobPanelSelect() },
+	};
+}
+
+export type teamImageRes = {
+	image: string | null;
+	id: number;
+};
+
+export default class TeamPrismaProvider {
+	// panel
+	async getByManager(managerId: number): Promise<teamPanelResType[]> {
+		return await prismaProvider.team.findMany({ where: { managerId }, select: teamPanelSelect() });
 	}
 
-	async getOne(id: number) {
-		throw new Error("Method not implemented.");
+	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }): Promise<teamPanelResType> {
+		return await prismaProvider.team.create({ data: body, select: teamPanelSelect() });
 	}
 
-	async create(body: { description: string; title: string; managerId: number; contactMethods?: string[] }) {
-		try {
-			const team = await prismaProvider.team.create({
-				data: body,
-				include: jobSelect,
-			});
-			return team;
-		} catch (error) {
-			return "ERR";
-		}
+	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }): Promise<teamPanelResType> {
+		return await prismaProvider.team.update({ data: body, where: { id }, select: teamPanelSelect() });
 	}
 
-	async update(id: number, body: { description?: string; title?: string; contactMethods?: string[] }) {
-		try {
-			const team = await prismaProvider.team.update({ data: body, where: { id }, include: jobSelect });
-			return team;
-		} catch (error) {
-			return "ERR";
-		}
+	async addImage({ teamId, imageName }: { teamId: number; imageName: string }): Promise<teamImageRes> {
+		return await prismaProvider.team.update({ where: { id: teamId }, data: { image: imageName }, select: { image: true, id: true } });
 	}
 
-	async delete(id: number) {
-		throw new Error("Method not implemented.");
-	}
-
+	// internal
 	async checkUniqueField({ title, teamId }: { title?: string; teamId?: number }) {
-		try {
-			const team = await prismaProvider.team.findFirst({
-				where: {
-					OR: [{ title: { equals: title } }],
-					NOT: { id: { equals: teamId } },
-				},
-				select: { title: true, id: true },
-			});
-			return team;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.team.findFirst({
+			where: { OR: [{ title: { equals: title } }], NOT: { id: { equals: teamId } } },
+			select: { title: true, id: true },
+		});
 	}
 
 	async checkTeamManager({ teamId }: { teamId: number }) {
-		try {
-			const team = await prismaProvider.team.findFirst({
-				where: { id: teamId },
-				select: { managerId: true },
-			});
-			return team;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.team.findFirst({ where: { id: teamId }, select: { managerId: true } });
 	}
 
 	async checkTeamCountLimit({ managerId }: { managerId: number }) {
-		try {
-			const teams = await prismaProvider.team.findMany({ where: { managerId } });
-			return teams.length;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.team.count({ where: { managerId } });
 	}
 }

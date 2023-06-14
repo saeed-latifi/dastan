@@ -3,6 +3,7 @@
 
 // LOCAL_DATABASE_URL
 // EXTERNAL_DATABASE_URL
+// LOCAL_TEST_DATABASE_URL
 
 generator client {
   provider = "prisma-client-js"
@@ -10,78 +11,254 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("LOCAL_DATABASE_URL")
+  url      = env("EXTERNAL_DATABASE_URL")
 }
 
 // location
-model province {
+model Province {
   id    Int    @id @default(autoincrement()) @db.SmallInt
   title String @db.VarChar(30)
-  user  user[]
-  job   job[]
+  users User[]
+  jobs  Job[]
 }
 
 // category
-model category {
-  id     Int      @id @default(autoincrement()) @db.SmallInt
-  title  String   @db.VarChar(30)
-  user   user[]
-  course course[]
-  post   post[]
+model Category {
+  id       Int       @id @default(autoincrement()) @db.SmallInt
+  title    String    @db.VarChar(30)
+  users    User[]
+  contents Content[]
 }
 
-//user
-model user {
-  id              Int            @id @default(autoincrement())
-  slug            String         @default(uuid())
-  username        String         @unique @db.VarChar(30)
-  email           String         @unique @db.VarChar(70)
-  password        String         @db.VarChar(30)
-  firstName       String?        @db.VarChar(30)
-  lastName        String?        @db.VarChar(30)
-  phone           String?        @unique @db.VarChar(11)
-  permissionLevel Int            @default(0) @db.SmallInt
-  createdAt       DateTime       @default(now()) @db.Date
-  isActive        Boolean        @default(false)
-  isDelete        Boolean        @default(false)
-  provinceId      Int?           @db.SmallInt
-  province        province?      @relation(fields: [provinceId], references: [id])
-  interests       category[]
-  keyword         keyword[]
-  Team            team[]
-  course          course[]
-  comment         comment[]
-  report          report[]
-  adminMessage    adminMessage[]
-  post            post[]
-  like            like[]
+//account
+enum PermissionType {
+  GUEST
+  USER
+  AUTHOR
+  SUPERVISOR
+  ADMIN
 }
 
-// TODO implement
-model adminMessage {
+model Account {
+  id         String         @id @default(cuid())
+  password   String         @db.VarChar(30)
+  createdAt  DateTime       @default(now()) @db.Date
+  isActive   Boolean        @default(false)
+  isDeleted  Boolean        @default(false)
+  permission PermissionType @default(GUEST)
+  user       User?
+
+  @@index([id, permission])
+}
+
+model User {
+  id        Int     @id @default(autoincrement())
+  username  String  @unique @db.VarChar(30)
+  firstName String? @db.VarChar(30)
+  lastName  String? @db.VarChar(30)
+  image     String?
+  email     String  @unique @db.VarChar(70)
+  phone     String? @unique @db.VarChar(11)
+
+  provinceId    Int?           @db.SmallInt
+  province      Province?      @relation(fields: [provinceId], references: [id])
+  interests     Category[]
+  keywords      Keyword[]
+  likes         Like[]
+  comments      Comment[]
+  reports       Report[]
+  adminMessages AdminMessage[]
+
+  resume      Resume?
+  teams       Team[]  @relation("manager")
+  memberships Team[]
+
+  contents        Content[] @relation("composed")
+  privateContents Content[]
+
+  followers User[] @relation("Followers")
+  follows   User[] @relation("Followers")
+
+  // account
+  accountId String  @unique
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId])
+  @@index([username])
+}
+
+model AdminMessage {
   id          Int      @id @default(autoincrement())
   title       String   @db.VarChar(30)
   description String
   isActive    Boolean  @default(true)
-  isReaded    Boolean  @default(false)
+  isRead      Boolean  @default(false)
   createdAt   DateTime @default(now()) @db.Date
   updatedAt   DateTime @updatedAt
   userId      Int
-  user        user     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt, isActive])
+}
+
+// contents
+model Keyword {
+  id       Int       @id @default(autoincrement())
+  title    String    @unique @db.VarChar(30)
+  authorId Int
+  author   User      @relation(fields: [authorId], references: [id])
+  contents Content[]
+
+  @@index([title])
+  @@index([id, title])
+}
+
+model Content {
+  id          Int     @id @default(autoincrement())
+  title       String  @unique @db.VarChar(100)
+  description String
+  image       String?
+  context     String?
+
+  // TODO quil
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt
+
+  // category
+  categoryId Int      @db.SmallInt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  course   Course?
+  lesson   Lesson?
+  post     Post?
+  comments Comment[]
+  reports  Report[]
+  likes    Like[]
+  keywords Keyword[]
+
+  // author
+  authorId Int
+  author   User @relation("composed", fields: [authorId], references: [id], onDelete: Cascade)
+
+  isPrivate       Boolean @default(false)
+  authorizedUsers User[]
+  price           Int?
+
+  @@unique([createdAt, id])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([createdAt, isActive])
+}
+
+model Course {
+  id      Int      @id @default(autoincrement())
+  lessons Lesson[]
+
+  // content
+  contentId Int     @unique
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+}
+
+model Lesson {
+  id       Int    @id @default(autoincrement())
+  videoUrl String
+
+  // course
+  courseId Int
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // content
+  contentId Int     @unique
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+  @@index([courseId])
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+
+  // content
+  contentId Int     @unique
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+}
+
+// content act
+model Like {
+  contentId Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@id([contentId, authorId])
+  @@index([authorId])
+  @@index([contentId])
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  description String
+  createdAt   DateTime @default(now()) @db.Date
+  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true)
+
+  contentId Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  parentId Int?
+  parent   Comment?  @relation("parent", fields: [parentId], references: [id])
+  children Comment[] @relation("parent")
+
+  replyId Int?
+  reply   Comment?  @relation("root", fields: [replyId], references: [id])
+  replies Comment[] @relation("root")
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+  @@index([authorId])
+  @@index([parentId, contentId])
+}
+
+model Report {
+  id          Int      @id @default(autoincrement())
+  description String
+  createdAt   DateTime @default(now()) @db.Date
+
+  contentId Int
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([contentId])
+  @@index([contentId, authorId])
 }
 
 //team
-
-model team {
+model Team {
   id             Int      @id @default(autoincrement())
   title          String   @unique
   description    String
+  context        String?
+  image          String?
   isActive       Boolean  @default(true)
   createdAt      DateTime @default(now()) @db.Date
-  managerId      Int
-  manager        user     @relation(fields: [managerId], references: [id])
   contactMethods String[]
-  Jobs           job[]
+  jobs           Job[]
+
+  managerId Int
+  manager   User   @relation("manager", fields: [managerId], references: [id], onDelete: Cascade)
+  members   User[] @relation()
+
+  @@index([managerId])
 }
 
 enum WageType {
@@ -90,7 +267,7 @@ enum WageType {
   AGREEMENT
 }
 
-model job {
+model Job {
   id           Int       @id @default(autoincrement())
   title        String
   description  String
@@ -100,158 +277,26 @@ model job {
   wageType     WageType
   wage         Int?
   provinceId   Int?      @db.SmallInt
-  province     province? @relation(fields: [provinceId], references: [id])
+  province     Province? @relation(fields: [provinceId], references: [id])
   benefits     String[]
   requirements String[]
-  team         team      @relation(fields: [teamId], references: [id])
-  teamId       Int
+
+  teamId Int
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId])
+  @@index([createdAt, isActive])
+  @@index([wageType, wage])
+  @@index([provinceId])
 }
 
-// contents
-// TODO
+model Resume {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model keyword {
-  id       Int       @id @default(autoincrement())
-  title    String    @unique @db.VarChar(30)
-  authorId Int
-  author   user      @relation(fields: [authorId], references: [id])
-  content  content[]
-}
+  portfolio String[]
+  context   String   @default("")
 
-model content {
-  id      String    @id @default(uuid())
-  course  course?
-  lesson  lesson?
-  post    post?
-  comment comment[]
-  report  report[]
-  like    like[]
-  keyword keyword[]
-}
-
-model course {
-  id          Int      @id @default(autoincrement())
-  title       String   @unique @db.VarChar(30)
-  description String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt
-
-  // lesson
-  lesson lesson[]
-
-  // author
-  authorId Int
-  author   user @relation(fields: [authorId], references: [id])
-
-  // category
-  categoryId Int      @db.SmallInt
-  category   category @relation(fields: [categoryId], references: [id])
-
-  // content
-  contentId String  @unique
-  content   content @relation(fields: [contentId], references: [id])
-
-  // TODO shop info
-  // price       Int?
-  // buyers       user[]          @relation(name: "PurchasedCourses")
-}
-
-model lesson {
-  id          Int      @id @default(autoincrement())
-  title       String   @unique @db.VarChar(30)
-  description String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt
-  videoUrl    String
-  attachments String[]
-
-  // course
-  courseId Int
-  course   course @relation(fields: [courseId], references: [id])
-
-  // content
-  contentId String  @unique
-  content   content @relation(fields: [contentId], references: [id])
-}
-
-model paragraph {
-  id      Int    @id @default(autoincrement())
-  heading String
-  text    String
-
-  // post
-  postId Int?
-  post   post? @relation(fields: [postId], references: [id])
-}
-
-model post {
-  id          Int      @id @default(autoincrement())
-  title       String   @unique @db.VarChar(30)
-  description String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt
-
-  // paragraphs
-  paragraph paragraph[]
-
-  // author
-  authorId Int
-  author   user @relation(fields: [authorId], references: [id])
-
-  // category
-  categoryId Int      @db.SmallInt
-  category   category @relation(fields: [categoryId], references: [id])
-
-  // content
-  contentId String  @unique
-  content   content @relation(fields: [contentId], references: [id])
-}
-
-// content act
-model comment {
-  id          Int      @id @default(autoincrement())
-  description String
-  createdAt   DateTime @default(now()) @db.Date
-  updatedAt   DateTime @updatedAt
-  isActive    Boolean  @default(true)
-
-  contentId String
-  content   content @relation(fields: [contentId], references: [id])
-
-  authorId Int
-  author   user @relation(fields: [authorId], references: [id])
-}
-
-model report {
-  id          Int      @id @default(autoincrement())
-  description String
-  createdAt   DateTime @default(now()) @db.Date
-  isActive    Boolean  @default(true)
-
-  contentId String
-  content   content @relation(fields: [contentId], references: [id])
-
-  authorId Int
-  author   user @relation(fields: [authorId], references: [id])
-}
-
-enum LikeType {
-  NONE
-  LIKE
-  DISLIKE
-}
-
-model like {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @updatedAt
-  state     LikeType
-
-  contentId String
-  content   content @relation(fields: [contentId], references: [id])
-
-  authorId Int
-  author   user @relation(fields: [authorId], references: [id])
+  @@index([userId])
 }

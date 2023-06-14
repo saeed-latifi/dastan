@@ -1,8 +1,8 @@
 import ButtonBase from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import FormSection from "@components/forms/form-section";
+import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import { useAccount } from "@hooks/useAccount";
-import { useCourse } from "@hooks/useCourse";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
@@ -10,12 +10,12 @@ import { staticURLs } from "statics/url";
 
 export default function Courses() {
 	const router = useRouter();
-	const { checkAccessRedirect } = useAccount();
-	checkAccessRedirect();
+	const { checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect();
 
-	const { coursesInfo, isLoading } = useCourse();
+	const { coursesInfo, isLoading } = useCoursePanel();
 
-	if (isLoading) return <LoaderSpinner />;
+	if (isLoading) return <LoadingSpinner />;
 
 	return (
 		<div className="flex flex-col gap-4 w-full max-w-md py-4">
@@ -30,8 +30,8 @@ export default function Courses() {
 
 						return (
 							<div key={index} className="flex items-center justify-between gap-2">
-								<Link href={staticURLs.client.panel.course.update({ courseId: course.id })}>
-									{course.title}
+								<Link href={staticURLs.client.panel.course.one({ courseId: course.id })}>
+									{course.content.title}
 								</Link>
 							</div>
 						);

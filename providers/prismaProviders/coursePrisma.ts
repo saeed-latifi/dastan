@@ -1,133 +1,199 @@
-import { iCRUD } from "@models/iCRUD";
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
-import { lessonReturnFields } from "./lessonPrisma";
+import { lessonPanelResType, lessonPanelSelect, lessonPublicResType, lessonPublicSelect } from "./lessonPrisma";
+import { categoryResType } from "./categoryPrisma";
+import { Category, Like } from "@prisma/client";
 
-const courseReturnFields = {
-	id: true,
-	title: true,
-	description: true,
-	category: true,
-	updatedAt: true,
-	createdAt: true,
-	contentId: true,
-	lesson: lessonReturnFields,
+type updateArgsType = {
+	courseId: number;
+	authorId: number;
+	description?: string;
+	title?: string;
+	categoryId?: number;
+	keywords?: string[];
+	context?: string;
 };
-type updateArgsType = { contentId: string; authorId: number; description?: string; title?: string; categoryId?: number; keywords?: string[] };
 
-export default class CoursePrismaProvider implements iCRUD {
-	async getByAuthor(userId: number) {
-		try {
-			const courses = await prismaProvider.course.findMany({
-				where: { authorId: userId },
-				select: {
-					id: true,
-					title: true,
-					description: true,
-					category: true,
-					updatedAt: true,
-					createdAt: true,
-					contentId: true,
-					content: { select: { keyword: { select: { title: true } } } },
-					lesson: lessonReturnFields,
+export type coursePanelResType = {
+	id: number;
+	content: {
+		id: number;
+		title: string;
+		description: string;
+		context: string | null;
+		image: string | null;
+		createdAt: Date;
+		updatedAt: Date;
+		category: categoryResType;
+		keywords: {
+			title: string;
+		}[];
+	};
+	lessons: lessonPanelResType[];
+};
+
+export type coursePublicResType = {
+	id: number;
+	content: {
+		id: number;
+		title: string;
+		description: string;
+		context: string | null;
+		createdAt: Date;
+		updatedAt: Date;
+		category: Category;
+		image: string | null;
+		author: {
+			id: number;
+			username: string;
+		};
+		_count: {
+			likes: number;
+		};
+		likes: Like[];
+		keywords: {
+			title: string;
+		}[];
+	};
+	lessons: lessonPublicResType[];
+};
+
+export type courseImageRes = {
+	content: {
+		image: string | null;
+	};
+	id: number;
+};
+
+function publicCourseSelect({ userId }: { userId?: number }) {
+	return {
+		id: true,
+		content: {
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				context: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				keywords: { select: { title: true } },
+				author: { select: { username: true, id: true } },
+				likes: { where: { authorId: userId } },
+				image: true,
+				_count: {
+					select: { likes: true },
 				},
-			});
+			},
+		},
+		lessons: { select: lessonPublicSelect({ userId }) },
+	};
+}
 
-			return courses;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
-	}
-
-	async create(body: { description: string; title: string; authorId: number; categoryId: number; keywords?: string[] }) {
-		const { authorId, categoryId, description, title, keywords } = body;
-
-		try {
-			const content = await prismaProvider.content.create({
-				data: {
-					course: { create: { authorId, categoryId, description, title } },
-					keyword: prismaKeywordCreateHandler({ authorId, keywords }),
+function coursePanelSelect() {
+	return {
+		id: true,
+		content: {
+			select: {
+				id: true,
+				title: true,
+				description: true,
+				context: true,
+				image: true,
+				category: true,
+				updatedAt: true,
+				createdAt: true,
+				keywords: { select: { title: true } },
+				_count: {
+					select: { likes: true },
 				},
-				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
-			});
+			},
+		},
+		lessons: { select: lessonPanelSelect() },
+	};
+}
 
-			return { ...content.course, content: { keyword: content.keyword } };
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+export default class CoursePrismaProvider {
+	// panel
+	async getByAuthor(userId: number): Promise<coursePanelResType[]> {
+		return await prismaProvider.course.findMany({
+			where: { content: { authorId: userId } },
+			select: coursePanelSelect(),
+		});
 	}
 
-	async update({ contentId, authorId, description, title, categoryId, keywords }: updateArgsType) {
-		try {
-			const content = await prismaProvider.content.update({
-				data: {
-					course: { update: { categoryId, description, title } },
-					keyword: prismaKeywordUpdateHandler({ authorId, keywords }),
+	async create(body: {
+		description: string;
+		title: string;
+		authorId: number;
+		categoryId: number;
+		keywords?: string[];
+		context?: string;
+	}): Promise<coursePanelResType> {
+		const { authorId, categoryId, description, title, keywords, context } = body;
+		return await prismaProvider.course.create({
+			data: {
+				content: {
+					create: {
+						title,
+						description,
+						authorId,
+						categoryId,
+						context,
+						keywords: prismaKeywordCreateHandler({ keywords, authorId }),
+					},
 				},
-				where: { id: contentId },
-				select: { course: { select: courseReturnFields }, keyword: { select: { title: true } } },
-			});
-			return { ...content.course, content: { keyword: content.keyword } };
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+			},
+			select: coursePanelSelect(),
+		});
 	}
 
-	async checkUniqueField({ title, contentId }: { title?: string; contentId?: string }) {
-		try {
-			const course = await prismaProvider.course.findFirst({
-				where: {
-					title: { equals: title },
-					NOT: { contentId: { equals: contentId } },
+	// : Promise<coursePanelResType>
+	async update({ courseId, authorId, description, title, categoryId, keywords, context }: updateArgsType) {
+		return await prismaProvider.course.update({
+			where: { id: courseId },
+			data: {
+				content: {
+					update: { description, title, categoryId, context, keywords: prismaKeywordUpdateHandler({ authorId, keywords }) },
 				},
-				select: { title: true, contentId: true },
-			});
-			return course;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+				// TODO ERR
+				// lessons: { update: { data: { content: { update: { categoryId } } }, where: { courseId } } },
+			},
+			select: coursePanelSelect(),
+		});
 	}
 
-	async checkCourseAuthor({ contentId }: { contentId: string }) {
-		try {
-			const course = await prismaProvider.course.findFirst({
-				where: { contentId },
-				select: { authorId: true },
-			});
-			return course;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	// public
+	async getFeed({ userId }: { userId?: number }): Promise<coursePublicResType[]> {
+		const feed = await prismaProvider.course.findMany({
+			where: { content: { isActive: true } },
+			select: publicCourseSelect({ userId }),
+		});
+		return feed;
 	}
 
-	async getSome({ userId }: { userId?: number }) {
-		try {
-			const courses = await prismaProvider.content.findMany({
-				select: {
-					_count: { select: { like: true } },
-					like: { where: { authorId: userId }, select: { state: true } },
-					course: { select: courseReturnFields },
-					keyword: { select: { title: true } },
-					comment: { select: { authorId: true, id: true, description: true, createdAt: true, updatedAt: true } },
-				},
-				where: { course: { isActive: true } },
-			});
-			return courses;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async addImage({ courseId, imageName }: { courseId: number; imageName: string }): Promise<courseImageRes> {
+		console.log("courseId : ", courseId);
+
+		return await prismaProvider.course.update({
+			where: { id: courseId },
+			data: { content: { update: { image: imageName } } },
+			select: { content: { select: { image: true } }, id: true },
+		});
 	}
 
-	async getOne(id: number) {
-		throw new Error("Method not implemented.");
+	// internals
+	async checkUniqueField({ title, courseId }: { title?: string; courseId?: number }) {
+		return await prismaProvider.course.findFirst({
+			where: { content: { title: { equals: title } }, NOT: { id: courseId } },
+			select: { content: { select: { title: true } }, id: true },
+		});
 	}
-	async delete(id: number) {
-		throw new Error("Method not implemented.");
+
+	async checkCourseAuthor({ courseId }: { courseId: number }) {
+		return await prismaProvider.course.findFirst({
+			where: { id: courseId },
+			select: { content: { select: { authorId: true } } },
+		});
 	}
 }

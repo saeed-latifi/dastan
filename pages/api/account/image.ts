@@ -4,12 +4,17 @@ import { NextApiRequest, NextApiResponse } from "next";
 import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
+import { errorLogger } from "@utilities/apiLogger";
+import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
+import formidable from "formidable";
 
 export const config = {
 	api: {
 		bodyParser: false,
 	},
 };
+
+const userPrismaProvider = new UserPrismaProvider();
 
 export default async function profileImageApi(req: NextApiRequest, res: NextApiResponse) {
 	// add image
@@ -20,20 +25,24 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 				removeCookieToken({ req, res });
 				return res.json(onErrorResponse("bad profile request"));
 			}
-			const slug = token.slug;
+			const id = token.userId;
 			const { files } = await formParser(req);
-			if (files.image) {
-				const buffer = await webpSquareBuffer({ path: files.image.filepath });
-				const fileName = slug + "." + buffer.info.format;
+			const reqImage = files.image as formidable.File;
+			if (!reqImage) return res.json(onErrorResponse("no image file"));
 
-				const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
-				if (awsRes) return res.json(onSuccessResponse("ok"));
-				else return res.json(onErrorResponse("error on aws"));
-			} else {
-				return res.json(onErrorResponse("no image file"));
-			}
+			const buffer = await webpSquareBuffer({ path: reqImage.filepath });
+			const fileName = id + "." + buffer.info.format;
+
+			const awsRes = await profileImageAWS({ file: buffer.data, fileName, ContentType: buffer.info.format });
+			if (!awsRes) return res.json(onErrorResponse("error on aws"));
+
+			const image = await userPrismaProvider.addImage({ imageName: fileName, userId: id });
+			if (!image) return res.json(onErrorResponse("error on create image"));
+
+			// ok res
+			return res.json(onSuccessResponse(image));
 		} catch (error) {
-			return res.json(onErrorResponse("err profile image"));
+			return errorLogger({ error, res, name: "image" });
 		}
 	}
 

@@ -27,3 +27,7 @@
 	scrollbar-gutter: rgba(0, 0, 0, 0.4);
 	scrollbar-width: thin;
 }
+
+.ql-editor {
+	min-height: 14rem;
+}

@@ -6,7 +6,9 @@ const description = z.string();
 const videoUrl = z.string();
 const courseId = z.number();
 const attachments = z.array(z.string());
-const contentId = z.string();
+const contentId = z.number();
+const categoryId = z.number();
+const id = z.number();
 
 // schema
 export const zLessonCreate = z.object({
@@ -14,6 +16,7 @@ export const zLessonCreate = z.object({
 	description,
 	courseId,
 	videoUrl,
+	categoryId,
 	attachments: attachments.optional(),
 	keywords: zKeywords.optional(),
 });
@@ -24,8 +27,9 @@ export const zLessonUpdate = z.object({
 	videoUrl: videoUrl.optional(),
 	courseId: courseId.optional(),
 	attachments: attachments.optional(),
+	categoryId: categoryId.optional(),
 	keywords: zKeywords.optional(),
-	contentId,
+	id,
 });
 
 // types

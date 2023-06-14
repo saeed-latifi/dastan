@@ -1,179 +1,174 @@
-import { iCRUD } from "@models/iCRUD";
 import { iUserLogin } from "@models/iUser";
 import prismaProvider from "@providers/prismaProvider";
+import { categoryResType } from "./categoryPrisma";
+import { PermissionType, Province } from "@prisma/client";
 
-export default class UserPrismaProvider implements iCRUD {
-	// don't return password and ... !
-	private manyParams = {
-		id: true,
-		firstName: true,
-		lastName: true,
-		username: true,
-		email: true,
-		phone: true,
-		permissionLevel: true,
-		interests: true,
-		province: true,
-		slug: true,
+type userUniqueResType = {
+	id: number;
+	username: string;
+	email: string;
+	phone: string | null;
+	account: {
+		permission: PermissionType;
 	};
+};
 
-	private uniqueParams = { phone: true, username: true, email: true, id: true, isActive: true, isDelete: true };
+export type userResType = {
+	id: number;
+	firstName: string | null;
+	lastName: string | null;
+	username: string;
+	interests: categoryResType[];
+	province: Province | null;
+	email: string;
+	phone: string | null;
+	image: string | null;
+	account: {
+		permission: PermissionType;
+	};
+};
 
-	async getSome(body: any) {
-		try {
-			const users = await prismaProvider.user.findMany({
-				skip: body.skip,
-				take: body.take,
-				select: this.manyParams,
-			});
-			return users;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+type UserCreateArgs = { username: string; password: string; email: string; firstName?: string; lastName?: string };
+type userUpdateArgs = { username?: string; firstName?: string; lastName?: string; interests?: { id: number }[]; provinceId?: number };
+type uniqueFieldArgs = { email?: string; phone?: string; username?: string; userId?: number };
+
+const userUniqueReturnField = { username: true, id: true, email: true, phone: true, account: { select: { permission: true } } };
+const userReturnField = {
+	id: true,
+	firstName: true,
+	lastName: true,
+	username: true,
+	interests: true,
+	province: true,
+	email: true,
+	phone: true,
+	image: true,
+	account: { select: { permission: true } },
+};
+
+export type userFeedResType = {
+	id: number;
+	username: string;
+	image: string | null;
+	followers: {
+		id: number;
+	}[];
+	_count: {
+		followers: number;
+		follows: number;
+	};
+	resume: {
+		context: string;
+		portfolio: string[];
+	} | null;
+} | null;
+
+export type uerImageRes = {
+	image: string | null;
+};
+
+export default class UserPrismaProvider {
+	// account
+	async getOne(userId: number): Promise<userResType | null> {
+		return await prismaProvider.user.findUnique({ where: { id: userId }, select: userReturnField });
 	}
 
-	async getOne(userId: number) {
-		try {
-			const user = await prismaProvider.user.findUnique({ where: { id: userId }, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async create(body: UserCreateArgs): Promise<userResType> {
+		const { username, firstName, lastName, email, password } = body;
+		return await prismaProvider.user.create({
+			data: { username, firstName, lastName, email, account: { create: { password } } },
+			select: userReturnField,
+		});
 	}
 
-	async create(body: any) {
-		try {
-			const user = await prismaProvider.user.create({ data: body, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async update(userId: number, body: userUpdateArgs): Promise<userResType> {
+		const { username, firstName, lastName, interests, provinceId } = body;
+		return await prismaProvider.user.update({
+			where: { id: userId },
+			data: { username, firstName, lastName, provinceId, interests: { set: interests } },
+			select: userReturnField,
+		});
 	}
 
-	async update(userId: number, body: any) {
-		try {
-			const user = await prismaProvider.user.update({ where: { id: userId }, data: body, select: this.manyParams });
-			return user;
-		} catch (error: any) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async Activate(email: string): Promise<userResType> {
+		return await prismaProvider.user.update({
+			where: { email },
+			data: { account: { update: { isActive: true, permission: "USER" } } },
+			select: userReturnField,
+		});
 	}
 
-	async delete(userId: number) {
-		try {
-			const user = await prismaProvider.user.update({ where: { id: userId }, data: { isActive: false }, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async checkPassword({ password, id }: { password: string; id: number }): Promise<userUniqueResType | null> {
+		return await prismaProvider.user.findFirst({
+			where: { AND: [{ account: { password: { equals: password } } }, { id: { equals: id } }] },
+			select: userUniqueReturnField,
+		});
 	}
 
-	async Activate(email: string) {
-		try {
-			const user = await prismaProvider.user.update({ where: { email }, data: { isActive: true }, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async changePassword({ userId, password }: { userId: number; password: string }): Promise<userResType> {
+		return await prismaProvider.user.update({
+			where: { id: userId },
+			data: { account: { update: { password } } },
+			select: userReturnField,
+		});
 	}
 
-	async getAllUserAuth() {
-		try {
-			const user = await prismaProvider.user.findMany({ select: { email: true, phone: true, password: true, isActive: true } });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async resetPassword({ email, password }: { email: string; password: string }): Promise<userUniqueResType> {
+		return await prismaProvider.user.update({
+			where: { email },
+			data: { account: { update: { password } } },
+			select: userUniqueReturnField,
+		});
 	}
 
-	async checkEmailAuth({ email, password }: iUserLogin) {
-		try {
-			const user = await prismaProvider.user.findFirst({
-				where: {
-					AND: [{ email: { equals: email } }, { password: { equals: password } }, { isActive: { equals: true } }],
-				},
-				select: this.manyParams,
-			});
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async changeEmail({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }): Promise<userResType> {
+		return await prismaProvider.user.update({
+			where: { email: oldEmail },
+			data: { email: newEmail },
+			select: userReturnField,
+		});
 	}
 
-	async checkUniqueField({ email, phone, username, userId }: { email?: string; username?: string; phone?: string; userId?: number }) {
-		try {
-			const user = await prismaProvider.user.findFirst({
-				where: {
-					OR: [{ email: { equals: email } }, { phone: { equals: phone } }, { username: { equals: username } }],
-					NOT: { id: { equals: userId } },
-				},
-				select: this.uniqueParams,
-			});
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async addPhone({ phone, id }: { phone: string; id: number }): Promise<userResType> {
+		return await prismaProvider.user.update({
+			where: { id },
+			data: { phone },
+			select: userReturnField,
+		});
 	}
 
-	async checkPassword({ password, id }: { password: string; id: number }) {
-		try {
-			const user = await prismaProvider.user.findFirst({
-				where: { AND: [{ password: { equals: password } }, { id: { equals: id } }] },
-				select: this.uniqueParams,
-			});
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+	async checkEmailAuth({ email, password }: iUserLogin): Promise<userResType | null> {
+		return await prismaProvider.user.findFirst({
+			where: {
+				AND: [
+					{ email: { equals: email } },
+					{ account: { password: { equals: password } } },
+					{ account: { isActive: { equals: true } } },
+				],
+			},
+			select: userReturnField,
+		});
+	}
+
+	async addImage({ userId, imageName }: { userId: number; imageName: string }): Promise<uerImageRes> {
+		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
+	}
+
+	//internal
+	async checkUniqueField({ email, phone, username, userId }: uniqueFieldArgs) {
+		return await prismaProvider.user.findFirst({
+			where: {
+				OR: [{ email: { equals: email } }, { phone: { equals: phone } }, { username: { equals: username } }],
+				NOT: { id: { equals: userId } },
+			},
+			select: { email: true, phone: true, username: true, id: true },
+		});
 	}
 
 	async getByEmail({ email }: { email: string }) {
-		try {
-			const user = await prismaProvider.user.findUnique({ where: { email }, select: this.uniqueParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
-	}
-
-	async resetPassword({ email, password }: { email: string; password: string }) {
-		try {
-			const user = await prismaProvider.user.update({ where: { email }, data: { password }, select: this.uniqueParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
-	}
-
-	async changeEmail({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }) {
-		try {
-			const user = await prismaProvider.user.update({ where: { email: oldEmail }, data: { email: newEmail }, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
-	}
-
-	async addPhone({ phone, id }: { phone: string; id: number }) {
-		try {
-			const user = await prismaProvider.user.update({ where: { id }, data: { phone }, select: this.manyParams });
-			return user;
-		} catch (error) {
-			console.log("error :: ", error);
-			return "ERR";
-		}
+		return await prismaProvider.user.findUnique({
+			where: { email },
+			select: { id: true, email: true, account: { select: { isActive: true } } },
+		});
 	}
 }

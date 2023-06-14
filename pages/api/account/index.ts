@@ -4,6 +4,7 @@ import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { zUserCreate, zUserLogin, zUserUpdate } from "@models/iUser";
 import { authEmailSender } from "@providers/emailService";
+import { errorLogger } from "@utilities/apiLogger";
 
 const userPrismaProvider = new UserPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
@@ -22,13 +23,12 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const user = await userPrismaProvider.getOne(token.userId);
-			if (user === "ERR") return res.json(onErrorResponse("err on identify ORM"));
 			if (user === null) return res.json(onErrorResponse("not found this user"));
 
 			// api
 			return res.json(onSuccessResponse(user));
 		} catch (error) {
-			return res.json(onErrorResponse("err on identify"));
+			return errorLogger({ error, res, name: "account" });
 		}
 	}
 
@@ -41,30 +41,30 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const { email, username } = validateRegister.data;
 
 			// prisma
-			const notUnique = await userPrismaProvider.checkUniqueField({ email, username });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on register ORM"));
+
+			const notUniqueFields = await userPrismaProvider.checkUniqueField({ username, email });
 
 			// validation
-			if (notUnique) {
+			if (notUniqueFields) {
 				const uniqueErrors: errorType = {};
-				if (email === notUnique.email) uniqueErrors.email = "this email already taken";
-				if (username === notUnique.username) uniqueErrors.username = "this username already taken";
+				if (username === notUniqueFields.username) uniqueErrors.username = "this username already taken";
+				if (email === notUniqueFields.email) uniqueErrors.email = "this email already taken";
 				return res.json(onErrorResponse(uniqueErrors));
 			}
 
 			// email
-			// const emailRes = await authEmailSender({ email: validateRegister.data.email });
-			// if (!emailRes) return res.json(onErrorResponse("error on sending email. please try again"));
+			const emailRes = await authEmailSender({ email: validateRegister.data.email });
+			if (!emailRes) return res.json(onErrorResponse("error on sending email. please try again"));
 
 			// prisma
 			delete validateRegister.data.confirm;
+
 			const user = await userPrismaProvider.create(validateRegister.data);
-			if (user === "ERR") return res.json(onErrorResponse("Error on register ORM"));
 
 			// api
 			return res.json(onSuccessResponse("success! check your inbox for verify email"));
 		} catch (error) {
-			return res.json(onErrorResponse("err on register"));
+			return errorLogger({ error, res, name: "account" });
 		}
 	}
 
@@ -77,17 +77,17 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const user = await userPrismaProvider.checkEmailAuth(validateLogin.data);
-			if (user === "ERR") return res.json(onErrorResponse("Error on login ORM"));
+
 			if (user === null) return res.json(onErrorResponse("not valid login"));
 
 			// token
-			const token = tokenCreator({ userId: user.id, username: user.username, permissionLevel: user.permissionLevel, slug: user.slug });
+			const token = tokenCreator({ userId: user.id, username: user.username, permission: user.account.permission });
 
 			// api
 			setCookieToken({ req, res, token });
 			return res.json(onSuccessResponse(user));
 		} catch (error) {
-			return res.json(onErrorResponse("err on login"));
+			return errorLogger({ error, res, name: "account" });
 		}
 	}
 
@@ -98,7 +98,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			removeCookieToken({ req, res });
 			return res.json(onSuccessResponse(false));
 		} catch (error) {
-			return res.json(onErrorResponse("err on logout"));
+			return errorLogger({ error, res, name: "account" });
 		}
 	}
 
@@ -121,7 +121,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// check not repetitive
 			const notUnique = await userPrismaProvider.checkUniqueField({ username, userId: token.userId });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
 
 			// on repetitive
 			if (notUnique) {
@@ -135,17 +134,17 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			};
 
 			if (validateUpdate.data.interests) {
-				body.interests = { set: validateUpdate.data.interests.map((cat) => ({ id: cat.id })) };
+				const interests = validateUpdate.data.interests.map((cat) => ({ id: cat.id }));
+				body.interests = interests;
 			}
 
 			// prisma
 			const user = await userPrismaProvider.update(token.userId, body);
-			if (user === "ERR") return res.json(onErrorResponse("Error on update ORM"));
 
 			// api
 			return res.json(onSuccessResponse(user));
 		} catch (error) {
-			return res.json(onErrorResponse("err on update user"));
+			return errorLogger({ error, res, name: "account" });
 		}
 	}
 

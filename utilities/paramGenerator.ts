@@ -3,5 +3,5 @@ export function paramGenerator() {
 	const milliseconds = date.getTime();
 
 	// TODO fix return to number shape
-	return { value: milliseconds };
+	return milliseconds;
 }

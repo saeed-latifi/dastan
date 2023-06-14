@@ -4,6 +4,7 @@ import { sendSMS } from "@providers/otpService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import TempOTP from "@providers/tempOTP";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { errorLogger } from "@utilities/apiLogger";
 import { otpGenerator } from "@utilities/otpGenerator";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -27,7 +28,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// check not repetitive
 			const notUnique = await userPrismaProvider.checkUniqueField({ phone: validate.data.phone, userId: token.userId });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
 
 			// on repetitive
 			if (notUnique) {
@@ -49,7 +49,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// api
 			return res.json(onSuccessResponse("your code send via sms. please enter your code."));
 		} catch (error) {
-			return res.json(onErrorResponse("error on send SMS"));
+			return errorLogger({ error, res, name: "phone" });
 		}
 	}
 
@@ -71,7 +71,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// check not repetitive
 			const notUnique = await userPrismaProvider.checkUniqueField({ phone: otp.phone, userId: token.userId });
-			if (notUnique === "ERR") return res.json(onErrorResponse("Error on update ORM"));
 
 			// on repetitive
 			if (notUnique) {
@@ -82,7 +81,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// prisma
 			const user = await userPrismaProvider.addPhone({ id: token.userId, phone: otp.phone });
-			if (user === "ERR") return res.json(onErrorResponse("err on add phone ORM"));
 			if (user === null) return res.json(onErrorResponse("not found this user"));
 
 			// otp purge
@@ -91,7 +89,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// api
 			return res.json(onSuccessResponse(user));
 		} catch (error) {
-			return res.json(onErrorResponse("error on send SMS"));
+			return errorLogger({ error, res, name: "phone" });
 		}
 	}
 

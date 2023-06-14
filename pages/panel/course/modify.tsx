@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoaderSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/common/loader-spinner";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormSection from "@components/forms/form-section";
@@ -12,10 +12,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import Navigation from "@components/navigation";
-import { useCourse } from "@hooks/useCourse";
 import { iCourseCreateForm, zCourseCreateForm } from "@models/iCourse";
 import { staticURLs } from "statics/url";
-import { useCategory } from "@hooks/useCategory";
 import Select from "@components/common/select";
 import { selectOptionType } from "@components/common/select-multi";
 import { iCategory } from "@models/iCategory";
@@ -24,18 +22,23 @@ import FormItemRow from "@components/forms/form-item-row";
 import { zKeyword, zKeywords } from "@models/iKeyword";
 import Link from "next/link";
 import DateFormatter from "@components/dateFormatter";
+import { useCategory } from "@hooks/public/useCategory";
+import { useCoursePanel } from "@hooks/panel/useCoursePanel";
+import FormRichText from "@components/forms/form-rich-text";
+import { coursePanelResType } from "@providers/prismaProviders/coursePrisma";
 
 export default function ModifyCourse() {
-	const { checkAccessRedirect } = useAccount();
-	const { coursesInfo, onAddCourse, onUpdateCourse, isLoading } = useCourse();
+	const { checkAccessAndRedirect } = useAccount();
+	const { coursesInfo, onAddCourse, onUpdateCourse, isLoading } = useCoursePanel();
 	const { categories } = useCategory();
-	checkAccessRedirect();
+	checkAccessAndRedirect();
 
+	const [context, setContext] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<iCategory>();
 	const [keyword, setKeyword] = useState<string>("");
 	const [keywords, setKeywords] = useState<string[]>([]);
 
-	const [course, setCourse] = useState<any>();
+	const [course, setCourse] = useState<coursePanelResType | undefined>();
 
 	const router = useRouter();
 
@@ -45,16 +48,17 @@ export default function ModifyCourse() {
 		handleSubmit,
 	} = useForm<iCourseCreateForm>({
 		resolver: zodResolver(zCourseCreateForm),
-		values: course,
+		values: course?.content,
 	});
 
 	useEffect(() => {
 		if (router.isReady) {
 			const item = coursesInfo?.find((item) => item.id === parseInt(router.query.item as string));
 			if (item) {
-				setSelectedCategory(item.category);
-				if (item?.content?.keyword && Array.isArray(item.content.keyword)) {
-					setKeywords(item.content.keyword.map((item: any) => item.title));
+				setSelectedCategory(item.content.category);
+				setContext(item.content.context || "");
+				if (item.content.keywords && Array.isArray(item.content.keywords)) {
+					setKeywords(item.content.keywords.map((item: any) => item.title));
 				}
 			}
 			setCourse(item);
@@ -64,9 +68,9 @@ export default function ModifyCourse() {
 	async function onSubmit(data: iCourseCreateForm) {
 		if (!selectedCategory) return toast.warn("select a category");
 		if (course) {
-			await onUpdateCourse({ ...data, categoryId: selectedCategory.id, contentId: course.contentId, keywords });
+			await onUpdateCourse({ ...data, context, categoryId: selectedCategory.id, id: course.id, keywords });
 		} else {
-			await onAddCourse({ ...data, categoryId: selectedCategory.id, keywords });
+			await onAddCourse({ ...data, context, categoryId: selectedCategory.id, keywords });
 		}
 	}
 
@@ -89,7 +93,7 @@ export default function ModifyCourse() {
 		setKeywords(newArr);
 	};
 
-	if (isLoading || !router.isReady) return <LoaderSpinner />;
+	if (isLoading || !router.isReady) return <LoadingSpinner />;
 	if (router.query.item && !course) {
 		return (
 			<div className="flex flex-col items-center gap-4">
@@ -107,10 +111,10 @@ export default function ModifyCourse() {
 
 			{course && (
 				<FormSection title="course image">
-					<CourseImage id={course.contentId} />
+					<CourseImage image={course.content.image} />
 					<ButtonBase
 						type="button"
-						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.contentId }))}
+						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.id }))}
 					>
 						update your course image
 					</ButtonBase>
@@ -131,10 +135,16 @@ export default function ModifyCourse() {
 				/>
 			</FormSection>
 
+			<FormSection title="context">
+				<FormRichText value={context} onChange={setContext} />
+			</FormSection>
+
 			<FormSection title="category">
 				<Select
 					selectId="profileProvinces"
-					preSelect={course?.category && { label: course?.category?.title, value: course?.category?.id }}
+					preSelect={
+						course?.content.category && { label: course?.content.category?.title, value: course?.content.category?.id }
+					}
 					options={categories?.map((category) => ({ value: category.id, label: category.title }))}
 					onChange={onSelectCategory}
 				/>
@@ -164,18 +174,18 @@ export default function ModifyCourse() {
 					</ButtonBase>
 
 					{/* TODO lessons */}
-					{Array.isArray(course.lesson) &&
-						course.lesson.map((l: any, index: number) => (
+					{Array.isArray(course.lessons) &&
+						course.lessons.map((lesson, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
 								<Link
-									href={staticURLs.client.panel.course.lesson.update({
+									href={staticURLs.client.panel.course.lesson.one({
 										courseId: course.id,
-										lessonId: l.id,
+										lessonId: lesson.id,
 									})}
 								>
-									{l.title}
+									{lesson.content.title}
 								</Link>
-								<DateFormatter date={l.updatedAt} />
+								<DateFormatter date={lesson.content.updatedAt} />
 							</div>
 						))}
 				</FormSection>

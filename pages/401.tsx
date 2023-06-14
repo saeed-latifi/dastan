@@ -1,3 +1,3 @@
 export default function Notfound() {
-	return <div className="body">401</div>;
+	return <div>401</div>;
 }
