@@ -5,7 +5,7 @@ import Navigation from "@components/navigation";
 import HTTPService from "@providers/HTTPService";
 import { AxiosRequestConfig } from "axios";
 import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { staticURLs } from "statics/url";
 
 export default function VideoUpload() {
@@ -13,13 +13,21 @@ export default function VideoUpload() {
 	const { courseId, lessonId } = router.query as { courseId: string; lessonId: string };
 
 	const [file, setFile] = useState<File | undefined>();
+	const [videoSrc, setVideoSrc] = useState<string>();
 	const [progress, setProgress] = useState(0);
 	const [error, setError] = useState(null);
 	const [submitting, setSubmitting] = useState(false);
 
+	const videoEl = useRef<HTMLVideoElement>(null);
+
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		if (!file) return;
+		const video = videoEl.current;
+		if (!file || !video) return;
+
+		console.log(`The video is ${video.duration} seconds long.`);
+		const duration = Math.floor(video.duration);
+		console.log(duration);
 
 		setSubmitting(true);
 		const data = new FormData();
@@ -31,7 +39,8 @@ export default function VideoUpload() {
 				const percentComplete = Math.round((progressEvent.loaded * 100) / total);
 				setProgress(percentComplete);
 			},
-			params: { lessonId },
+			params: { lessonId, duration },
+			timeout: 1000 * 60 * 30,
 		};
 
 		try {
@@ -50,6 +59,7 @@ export default function VideoUpload() {
 
 		if (files?.length) {
 			setFile(files[0]);
+			setVideoSrc(URL.createObjectURL(files[0]));
 		}
 	}
 
@@ -64,11 +74,12 @@ export default function VideoUpload() {
 
 			{error && <p>{error}</p>}
 			{submitting && <p>{progress}%</p>}
-			<div className="flex items-center gap-2">
+			<div className="flex flex-col items-center gap-2">
 				<label htmlFor="file">File</label>
 				<input type="file" id="file" accept=".mp4" onChange={handleSetFile} />
+				{videoSrc && <video ref={videoEl} className="" src={videoSrc} controls></video>}
 			</div>
-			<ButtonBase>Upload video</ButtonBase>
+			{videoSrc && <ButtonBase>Upload video</ButtonBase>}
 		</Form>
 	);
 }

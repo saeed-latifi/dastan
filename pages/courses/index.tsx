@@ -6,7 +6,7 @@ export default function CourseFeed() {
 	const { coursesInfo } = useCourseFeed();
 
 	return (
-		<div className="w-full flex flex-wrap p-1 gap-2">
+		<div className="w-full flex flex-wrap p-1 gap-2 max-w-theme">
 			{coursesInfo?.map((course) => (
 				<CourseFeedCard key={course.id} course={course} />
 			))}

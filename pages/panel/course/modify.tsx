@@ -183,9 +183,9 @@ export default function ModifyCourse() {
 										lessonId: lesson.id,
 									})}
 								>
-									{lesson.content.title}
+									{lesson.title}
 								</Link>
-								<DateFormatter date={lesson.content.updatedAt} />
+								<span>{lesson.duration}</span>
 							</div>
 						))}
 				</FormSection>

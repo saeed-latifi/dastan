@@ -23,7 +23,7 @@ export default function Profile() {
 	const [selectedProvince, setSelectedProvince] = useState<iProvince>();
 	const [selectedCategories, setSelectedCategories] = useState<iCategory[]>();
 
-	const { userInfo, isLoading, checkAccessAndRedirect, onUpdateUser, onErrorPurge, error } = useAccount();
+	const { userInfo, isLoading, checkAccessAndRedirect, onUpdateUser, onErrorPurge, error, onLogout } = useAccount();
 	const { provinces } = useProvince();
 	const { categories } = useCategory();
 
@@ -69,6 +69,12 @@ export default function Profile() {
 	if (!userInfo) return <span>no access</span>;
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
+			<div className="w-full flex flex-col gap-1">
+				<ButtonBase type="button" onClick={onLogout} Variety={BaseButtonVariety.form}>
+					SignOut
+				</ButtonBase>
+			</div>
+
 			<FormSection title="info">
 				<FormInput
 					labelText="firstName"

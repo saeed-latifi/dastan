@@ -1,11 +1,13 @@
 import { zLessonCreate, zLessonUpdate } from "@models/iLesson";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
+import CoursePrismaProvider from "@providers/prismaProviders/coursePrisma";
 import LessonPrismaProvider from "@providers/prismaProviders/lessonPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const lessonPrismaProvider = new LessonPrismaProvider();
+const coursePrismaProvider = new CoursePrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
 	// token
 	// validation
@@ -25,21 +27,18 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zLessonCreate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { title } = validateData.data;
+			const { courseId } = validateData.data;
 
-			// prisma unique
-			const notUnique = await lessonPrismaProvider.checkUniqueField({ title });
-			if (notUnique) {
-				const uniqueErrors: errorType = {};
-				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
-				return res.json(onErrorResponse(uniqueErrors));
-			}
+			// prisma check author
+			const author = await coursePrismaProvider.checkCourseAuthor({ courseId });
+			if (!author) return res.json(onErrorResponse("not correct course"));
+			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
 
 			// prisma create
-			const course = await lessonPrismaProvider.create({ body: validateData.data, authorId: token.userId });
+			const lesson = await lessonPrismaProvider.create({ body: validateData.data });
 
 			// api
-			return res.json(onSuccessResponse(course));
+			return res.json(onSuccessResponse(lesson));
 		} catch (error) {
 			return errorLogger({ error, res, name: "lesson" });
 		}
@@ -58,20 +57,12 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zLessonUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { id, title } = validateData.data;
+			const { id } = validateData.data;
 
 			// prisma check course author
 			const author = await lessonPrismaProvider.checkLessonAuthor({ lessonId: id });
 			if (author === null) return res.json(onErrorResponse("this course not exist"));
-			if (author.content.authorId !== token.userId) return res.json(onErrorResponse("Error course access denied!"));
-
-			// unique check
-			const notUnique = await lessonPrismaProvider.checkUniqueField({ title, lessonId: id });
-			if (notUnique) {
-				const uniqueErrors: errorType = {};
-				if (title === notUnique.content.title) uniqueErrors.title = "this title already taken";
-				return res.json(onErrorResponse(uniqueErrors));
-			}
+			if (author.course.content.authorId !== token.userId) return res.json(onErrorResponse("Error lesson access denied!"));
 
 			// prisma
 			const course = await lessonPrismaProvider.update({ body: validateData.data, authorId: token.userId });

@@ -35,6 +35,11 @@ module.exports = {
 			maxHeight: {
 				select: "9rem",
 			},
+
+			maxWidth: {
+				theme: "36rem",
+				form: "28rem",
+			},
 			borderRadius: {
 				"theme-border": "0.4rem",
 			},

@@ -130,7 +130,6 @@ model Content {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   course   Course?
-  lesson   Lesson?
   post     Post?
   comments Comment[]
   reports  Report[]
@@ -163,18 +162,15 @@ model Course {
 }
 
 model Lesson {
-  id       Int    @id @default(autoincrement())
-  videoUrl String
+  id       Int     @id @default(autoincrement())
+  title    String
+  videoUrl String?
+  duration Int     @default(0)
 
   // course
   courseId Int
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  // content
-  contentId Int     @unique
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-
-  @@index([contentId])
   @@index([courseId])
 }
 

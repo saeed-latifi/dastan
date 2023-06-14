@@ -1,7 +1,6 @@
 export const staticURLs = {
 	client: {
 		home: "/",
-		course: "/course",
 
 		welcome: "/welcome",
 		login: "/login",
@@ -55,10 +54,11 @@ export const staticURLs = {
 
 		feed: {
 			courses: "/courses",
-			course: ({ courseName }: { courseName: string }) => `/courses/${courseName}`,
-			lesson: ({ courseName, lessonName }: { courseName: string; lessonName: string }) => `/courses/${courseName}/${lessonName}`,
 
+			course: ({ courseName }: { courseName: string }) => `/courses/${courseName}`,
 			resume: ({ username }: { username: string }) => `/resume/${username}`,
+
+			jobs: "/jobs",
 		},
 	},
 

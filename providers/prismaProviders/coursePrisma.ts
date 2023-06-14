@@ -1,6 +1,6 @@
 import prismaProvider from "@providers/prismaProvider";
 import { prismaKeywordCreateHandler, prismaKeywordUpdateHandler } from "@utilities/keywordMapperPrisma";
-import { lessonPanelResType, lessonPanelSelect, lessonPublicResType, lessonPublicSelect } from "./lessonPrisma";
+import { lessonResType, lessonSelect } from "./lessonPrisma";
 import { categoryResType } from "./categoryPrisma";
 import { Category, Like } from "@prisma/client";
 
@@ -29,7 +29,7 @@ export type coursePanelResType = {
 			title: string;
 		}[];
 	};
-	lessons: lessonPanelResType[];
+	lessons: lessonResType[];
 };
 
 export type coursePublicResType = {
@@ -55,7 +55,7 @@ export type coursePublicResType = {
 			title: string;
 		}[];
 	};
-	lessons: lessonPublicResType[];
+	lessons: lessonResType[];
 };
 
 export type courseImageRes = {
@@ -86,7 +86,7 @@ function publicCourseSelect({ userId }: { userId?: number }) {
 				},
 			},
 		},
-		lessons: { select: lessonPublicSelect({ userId }) },
+		lessons: { select: lessonSelect() },
 	};
 }
 
@@ -109,7 +109,7 @@ function coursePanelSelect() {
 				},
 			},
 		},
-		lessons: { select: lessonPanelSelect() },
+		lessons: { select: lessonSelect() },
 	};
 }
 

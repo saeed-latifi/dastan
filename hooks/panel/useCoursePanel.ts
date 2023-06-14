@@ -9,7 +9,7 @@ import { iLessonCreate, iLessonUpdate } from "@models/iLesson";
 import { staticURLs } from "statics/url";
 import { fetchHandler } from "@hooks/useFetch";
 import { courseImageRes, coursePanelResType } from "@providers/prismaProviders/coursePrisma";
-import { lessonPanelResType } from "@providers/prismaProviders/lessonPrisma";
+import { lessonResType } from "@providers/prismaProviders/lessonPrisma";
 import { useImage } from "@hooks/useImage";
 
 export function useCoursePanel() {
@@ -75,7 +75,7 @@ export function useCoursePanel() {
 	}
 
 	function onAddLesson(body: iLessonCreate) {
-		fetchHandler<lessonPanelResType>({
+		fetchHandler<lessonResType>({
 			fetcher: () => HTTPService.post(staticURLs.server.panel.lesson.base, body),
 			onOK: (res) => {
 				let pageId = 0;
@@ -100,7 +100,7 @@ export function useCoursePanel() {
 	}
 
 	function onUpdateLesson(body: iLessonUpdate) {
-		fetchHandler<lessonPanelResType>({
+		fetchHandler<lessonResType>({
 			fetcher: () => HTTPService.put(staticURLs.server.panel.lesson.base, body),
 			onOK: (res) => {
 				let pageId = 0;
