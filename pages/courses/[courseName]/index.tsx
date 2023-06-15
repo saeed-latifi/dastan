@@ -1,9 +1,12 @@
+import AddComment from "@components/comments/add-comment";
+import CommentCard from "@components/comments/commentCard";
 import DateFormatter from "@components/dateFormatter";
 import HeartIcon from "@components/icons/heart-icon";
 import CourseImage from "@components/images/course-image";
 import Navigation from "@components/navigation";
 import { useCourseFeed } from "@hooks/feed/useCourseFeed";
 import { useAccount } from "@hooks/useAccount";
+import { useComment } from "@hooks/useComment";
 import { coursePublicResType } from "@providers/prismaProviders/coursePrisma";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -12,11 +15,13 @@ import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
 
 export default function CourseName() {
+	const [course, setCourse] = useState<coursePublicResType>();
+
 	const { onLikeCourse, isValidating, isLoading, coursesInfo } = useCourseFeed();
+	const { commentInfo, isLoading: commentIsLoading, isValidating: commentIsValidating } = useComment({ contentId: course?.content.id });
 	const { userInfo } = useAccount();
 
 	const [freeze, setFreeze] = useState(false);
-	const [course, setCourse] = useState<coursePublicResType>();
 	const [selected, setSelected] = useState(-1);
 
 	const router = useRouter();
@@ -61,16 +66,16 @@ export default function CourseName() {
 	} = course;
 
 	return (
-		<div className="flex flex-col gap-2 w-full p-2 max-w-theme	">
+		<div className="flex flex-col gap-4 w-full p-2 max-w-theme">
 			<Navigation label="" path={staticURLs.client.feed.courses} />
 			{image && <CourseImage image={image} />}
 			<div className="flex flex-col gap-2 border border-theme-border rounded-theme-border w-full p-2">
 				<p>{title}</p>
 				<p>{description}</p>
-				<p className="flex items-center gap-1">
+				<div className="flex items-center gap-1">
 					<span>author : </span>
 					<Link href={staticURLs.client.feed.resume({ username: authorName })}>{authorName}</Link>
-				</p>
+				</div>
 
 				<p className="flex items-center gap-2">
 					<span>category : </span>
@@ -95,9 +100,8 @@ export default function CourseName() {
 				<div
 					className="ql-editor border border-theme-border rounded-theme-border w-full p-2"
 					dangerouslySetInnerHTML={{ __html: context }}
-				/>
+				></div>
 			)}
-
 			{lessons.length > 0 && (
 				<div className="flex flex-col border border-theme-border rounded-theme-border w-full overflow-hidden">
 					{lessons.map((lesson) => (
@@ -128,6 +132,18 @@ export default function CourseName() {
 					))}
 				</div>
 			)}
+
+			{commentInfo && commentInfo.length > 0 && (
+				<div className="flex flex-col gap-1">
+					<p>comments</p>
+					<div className="flex flex-col border border-theme-border rounded-theme-border w-full overflow-hidden p-2">
+						{commentInfo.map((comment) => (
+							<CommentCard key={comment.id} comment={comment}  />
+						))}
+					</div>
+				</div>
+			)}
+			<AddComment contentId={course.content.id} />
 		</div>
 	);
 }

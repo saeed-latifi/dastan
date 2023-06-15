@@ -8,10 +8,10 @@ export default function DateFormatter({ date }: { date: Date | string }) {
 	});
 	const dateArr = d.split(" ");
 	return (
-		<p className="flex items-center gap-1 text-sm overflow-hidden">
+		<span className="flex items-center gap-1 text-sm overflow-hidden">
 			<span>{dateArr[0]}</span>
 			<span>{dateArr[1]}</span>
 			<span>{dateArr[2]}</span>
-		</p>
+		</span>
 	);
 }
