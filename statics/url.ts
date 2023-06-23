@@ -100,7 +100,9 @@ export const staticURLs = {
 			resume: "feed/resume",
 			like: "feed/like",
 			follow: "feed/follow",
-			comment: "feed/comment",
+			comment: {
+				base: "feed/comment",
+			},
 		},
 	},
 };

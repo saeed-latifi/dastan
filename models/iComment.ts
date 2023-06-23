@@ -9,6 +9,7 @@ const replyId = z.number().optional();
 // schema
 export const zCommentGet = z.object({ contentId });
 export const zCommentCreate = z.object({ contentId, description, parentId, replyId });
+export const zCommentDelete = z.object({ id });
 export const zCommentCreateForm = z.object({ description });
 
 // types

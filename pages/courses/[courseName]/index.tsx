@@ -18,7 +18,7 @@ export default function CourseName() {
 	const [course, setCourse] = useState<coursePublicResType>();
 
 	const { onLikeCourse, isValidating, isLoading, coursesInfo } = useCourseFeed();
-	const { commentInfo, isLoading: commentIsLoading, isValidating: commentIsValidating } = useComment({ contentId: course?.content.id });
+	const { commentInfo, isLoading: commentIsLoading, isValidating: commentIsValidating, onDelete } = useComment({ contentId: course?.content.id });
 	const { userInfo } = useAccount();
 
 	const [freeze, setFreeze] = useState(false);
@@ -138,7 +138,7 @@ export default function CourseName() {
 					<p>comments</p>
 					<div className="flex flex-col border border-theme-border rounded-theme-border w-full overflow-hidden p-2">
 						{commentInfo.map((comment) => (
-							<CommentCard key={comment.id} comment={comment}  />
+							<CommentCard key={comment.id} comment={comment} onDelete={onDelete} />
 						))}
 					</div>
 				</div>

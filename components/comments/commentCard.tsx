@@ -7,8 +7,11 @@ import React from "react";
 
 type onEditType = ({ id, description }: { id: number; description: string }) => void;
 type onReplyType = ({ id, parentId }: { id: number; parentId: number | null }) => void;
+type onDeleteType = ({ id }: { id: number }) => any;
 
-export default function CommentCard({ comment, onEdit, onReply }: { comment: commentResType; onEdit?: onEditType; onReply?: onReplyType }) {
+type propsType = { comment: commentResType; onEdit?: onEditType; onReply?: onReplyType; onDelete?: onDeleteType };
+
+export default function CommentCard({ comment, onEdit, onReply, onDelete }: propsType) {
 	const { author, contentId, createdAt, description, id, parentId, replyId, updatedAt } = comment;
 
 	return (
@@ -16,7 +19,7 @@ export default function CommentCard({ comment, onEdit, onReply }: { comment: com
 			<p>{author.username}</p>
 			<p>{description}</p>
 			<p className="flex items-center gap-4 pt-2">
-				<span className="w-5 active:opacity-70 cursor-pointer fill-theme-dark" onClick={() => {}}>
+				<span className="w-5 active:opacity-70 cursor-pointer fill-theme-dark" onClick={() => onDelete && onDelete({ id })}>
 					<DeleteIcon />
 				</span>
 

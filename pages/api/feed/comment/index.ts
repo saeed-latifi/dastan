@@ -1,8 +1,9 @@
-import { zCommentCreate, zCommentGet } from "@models/iComment";
+import { zCommentCreate, zCommentDelete, zCommentGet } from "@models/iComment";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import CommentPrismaProvider from "@providers/prismaProviders/commentPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
+import { sleep } from "@utilities/devSleep";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const commentPrismaProvider = new CommentPrismaProvider();
@@ -24,6 +25,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		}
 	}
 
+	// on create
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
@@ -45,6 +47,31 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		}
 	}
 
+	// on delete
+	if (req.method === "PATCH") {
+		try {
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) {
+				removeCookieToken({ req, res });
+				return res.json(onErrorResponse("bad comment request"));
+			}
+
+			const validateData = zCommentDelete.safeParse(req.body);
+			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
+
+			// check Author
+			const author = await commentPrismaProvider.checkAuthor({ id: validateData.data.id });
+			if (author?.authorId !== token.userId) return onErrorResponse("comment access denied!");
+
+			// prisma
+			const comment = await commentPrismaProvider.delete({ id: validateData.data.id });
+
+			// api
+			return res.json(onSuccessResponse(comment));
+		} catch (error) {
+			return errorLogger({ error, res, name: "create comment" });
+		}
+	}
 	// not supported method
 	else {
 		return res.json(onErrorResponse("not supported method"));

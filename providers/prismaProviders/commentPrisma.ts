@@ -43,4 +43,22 @@ export default class CommentPrismaProvider {
 		});
 		return comment;
 	}
+
+	async delete({ id }: { id: number }) {
+		const comment = await prismaProvider.comment.update({
+			where: { id },
+			select: commentSelect,
+			data: { isActive: false },
+		});
+		return comment;
+	}
+
+	// internal
+	async checkAuthor({ id }: { id: number }) {
+		const comment = await prismaProvider.comment.findFirst({
+			where: { id },
+			select: { authorId: true, id: true },
+		});
+		return comment;
+	}
 }

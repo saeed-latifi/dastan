@@ -28,7 +28,7 @@ export function useComment({ contentId }: { contentId?: number }) {
 		if (!contentId) return;
 
 		try {
-			const { data }: { data: apiResponse<commentResType[]> } = await HTTPService.get(staticURLs.server.feed.comment, {
+			const { data }: { data: apiResponse<commentResType[]> } = await HTTPService.get(staticURLs.server.feed.comment.base, {
 				params: { contentId },
 			});
 			console.log("comments :: ", data);
@@ -41,7 +41,7 @@ export function useComment({ contentId }: { contentId?: number }) {
 
 	async function addComment(body: iCommentCreate) {
 		fetchHandler<commentResType>({
-			fetcher: () => HTTPService.post(staticURLs.server.feed.comment, body),
+			fetcher: () => HTTPService.post(staticURLs.server.feed.comment.base, body),
 			onOK: (res) => {
 				commentMutator(undefined, {
 					populateCache(_result, _baseState) {
@@ -60,5 +60,36 @@ export function useComment({ contentId }: { contentId?: number }) {
 		});
 	}
 
-	return { isLoading, commentInfo, isValidating, addComment };
+	async function onDelete({ id }: { id: number }) {
+		await commentMutator(
+			async () => {
+				try {
+					const { data }: { data: apiResponse<commentResType> } = await HTTPService.patch(
+						staticURLs.server.feed.comment.base,
+						{ id }
+					);
+					if (data.resState === responseState.ok) return data.data as any;
+					toast.warn("some problem");
+					throw 500;
+				} catch (error) {
+					throw 500;
+				}
+			},
+			{
+				optimisticData: (_currentData) => {
+					return commentInfo?.filter((comment) => comment.id !== id);
+				},
+
+				populateCache: (res, _baseState) => {
+					return commentInfo?.filter((comment) => comment.id !== res.id);
+				},
+
+				rollbackOnError: true,
+				throwOnError: false,
+				revalidate: false,
+			}
+		);
+	}
+
+	return { isLoading, commentInfo, isValidating, addComment, onDelete };
 }
