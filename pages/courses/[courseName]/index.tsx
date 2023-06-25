@@ -1,5 +1,5 @@
 import AddComment from "@components/comments/add-comment";
-import CommentCard from "@components/comments/commentCard";
+import CommentCard, { commentEditType, commentReplyType } from "@components/comments/commentCard";
 import DateFormatter from "@components/dateFormatter";
 import HeartIcon from "@components/icons/heart-icon";
 import CourseImage from "@components/images/course-image";
@@ -16,9 +16,17 @@ import { staticURLs } from "statics/url";
 
 export default function CourseName() {
 	const [course, setCourse] = useState<coursePublicResType>();
+	const [ediInfo, setEdit] = useState<commentEditType>();
+	const [replyInfo, setReply] = useState<commentReplyType>();
 
 	const { onLikeCourse, isValidating, isLoading, coursesInfo } = useCourseFeed();
-	const { commentInfo, isLoading: commentIsLoading, isValidating: commentIsValidating, onDelete } = useComment({ contentId: course?.content.id });
+	const {
+		commentInfo,
+		isLoading: commentIsLoading,
+		isValidating: commentIsValidating,
+		onDelete,
+		getReplies,
+	} = useComment({ contentId: course?.content.id });
 	const { userInfo } = useAccount();
 
 	const [freeze, setFreeze] = useState(false);
@@ -64,7 +72,7 @@ export default function CourseName() {
 		},
 		lessons,
 	} = course;
-
+	const focusId = "commentInputFocus";
 	return (
 		<div className="flex flex-col gap-4 w-full p-2 max-w-theme">
 			<Navigation label="" path={staticURLs.client.feed.courses} />
@@ -106,13 +114,11 @@ export default function CourseName() {
 				<div className="flex flex-col border border-theme-border rounded-theme-border w-full overflow-hidden">
 					{lessons.map((lesson) => (
 						<div
+							key={lesson.id}
+							onClick={() => setSelected(lesson.id)}
 							className={`flex flex-col w-full items-center border-b border-theme-border last:border-b-0 ${
 								lesson.videoUrl && selected === lesson.id ? "bg-theme-select text-theme-accent" : ""
 							}`}
-							key={lesson.id}
-							onClick={() => {
-								setSelected(lesson.id);
-							}}
 						>
 							{lesson.videoUrl && selected === lesson.id && (
 								<video
@@ -138,12 +144,34 @@ export default function CourseName() {
 					<p>comments</p>
 					<div className="flex flex-col border border-theme-border rounded-theme-border w-full overflow-hidden p-2">
 						{commentInfo.map((comment) => (
-							<CommentCard key={comment.id} comment={comment} onDelete={onDelete} />
+							// TODO ask first for delete
+							<>
+								<CommentCard
+									key={"com" + comment.id}
+									comment={comment}
+									onDelete={onDelete}
+									onEdit={setEdit}
+									onReply={setReply}
+									onGetReplies={getReplies}
+									focusId={focusId}
+								/>
+								{comment.children?.map((comment) => (
+									<CommentCard
+										isReply
+										key={"rep" + comment.id}
+										comment={comment}
+										onDelete={onDelete}
+										onEdit={setEdit}
+										onReply={setReply}
+										focusId={focusId}
+									/>
+								))}
+							</>
 						))}
 					</div>
 				</div>
 			)}
-			<AddComment contentId={course.content.id} />
+			<AddComment contentId={course.content.id} editInfo={ediInfo} replyInfo={replyInfo} focusId={focusId} />
 		</div>
 	);
 }

@@ -131,7 +131,7 @@ export default function Profile() {
 				</div>
 			</FormSection>
 
-			<ButtonBase Variety={BaseButtonVariety.form} type="submit" style={{ marginTop: "1rem" }}>
+			<ButtonBase Variety={BaseButtonVariety.form} type="submit" className="mt-4">
 				update
 			</ButtonBase>
 

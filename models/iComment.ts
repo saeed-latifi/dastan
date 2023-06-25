@@ -11,9 +11,11 @@ export const zCommentGet = z.object({ contentId });
 export const zCommentCreate = z.object({ contentId, description, parentId, replyId });
 export const zCommentDelete = z.object({ id });
 export const zCommentCreateForm = z.object({ description });
+export const zCommentUpdate = z.object({ description, id });
 
 // types
 export type iCommentGet = z.infer<typeof zCommentGet>;
 
 export type iCommentCreate = z.infer<typeof zCommentCreate>;
 export type iCommentCreateForm = z.infer<typeof zCommentCreateForm>;
+export type iCommentUpdate = z.infer<typeof zCommentUpdate>;

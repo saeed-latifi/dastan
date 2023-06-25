@@ -9,7 +9,9 @@ export default function ButtonBase({ Variety = BaseButtonVariety.primary, ...pro
 			{...props}
 			className={`${typeRender(
 				Variety
-			)} flex items-center justify-center rounded-theme-border outline-none py-2 px-4 align-middle  min-w-theme-medium active:opacity-70  bg-theme-form`}
+			)} flex items-center justify-center rounded-theme-border outline-none py-2 px-4 align-middle  min-w-theme-medium active:opacity-70  bg-theme-form ${
+				props.className
+			}`}
 		/>
 	);
 }
