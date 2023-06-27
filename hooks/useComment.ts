@@ -70,6 +70,9 @@ export function useComment({ contentId }: { contentId?: number }) {
 							if (body.replyId) {
 								draft?.forEach((comment) => {
 									if (comment.id === res.parentId) {
+										if (comment._count?.children) comment._count.children += 1;
+										else comment._count = { children: 1 };
+
 										if (comment.children) comment.children.push(res);
 										else comment.children = [res];
 									}
@@ -177,10 +180,34 @@ export function useComment({ contentId }: { contentId?: number }) {
 			},
 			{
 				optimisticData: (_currentData) => {
+					if (parentId) {
+						return commentInfo?.map((comment) => {
+							if (comment.id === parentId) {
+								const count = comment._count?.children ? comment._count.children - 1 : 0;
+								const children = comment.children?.filter((child) => child.id !== id);
+								comment = { ...comment, children, _count: { children: count } };
+							}
+							return comment;
+						});
+					}
+
 					return commentInfo?.filter((comment) => comment.id !== id);
 				},
 
 				populateCache: (res, _baseState) => {
+					console.log(res);
+
+					if (parentId) {
+						return commentInfo?.map((comment) => {
+							if (comment.id === parentId) {
+								const count = comment._count?.children ? comment._count.children - 1 : 0;
+								const children = comment.children?.filter((child) => child.id !== res.id);
+								comment = { ...comment, children, _count: { children: count } };
+							}
+							return comment;
+						});
+					}
+
 					return commentInfo?.filter((comment) => comment.id !== res.id);
 				},
 

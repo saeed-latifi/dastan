@@ -58,14 +58,16 @@ export default class CommentPrismaProvider {
 	}
 
 	async delete({ id }: { id: number }): Promise<commentResType> {
-		// 	// TODO fix on "disconnect" child _count
-		// const comment = await prismaProvider.comment.update({
-		// 	where: { id },
-		// 	select: commentSelect,
-		// 	data: { isActive: false },
-		// });
-
-		const comment = await prismaProvider.comment.delete({ where: { id }, select: commentSelect });
+		const checkParent = await prismaProvider.comment.findUnique({ where: { id }, select: { parentId: true } });
+		if (checkParent?.parentId) {
+			const comment = await prismaProvider.comment.update({
+				where: { id },
+				data: { isActive: false, parent: { disconnect: true } },
+				select: commentSelect,
+			});
+			return comment;
+		}
+		const comment = await prismaProvider.comment.update({ where: { id }, data: { isActive: false }, select: commentSelect });
 		return comment;
 	}
 

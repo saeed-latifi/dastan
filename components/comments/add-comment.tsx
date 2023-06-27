@@ -87,7 +87,7 @@ export default function AddComment({ contentId, editInfo, replyInfo, focusId }: 
 		>
 			{reply && (
 				<div className="flex items-center justify-between">
-					<CloseIcon width={"1.4rem"} onClick={onClear} />
+					<CloseIcon className="w-6" onClick={onClear} />
 					<span className="flex items-center gap-2 text-sm">
 						<span>answer to :</span>
 						<span>{reply.authorName}</span>
@@ -96,7 +96,7 @@ export default function AddComment({ contentId, editInfo, replyInfo, focusId }: 
 			)}
 			{edit && (
 				<div className="flex items-center justify-between">
-					<CloseIcon width={"1.4rem"} onClick={onClear} />
+					<CloseIcon className="w-6" onClick={onClear} />
 				</div>
 			)}
 
