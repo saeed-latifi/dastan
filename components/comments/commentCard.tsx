@@ -2,9 +2,12 @@ import DateFormatter from "@components/dateFormatter";
 import DeleteIcon from "@components/icons/delete-icon";
 import EditIcon from "@components/icons/edit-icon";
 import ReplyIcon from "@components/icons/reply-icon";
+import { useAccount } from "@hooks/useAccount";
 import { commentResType } from "@providers/prismaProviders/commentPrisma";
 import onFocus from "@utilities/onFocus";
+import Link from "next/link";
 import React from "react";
+import { staticURLs } from "statics/url";
 
 export type commentEditType = { description: string; id: number; parentId?: number };
 export type commentReplyType = { parentId?: number; id: number; authorName: string };
@@ -25,6 +28,7 @@ type propsType = {
 };
 
 export default function CommentCard({ comment, isReply, onEdit, onReply, onDelete, onGetReplies, focusId }: propsType) {
+	const { userInfo } = useAccount();
 	const { author, contentId, createdAt, description, id, parentId, replyId, updatedAt, reply, children, _count } = comment;
 
 	return (
@@ -35,29 +39,33 @@ export default function CommentCard({ comment, isReply, onEdit, onReply, onDelet
 			}`}
 		>
 			<p className="flex items-center justify-between gap-2">
-				<span>{author.username} </span>
+				<Link href={staticURLs.client.feed.resume({ username: author.username })}>{author.username}</Link>
 				<span className="flex-1"></span>
 				{reply?.author.username && <span>reply to </span>}
 				{reply?.author.username && <span>{reply?.author.username}</span>}
 			</p>
 			<p>{description}</p>
 			<p className="flex items-center gap-4 pt-2">
-				<span
-					className="w-5 active:opacity-70 cursor-pointer fill-theme-dark"
-					onClick={() => onDelete && onDelete({ id, parentId: parentId ? parentId : undefined })}
-				>
-					<DeleteIcon />
-				</span>
+				{userInfo?.id === author.id && (
+					<>
+						<span
+							className="w-5 active:opacity-70 cursor-pointer fill-theme-dark"
+							onClick={() => onDelete && onDelete({ id, parentId: parentId ? parentId : undefined })}
+						>
+							<DeleteIcon />
+						</span>
 
-				<span
-					className="w-5 active:opacity-70 cursor-pointer fill-theme-dark"
-					onClick={() => {
-						onEdit && onEdit({ id, description, parentId: parentId ? parentId : undefined });
-						focusId && onFocus({ focusId });
-					}}
-				>
-					<EditIcon />
-				</span>
+						<span
+							className="w-5 active:opacity-70 cursor-pointer fill-theme-dark"
+							onClick={() => {
+								onEdit && onEdit({ id, description, parentId: parentId ? parentId : undefined });
+								focusId && onFocus({ focusId });
+							}}
+						>
+							<EditIcon />
+						</span>
+					</>
+				)}
 
 				<span
 					className="active:opacity-70 cursor-pointer fill-theme-dark flex items-center gap-2"

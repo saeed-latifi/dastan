@@ -76,7 +76,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// check Author
 			const author = await commentPrismaProvider.checkAuthor({ id: validateData.data.id });
-			if (author?.authorId !== token.userId) return onErrorResponse("comment access denied!");
+			if (author?.authorId !== token.userId) return res.json(onErrorResponse("comment access denied!"));
 
 			// prisma
 			const comments = await commentPrismaProvider.update(validateData.data);
@@ -102,7 +102,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// check Author
 			const author = await commentPrismaProvider.checkAuthor({ id: validateData.data.id });
-			if (author?.authorId !== token.userId) return onErrorResponse("comment access denied!");
+			if (author?.authorId !== token.userId) return res.json(onErrorResponse("comment access denied!"));
 
 			// prisma
 			const comment = await commentPrismaProvider.delete({ id: validateData.data.id });

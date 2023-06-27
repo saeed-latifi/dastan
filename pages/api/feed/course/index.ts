@@ -1,4 +1,4 @@
-import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
+import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
 import CoursePrismaProvider from "@providers/prismaProviders/coursePrisma";
 import { tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
