@@ -103,6 +103,7 @@ export const staticURLs = {
 			comment: {
 				base: "feed/comment",
 			},
+			jobs: "feed/job",
 		},
 	},
 };

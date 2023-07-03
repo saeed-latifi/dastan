@@ -28,6 +28,7 @@ model Category {
   title    String    @db.VarChar(30)
   users    User[]
   contents Content[]
+  Job      Job[]
 }
 
 //account
@@ -276,6 +277,8 @@ model Job {
   province     Province? @relation(fields: [provinceId], references: [id])
   benefits     String[]
   requirements String[]
+  categoryId   Int
+  category     Category  @relation(fields: [categoryId], references: [id])
 
   teamId Int
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)

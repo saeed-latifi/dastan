@@ -20,12 +20,31 @@ import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import LoadingSpinner from "@components/common/loader-spinner";
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
+import { jobPanelResType } from "@providers/prismaProviders/jobPrisma";
+import { useCategory } from "@hooks/public/useCategory";
+import { iCategory } from "@models/iCategory";
 
 export default function Jobs() {
 	const router = useRouter();
 	const { provinces } = useProvince();
 	const { onAddJob, teamsInfo, isLoading, allowMoreJob, onUpdateJob } = useTeamPanel();
-	const [job, setJob] = useState<any>();
+	const [job, setJob] = useState<jobPanelResType>();
+
+	const [requirement, setRequirement] = useState<string>();
+	const [benefit, setBenefit] = useState<string>();
+
+	const [title, setTitle] = useState<string>();
+	const [description, setDescription] = useState<string>();
+	const [requirements, setRequirements] = useState<string[]>([]);
+	const [benefits, setBenefits] = useState<string[]>([]);
+	const [wageType, setWageType] = useState<WageType>("FIXED");
+	const [wage, setWage] = useState(0);
+	const [selectedCategory, setSelectedCategory] = useState<iCategory>();
+	const [selectedProvince, setSelectedProvince] = useState<iProvince>({ id: -1, title: "remote" });
+
+	const [errors, setErrors] = useState<errorType>();
+
+	const { categories } = useCategory();
 
 	useEffect(() => {
 		if (router.isReady) {
@@ -42,24 +61,12 @@ export default function Jobs() {
 					setBenefits(item.benefits);
 					setWageType(item.wageType);
 					setWage(item.wage || 0);
+					setSelectedCategory(item.category);
 					item.province && setSelectedProvince(item.province);
 				}
 			}
 		}
 	}, [router, teamsInfo]);
-
-	const [requirement, setRequirement] = useState<string>();
-	const [benefit, setBenefit] = useState<string>();
-
-	const [title, setTitle] = useState<string>();
-	const [description, setDescription] = useState<string>();
-	const [requirements, setRequirements] = useState<string[]>([]);
-	const [benefits, setBenefits] = useState<string[]>([]);
-	const [wageType, setWageType] = useState<WageType>("FIXED");
-	const [wage, setWage] = useState(0);
-	const [selectedProvince, setSelectedProvince] = useState<iProvince>({ id: -1, title: "remote" });
-
-	const [errors, setErrors] = useState<errorType>();
 
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		function provinceHandler() {
@@ -69,7 +76,10 @@ export default function Jobs() {
 			}
 			return undefined;
 		}
+
 		event.preventDefault();
+		if (!selectedCategory) return toast.warn("select a category");
+
 		if (router.query.teamId) {
 			const body = {
 				title,
@@ -78,6 +88,7 @@ export default function Jobs() {
 				requirements,
 				benefits,
 				wage,
+				categoryId: selectedCategory.id,
 				teamId: parseInt(router.query.teamId as string),
 			};
 
@@ -139,6 +150,10 @@ export default function Jobs() {
 		setBenefits(newArr);
 	};
 
+	function onSelectCategory(option: selectOptionType) {
+		setSelectedCategory({ id: option.value, title: option.label });
+	}
+
 	function provinceMapper() {
 		const options = [{ value: 0, label: "remote" }];
 		if (provinces) {
@@ -180,6 +195,16 @@ export default function Jobs() {
 			<FormSection title="description">
 				<TextArea value={description} onChange={(e) => setDescription(e.target.value)} warnings={errors?.description} />
 			</FormSection>
+
+			<FormSection title="category">
+				<Select
+					selectId="profileProvinces"
+					preSelect={job?.category && { label: job.category.title, value: job.category.id }}
+					options={categories?.map((category) => ({ value: category.id, label: category.title }))}
+					onChange={onSelectCategory}
+				/>
+			</FormSection>
+
 			<FormSection title="requirements">
 				<TextArea value={requirement} onChange={(e) => setRequirement(e.target.value)} />
 				<ButtonBase Variety={BaseButtonVariety.form} type="button" onClick={addRequirement}>
@@ -216,6 +241,7 @@ export default function Jobs() {
 					<FormInput type="number" value={wage} onChange={(e) => setWage(parseInt(e.target.value))}></FormInput>
 				)}
 			</FormSection>
+
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">
 				{job ? "update" : "create"}
 			</ButtonBase>

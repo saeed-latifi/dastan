@@ -51,7 +51,9 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			// validation
 			const validateData = zJobUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
-			const { id, title, description, benefits, provinceId, requirements, wage, wageType } = validateData.data;
+			const { id } = validateData.data;
+			const body: any = validateData.data;
+			delete body.id;
 
 			// prisma check team manager
 			const teamInfo = await jobPrismaProvider.checkJobOwner({ jobId: id });
@@ -59,13 +61,20 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			if (teamInfo.team.managerId !== token.userId) return res.json(onErrorResponse("Error job access denied!"));
 
 			// prisma
-			const job = await jobPrismaProvider.update(id, { title, description, benefits, provinceId, requirements, wage, wageType });
+			const job = await jobPrismaProvider.update(id, body);
 
 			// api
 			return res.json(onSuccessResponse(job));
 		} catch (error) {
 			return errorLogger({ error, res, name: "job" });
 		}
+	}
+
+	if (req.method === "GET") {
+		console.log("get jobs :: ", req.query);
+
+		const validateData = zJobUpdate.safeParse(req.query);
+		return res.json(onSuccessResponse("sfgdg"));
 	}
 
 	// not supported method
