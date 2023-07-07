@@ -59,6 +59,7 @@ export const staticURLs = {
 			resume: ({ username }: { username: string }) => `/resume/${username}`,
 
 			jobs: "/jobs",
+			team: (id: number) => `/team/${id}`,
 		},
 	},
 
@@ -104,6 +105,7 @@ export const staticURLs = {
 				base: "feed/comment",
 			},
 			jobs: "feed/job",
+			team: (id: number) => `feed/team/${id}`,
 		},
 	},
 };
