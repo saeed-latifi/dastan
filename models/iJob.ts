@@ -37,6 +37,10 @@ export const zJobUpdate = z
 	.partial()
 	.merge(z.object({ id }));
 
+const take = z.number();
+const skip = z.number();
+export const zJobFeed = z.object({ take, skip, categoryId: categoryId.optional() });
 // types
 export type iJobCreate = z.infer<typeof zJobCreate>;
 export type iJobUpdate = z.infer<typeof zJobUpdate>;
+export type iJobFeed = z.infer<typeof zJobFeed>;

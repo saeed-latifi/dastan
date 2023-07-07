@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import Router from "next/router";
 
+export const takeNumber = 3;
 const HTTPService = axios.create({ baseURL: "/api/" });
 
 export default HTTPService;

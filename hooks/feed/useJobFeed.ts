@@ -1,35 +1,42 @@
 import { WageType } from "@prisma/client";
-import HTTPService from "@providers/HTTPService";
+import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
-import { jobPanelResType } from "@providers/prismaProviders/jobPrisma";
+import { jobFeedResType } from "@providers/prismaProviders/jobPrisma";
 import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
-import useSWR from "swr";
+import useSWRInfinite from "swr/infinite";
+import { iJobFeed } from "@models/iJob";
 
 type argsType = { categoryId?: number; wageType?: WageType; wage?: number; provinceId?: number };
+
 export function useJobFeed({ categoryId, provinceId, wage, wageType }: argsType) {
-	const {
-		data: jobsInfo,
-		mutate,
-		isLoading,
-		isValidating,
-	} = useSWR(generateKey(), getJobs, {
+	function keyGenerator(pageIndex: number, previousPageData: any) {
+		return `jub,${pageIndex}`;
+	}
+
+	const options = {
+		revalidateFirstPage: false,
+		revalidateAll: false,
 		revalidateIfStale: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
-	});
-	function generateKey() {
-		return `feedJobs,${categoryId},${provinceId},${wage},${wageType}`;
-	}
+		// revalidateOnMount: false,
+	};
 
-	async function getJobs() {
+	const { data: jobsInfo, isLoading, isValidating, size, setSize } = useSWRInfinite(keyGenerator, getJobs, { ...options });
+
+	async function getJobs(key: string) {
+		const pageNumber = parseInt(key.split(",")[1]);
+		if (!pageNumber && pageNumber !== 0) return;
+		const body: iJobFeed = { take: takeNumber, skip: pageNumber * takeNumber };
+
 		try {
-			const { data }: { data: apiResponse<jobPanelResType[]> } = await HTTPService.get(staticURLs.server.feed.jobs);
+			const { data }: { data: apiResponse<jobFeedResType> } = await HTTPService.put(staticURLs.server.feed.jobs, body);
 			if (data.resState === responseState.ok) return data.data;
 		} catch (error: any) {
 			toast.warn("bad connection");
 		}
 	}
 
-	return { isLoading: isLoading || isValidating, jobsInfo };
+	return { isLoading: isLoading, isValidating, jobsInfo, setPage: setSize, size };
 }

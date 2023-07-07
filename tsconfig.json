@@ -16,11 +16,11 @@
 		// "jsx": "react-jsx",
 		"incremental": true,
 		// "sourceMap": true,
-		"plugins": [
-			{
-				"name": "next"
-			}
-		],
+		// "plugins": [
+		// 	{
+		// 		"name": "next"
+		// 	}
+		// ],
 		"baseUrl": ".",
 		"paths": {
 			"@public/*": ["public/*"],
