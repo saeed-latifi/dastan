@@ -2,7 +2,7 @@ import ButtonBase from "@components/common/base-button";
 import LoadingSpinner from "@components/common/loader-spinner";
 import { useResumeFeed } from "@hooks/feed/useResumeFeed";
 import { useAccount } from "@hooks/useAccount";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 export default function Resume() {
 	const { resumeInfo, isLoading, onFollow } = useResumeFeed();
@@ -52,24 +52,22 @@ export default function Resume() {
 					</ButtonBase>
 				)}
 			</div>
-			{resumeInfo.resume?.context && (
-				<div
-					className="w-full rounded-theme-border p-2 border border-theme-border"
-					dangerouslySetInnerHTML={{ __html: resumeInfo.resume?.context }}
-				/>
-			)}
-			{resumeInfo.resume?.portfolio && (
-				<div className="rounded-theme-border overflow-hidden w-full max-w-3xl grid grid-cols-2 border border-theme-border  bg-theme-light gap-2 p-2">
-					{resumeInfo.resume?.portfolio.map((pic, index) => (
-						<img
-							key={index}
-							className="w-full object-contain rounded-theme-border border border-theme-border"
-							src={pic}
-							alt="portfolio"
-						/>
-					))}
-				</div>
-			)}
+			<div
+				className="w-full rounded-theme-border p-2 border border-theme-border"
+				dangerouslySetInnerHTML={{ __html: resumeInfo.resumeContext }}
+			/>
+
+			<div className="rounded-theme-border overflow-hidden w-full max-w-3xl grid grid-cols-2 border border-theme-border  bg-theme-light gap-2 p-2">
+				{resumeInfo.portfolio.map((pic, index) => (
+					<img
+						key={index}
+						className="w-full object-contain rounded-theme-border border border-theme-border"
+						// TODO src
+						src={pic}
+						alt="portfolio"
+					/>
+				))}
+			</div>
 		</div>
 	);
 }

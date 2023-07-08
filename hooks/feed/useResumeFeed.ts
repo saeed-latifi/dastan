@@ -4,15 +4,10 @@ import { toast } from "react-toastify";
 import useSWR from "swr";
 import { produce } from "immer";
 import { staticURLs } from "statics/url";
-import { coursePublicResType } from "@providers/prismaProviders/coursePrisma";
-import { iLike } from "@models/iLike";
-import { Like } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { userFeedResType } from "@providers/prismaProviders/userPrisma";
-import { userInfo } from "os";
+import { followResType, userFeedResType } from "@providers/prismaProviders/userPrisma";
 import { iFollow } from "@models/iResume";
-import { followResType } from "@providers/prismaProviders/resumePrisma";
 import { useAccount } from "@hooks/useAccount";
 
 export function useResumeFeed() {
@@ -78,7 +73,6 @@ export function useResumeFeed() {
 						}
 					});
 
-					console.log("optimisticData :: ", mutated);
 					return mutated;
 				},
 
@@ -92,8 +86,6 @@ export function useResumeFeed() {
 							draft.followers = [];
 						}
 					});
-
-					console.log("populateCache :: ", mutated);
 
 					return mutated;
 				},

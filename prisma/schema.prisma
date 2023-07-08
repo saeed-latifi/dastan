@@ -70,8 +70,10 @@ model User {
   reports       Report[]
   adminMessages AdminMessage[]
 
-  resume      Resume?
-  teams       Team[]  @relation("manager")
+  resumeContext String   @default("")
+  portfolio     String[]
+
+  teams       Team[] @relation("manager")
   memberships Team[]
 
   contents        Content[] @relation("composed")
@@ -287,15 +289,4 @@ model Job {
   @@index([createdAt, isActive])
   @@index([wageType, wage])
   @@index([provinceId])
-}
-
-model Resume {
-  id     Int  @id @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  portfolio String[]
-  context   String   @default("")
-
-  @@index([userId])
 }

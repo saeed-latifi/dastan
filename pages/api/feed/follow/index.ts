@@ -1,11 +1,11 @@
 import { zFollow } from "@models/iResume";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
-import ResumePrismaProvider from "@providers/prismaProviders/resumePrisma";
+import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const resumePrismaProvider = new ResumePrismaProvider();
+const userPrismaProvider = new UserPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
 	// follow
 	if (req.method === "POST") {
@@ -22,7 +22,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const { userId } = validateData.data;
 
 			// prisma
-			const followed = await resumePrismaProvider.onFollow({ userId, viewerId: token.userId });
+			const followed = await userPrismaProvider.onFollow({ userId, viewerId: token.userId });
 
 			// api
 			return res.json(onSuccessResponse(followed));

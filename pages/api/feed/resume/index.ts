@@ -1,11 +1,11 @@
 import { zResumeFeed } from "@models/iResume";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
-import ResumePrismaProvider from "@providers/prismaProviders/resumePrisma";
+import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const resumePrismaProvider = new ResumePrismaProvider();
+const userPrismaProvider = new UserPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
 	// resume
 	if (req.method === "GET") {
@@ -19,7 +19,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 			const { username } = validateData.data;
 
 			// prisma
-			const resume = await resumePrismaProvider.getResumeFeed({ username, viewerId });
+			const resume = await userPrismaProvider.getResumeFeed({ username, viewerId });
 
 			// api
 			return res.json(onSuccessResponse(resume));
