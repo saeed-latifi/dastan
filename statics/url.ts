@@ -31,12 +31,9 @@ export const staticURLs = {
 				image: ({ courseId }: { courseId: number }) => `/panel/course/image?item=${courseId}`,
 				lesson: {
 					add: ({ courseId }: { courseId: number }) => `/panel/course/${courseId}`,
-					one: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
-						`/panel/course/${courseId}?item=${lessonId}`,
-					addVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
-						`/panel/course/${courseId}/${lessonId}`,
-					showVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) =>
-						`/panel/course/${courseId}/${lessonId}/video`,
+					one: ({ courseId, lessonId }: { courseId: number; lessonId: number }) => `/panel/course/${courseId}?item=${lessonId}`,
+					addVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) => `/panel/course/${courseId}/${lessonId}`,
+					showVideo: ({ courseId, lessonId }: { courseId: number; lessonId: number }) => `/panel/course/${courseId}/${lessonId}/video`,
 				},
 			},
 
@@ -50,6 +47,7 @@ export const staticURLs = {
 					one: ({ teamId, jobId }: { teamId: number; jobId: number }) => `/panel/team/${teamId}?item=${jobId}`,
 				},
 			},
+			resume: { base: "/panel/resume", addImage: "/panel/resume/add" },
 		},
 
 		feed: {
@@ -75,6 +73,8 @@ export const staticURLs = {
 			},
 			team: { base: "panel/team", image: "panel/team/image" },
 			job: { base: "panel/job" },
+			portfolio: { add: "panel/portfolio/add" },
+			resume: { base: "panel/resume" },
 		},
 
 		account: {

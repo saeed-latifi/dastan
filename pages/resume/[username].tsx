@@ -3,6 +3,7 @@ import LoadingSpinner from "@components/common/loader-spinner";
 import { useResumeFeed } from "@hooks/feed/useResumeFeed";
 import { useAccount } from "@hooks/useAccount";
 import React, { useState } from "react";
+import { bucketUrl } from "statics/keys";
 
 export default function Resume() {
 	const { resumeInfo, isLoading, onFollow } = useResumeFeed();
@@ -22,17 +23,15 @@ export default function Resume() {
 		await onFollow(followedByMe);
 		setFreeze(false);
 	}
+	const src = resumeInfo.image ? `${bucketUrl}/profile/${resumeInfo.image}` : "/images/profile.svg";
 
 	return (
 		<div className="flex flex-col w-full items-center gap-2 p-2">
-			<div
-				className="flex flex-wrap items-center justify-between gap-2 w-full max-w-3xl
-			pb-2 border-b border-theme-border"
-			>
+			<div className="flex flex-wrap items-center justify-between gap-2 w-full max-w-3xl pb-2 border-b border-theme-border">
 				<span className="flex items-center gap-2">
 					<img
 						className="aspect-square overflow-hidden border rounded-full border-theme-border object-cover w-10"
-						src={resumeInfo.image ? resumeInfo.image : "/images/profile.svg"}
+						src={src}
 						alt={resumeInfo.username}
 					/>
 					<span>{resumeInfo.username}</span>
@@ -47,23 +46,24 @@ export default function Resume() {
 				</span>
 
 				{!isMyProfile && userInfo && (
-					<ButtonBase onClick={handleOnFollow}>
-						{resumeInfo.followers[0]?.id === userInfo.id ? "unfollow" : "follow"}
-					</ButtonBase>
+					<ButtonBase onClick={handleOnFollow}>{resumeInfo.followers[0]?.id === userInfo.id ? "unfollow" : "follow"}</ButtonBase>
 				)}
 			</div>
-			<div
-				className="w-full rounded-theme-border p-2 border border-theme-border"
-				dangerouslySetInnerHTML={{ __html: resumeInfo.resumeContext }}
-			/>
+			{resumeInfo.resumeContext ? (
+				<div
+					className="w-full rounded-theme-border p-2 border border-theme-border"
+					dangerouslySetInnerHTML={{ __html: resumeInfo.resumeContext }}
+				/>
+			) : (
+				""
+			)}
 
 			<div className="rounded-theme-border overflow-hidden w-full max-w-3xl grid grid-cols-2 border border-theme-border  bg-theme-light gap-2 p-2">
 				{resumeInfo.portfolio.map((pic, index) => (
 					<img
 						key={index}
 						className="w-full object-contain rounded-theme-border border border-theme-border"
-						// TODO src
-						src={pic}
+						src={`${bucketUrl}/portfolio/${pic}`}
 						alt="portfolio"
 					/>
 				))}

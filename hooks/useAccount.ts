@@ -184,6 +184,27 @@ export function useAccount() {
 		}
 	}
 
+	// resume
+	async function addPortfolio({ formData }: { formData: FormData }) {
+		try {
+			const { data }: { data: apiResponse<userResType> } = await HTTPService.post(staticURLs.server.panel.portfolio.add, formData);
+			if (data.resState === responseState.ok) {
+				userMutate(undefined, {
+					populateCache(_r, _) {
+						return data.data;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.panel.resume.base);
+				return toast.success("image uploaded.");
+			} else {
+				return toast.warn("image upload failed!");
+			}
+		} catch (error) {
+			return toast.warn("image upload failed!");
+		}
+	}
+
 	// access
 	function checkAccessAndRedirect(requirePermissionLevel = PermissionType.USER) {
 		if (isLoading) return;
@@ -219,6 +240,7 @@ export function useAccount() {
 		onCheckOTP,
 		onErrorPurge,
 		onUpdateProfileImage,
+		addPortfolio,
 		userInfo: userInfo,
 		isLoading: isLoading,
 		error: userErr,

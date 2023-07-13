@@ -17,11 +17,3 @@ export default function HeaderMain() {
 		</div>
 	);
 }
-
-function HeaderLink({ text, href }: { text: string; href: string }) {
-	return (
-		<li className="header_link pl-6">
-			<Link href={href}>{text}</Link>
-		</li>
-	);
-}

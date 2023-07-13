@@ -102,9 +102,7 @@ export default function Profile() {
 					<p className="px-2">select your province help for local events </p>
 					<Select
 						selectId="profileProvinces"
-						preSelect={
-							userInfo.province ? { label: userInfo?.province?.title, value: userInfo?.province?.id } : undefined
-						}
+						preSelect={userInfo.province ? { label: userInfo?.province?.title, value: userInfo?.province?.id } : undefined}
 						options={provinces?.map((province) => ({ value: province.id, label: province.title }))}
 						onChange={onSelectProvince}
 					/>
@@ -165,6 +163,11 @@ export default function Profile() {
 				<div className="w-full flex flex-col gap-1">
 					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.all)}>
 						your courses
+					</ButtonBase>
+				</div>
+				<div className="w-full flex flex-col gap-1">
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.resume.base)}>
+						your portfolio
 					</ButtonBase>
 				</div>
 			</div>
