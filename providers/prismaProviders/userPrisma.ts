@@ -3,14 +3,19 @@ import prismaProvider from "@providers/prismaProvider";
 import { categoryResType } from "./categoryPrisma";
 import { PermissionType, Province } from "@prisma/client";
 
+// types
+type userUpdateArgs = { username?: string; firstName?: string; lastName?: string; interests?: { id: number }[]; provinceId?: number };
+type UserCreateArgs = { username: string; password: string; email: string; firstName?: string; lastName?: string };
+type uniqueFieldArgs = { email?: string; phone?: string; username?: string; userId?: number };
+export type followResType = { isFollowed: boolean; userId: number };
+export type uerImageRes = { image: string | null };
+
 type userUniqueResType = {
 	id: number;
 	username: string;
 	email: string;
 	phone: string | null;
-	account: {
-		permission: PermissionType;
-	};
+	account: { permission: PermissionType };
 };
 
 export type userResType = {
@@ -23,16 +28,24 @@ export type userResType = {
 	email: string;
 	phone: string | null;
 	image: string | null;
-	account: {
-		permission: PermissionType;
-	};
+	account: { permission: PermissionType };
+	portfolio: string[];
+	resumeContext: string;
 };
 
-type UserCreateArgs = { username: string; password: string; email: string; firstName?: string; lastName?: string };
-type userUpdateArgs = { username?: string; firstName?: string; lastName?: string; interests?: { id: number }[]; provinceId?: number };
-type uniqueFieldArgs = { email?: string; phone?: string; username?: string; userId?: number };
+export type userFeedResType = {
+	id: number;
+	username: string;
+	image: string | null;
+	portfolio: string[];
+	resumeContext: string;
+	followers: { id: number }[];
+	_count: { followers: number; follows: number };
+} | null;
 
+// select
 const userUniqueReturnField = { username: true, id: true, email: true, phone: true, account: { select: { permission: true } } };
+
 const userReturnField = {
 	id: true,
 	firstName: true,
@@ -44,27 +57,20 @@ const userReturnField = {
 	phone: true,
 	image: true,
 	account: { select: { permission: true } },
+	portfolio: true,
+	resumeContext: true,
 };
 
-export type userFeedResType = {
-	id: number;
-	username: string;
-	image: string | null;
-	followers: {
-		id: number;
-	}[];
-	_count: {
-		followers: number;
-		follows: number;
+const userFeedSelect = (viewerId?: number) => {
+	return {
+		id: true,
+		image: true,
+		username: true,
+		portfolio: true,
+		resumeContext: true,
+		_count: { select: { followers: true, follows: true } },
+		followers: !viewerId ? undefined : { where: { id: viewerId }, select: { id: true } },
 	};
-	resume: {
-		context: string;
-		portfolio: string[];
-	} | null;
-} | null;
-
-export type uerImageRes = {
-	image: string | null;
 };
 
 export default class UserPrismaProvider {
@@ -106,45 +112,25 @@ export default class UserPrismaProvider {
 	}
 
 	async changePassword({ userId, password }: { userId: number; password: string }): Promise<userResType> {
-		return await prismaProvider.user.update({
-			where: { id: userId },
-			data: { account: { update: { password } } },
-			select: userReturnField,
-		});
+		return await prismaProvider.user.update({ where: { id: userId }, data: { account: { update: { password } } }, select: userReturnField });
 	}
 
 	async resetPassword({ email, password }: { email: string; password: string }): Promise<userUniqueResType> {
-		return await prismaProvider.user.update({
-			where: { email },
-			data: { account: { update: { password } } },
-			select: userUniqueReturnField,
-		});
+		return await prismaProvider.user.update({ where: { email }, data: { account: { update: { password } } }, select: userUniqueReturnField });
 	}
 
 	async changeEmail({ oldEmail, newEmail }: { oldEmail: string; newEmail: string }): Promise<userResType> {
-		return await prismaProvider.user.update({
-			where: { email: oldEmail },
-			data: { email: newEmail },
-			select: userReturnField,
-		});
+		return await prismaProvider.user.update({ where: { email: oldEmail }, data: { email: newEmail }, select: userReturnField });
 	}
 
 	async addPhone({ phone, id }: { phone: string; id: number }): Promise<userResType> {
-		return await prismaProvider.user.update({
-			where: { id },
-			data: { phone },
-			select: userReturnField,
-		});
+		return await prismaProvider.user.update({ where: { id }, data: { phone }, select: userReturnField });
 	}
 
 	async checkEmailAuth({ email, password }: iUserLogin): Promise<userResType | null> {
 		return await prismaProvider.user.findFirst({
 			where: {
-				AND: [
-					{ email: { equals: email } },
-					{ account: { password: { equals: password } } },
-					{ account: { isActive: { equals: true } } },
-				],
+				AND: [{ email: { equals: email } }, { account: { password: { equals: password } } }, { account: { isActive: { equals: true } } }],
 			},
 			select: userReturnField,
 		});
@@ -152,6 +138,39 @@ export default class UserPrismaProvider {
 
 	async addImage({ userId, imageName }: { userId: number; imageName: string }): Promise<uerImageRes> {
 		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
+	}
+
+	// resume
+	async updateResume({ userId, resumeContext }: { userId: number; resumeContext: string }) {
+		return await prismaProvider.user.update({ where: { id: userId }, data: { resumeContext }, select: userReturnField });
+	}
+
+	// portfolio
+	async addPortfolioImage({ userId, imageName }: { userId: number; imageName: string }) {
+		return await prismaProvider.user.update({ where: { id: userId }, data: { portfolio: { push: imageName } }, select: userReturnField });
+	}
+
+	async removePortfolioImage({ userId, imageName }: { userId: number; imageName: string }) {
+		const userPortfo = await prismaProvider.user.findFirst({ where: { id: userId }, select: { portfolio: true } });
+		if (!userPortfo) return;
+
+		return await prismaProvider.user.update({
+			where: { id: userId },
+			data: { portfolio: { set: userPortfo.portfolio.filter((image) => image !== imageName) } },
+			select: userReturnField,
+		});
+	}
+
+	// feed
+	async getResumeFeed({ username, viewerId }: { username: string; viewerId?: number }): Promise<userFeedResType> {
+		return await prismaProvider.user.findUnique({ where: { username }, select: userFeedSelect(viewerId) });
+	}
+
+	async onFollow({ userId, viewerId }: { userId: number; viewerId: number }): Promise<followResType> {
+		const isFollowed = await prismaProvider.user.findFirst({ where: { id: userId, followers: { some: { id: viewerId } } } });
+		if (isFollowed) await prismaProvider.user.update({ where: { id: userId }, data: { followers: { disconnect: { id: viewerId } } } });
+		else await prismaProvider.user.update({ where: { id: userId }, data: { followers: { connect: { id: viewerId } } } });
+		return { isFollowed: !isFollowed, userId: viewerId };
 	}
 
 	//internal
