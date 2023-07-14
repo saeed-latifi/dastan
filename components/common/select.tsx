@@ -17,18 +17,12 @@ export default function Select({ preSelect, onChange, selectId, options, onExtra
 
 	useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
+		return () => document.removeEventListener("mousedown", handleClickOutside);
 	}, [wrapperRef, options, preSelect]);
 
 	function handleClickOutside(event: MouseEvent) {
 		const currentNode: any = wrapperRef.current;
-		if (currentNode !== undefined) {
-			if (!currentNode.contains(event.target)) {
-				setIsOpen(false);
-			}
-		}
+		if (currentNode !== undefined && !currentNode.contains(event.target)) setIsOpen(false);
 	}
 
 	return (
@@ -40,21 +34,13 @@ export default function Select({ preSelect, onChange, selectId, options, onExtra
 			onClick={() => {
 				setIsOpen(!isOpen);
 				const element = document.getElementById(selectId + selected.value);
-				if (element) {
-					element.scrollIntoView({ behavior: "smooth" });
-				}
+				if (element) element.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
 			}}
 		>
 			<div className="w-full flex items-center justify-between h-9 px-2 py-1 pr-3 gap-2">
 				<div className="flex-1 block overflow-hidden whitespace-nowrap text-ellipsis text-center ">{selected.label}</div>
 
-				<div
-					className={`flex items-center justify-center w-3 h-3 cursor-pointer transition ${
-						isOpen ? "rotate-0" : "rotate-180"
-					}`}
-				>
-					^
-				</div>
+				<div className={`flex items-center justify-center w-3 h-3 cursor-pointer transition ${isOpen ? "rotate-0" : "rotate-180"}`}>^</div>
 			</div>
 			<div
 				className={`absolute z-30 top-10 flex flex-col rounded-theme-border min-w-full border-theme-select transition-theme-select bg-white h-max  overflow-y-auto ${

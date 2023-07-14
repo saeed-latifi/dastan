@@ -44,9 +44,7 @@ export default function Profile() {
 	checkAccessAndRedirect();
 
 	useEffect(() => {
-		if (!isLoading && userInfo) {
-			setSelectedCategories(userInfo.interests);
-		}
+		if (!isLoading && userInfo) setSelectedCategories(userInfo.interests);
 	}, [isLoading]);
 
 	function onSelectProvince(option: selectOptionType) {
@@ -65,7 +63,6 @@ export default function Profile() {
 	}
 
 	if (isLoading) return <LoadingSpinner />;
-
 	if (!userInfo) return <span>no access</span>;
 	return (
 		<Form onSubmit={handleSubmit(onSubmit)}>
@@ -89,10 +86,7 @@ export default function Profile() {
 				<FormInput
 					labelText="username"
 					warnings={errors.username?.message || error?.username}
-					register={register("username", {
-						setValueAs: (v) => (v === "" ? undefined : v),
-						onChange: () => onErrorPurge("username"),
-					})}
+					register={register("username", { setValueAs: (v) => (v === "" ? undefined : v), onChange: () => onErrorPurge("username") })}
 					required
 				/>
 			</FormSection>
@@ -115,15 +109,9 @@ export default function Profile() {
 					<SelectMulti
 						preSelect={
 							userInfo.interests &&
-							(userInfo.interests as iCategory[]).map((interest) => ({
-								label: interest.title,
-								value: interest.id,
-							}))
+							(userInfo.interests as iCategory[]).map((interest) => ({ label: interest.title, value: interest.id }))
 						}
-						options={categories?.map((category) => ({
-							value: category.id,
-							label: category.title,
-						}))}
+						options={categories?.map((category) => ({ value: category.id, label: category.title }))}
 						onChange={onChangeInterests}
 					/>
 				</div>
