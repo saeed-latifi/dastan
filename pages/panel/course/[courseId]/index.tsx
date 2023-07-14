@@ -41,27 +41,20 @@ export default function Jobs() {
 	async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		if (router.query.courseId) {
-			const body = {
-				title,
-				courseId: parseInt(router.query.courseId as string),
-			};
+			const body = { title, courseId: parseInt(router.query.courseId as string) };
 			const purged = emptyPurger(body);
 			if (lesson) {
 				purged.id = lesson.id;
 				const validJob = zLessonUpdate.safeParse(purged);
-				if (!validJob.success) {
-					console.log(zodErrorMapper(validJob.error.issues));
-					return setErrors(zodErrorMapper(validJob.error.issues));
-				} else {
+				if (!validJob.success) return setErrors(zodErrorMapper(validJob.error.issues));
+				else {
 					await onUpdateLesson({ ...validJob.data });
 					setErrors({});
 				}
 			} else {
 				const validJob = zLessonCreate.safeParse(purged);
-				if (!validJob.success) {
-					console.log(zodErrorMapper(validJob.error.issues));
-					return setErrors(zodErrorMapper(validJob.error.issues));
-				} else {
+				if (!validJob.success) return setErrors(zodErrorMapper(validJob.error.issues));
+				else {
 					await onAddLesson(validJob.data);
 					setErrors({});
 				}
@@ -92,9 +85,7 @@ export default function Jobs() {
 				<FormSection title="video">
 					<p>{videoUrl}</p>
 
-					<Link href={staticURLs.client.panel.course.lesson.addVideo({ lessonId: lesson.id, courseId: lesson.courseId })}>
-						add video
-					</Link>
+					<Link href={staticURLs.client.panel.course.lesson.addVideo({ lessonId: lesson.id, courseId: lesson.courseId })}>add video</Link>
 				</FormSection>
 			)}
 

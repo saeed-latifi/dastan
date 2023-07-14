@@ -140,12 +140,11 @@ export default class UserPrismaProvider {
 		return await prismaProvider.user.update({ where: { id: userId }, data: { image: imageName }, select: { image: true } });
 	}
 
-	// resume
+	// portfolio
 	async updateResume({ userId, resumeContext }: { userId: number; resumeContext: string }) {
 		return await prismaProvider.user.update({ where: { id: userId }, data: { resumeContext }, select: userReturnField });
 	}
 
-	// portfolio
 	async addPortfolioImage({ userId, imageName }: { userId: number; imageName: string }) {
 		return await prismaProvider.user.update({ where: { id: userId }, data: { portfolio: { push: imageName } }, select: userReturnField });
 	}

@@ -24,11 +24,7 @@ export default function VideoUpload() {
 		event.preventDefault();
 		const video = videoEl.current;
 		if (!file || !video) return;
-
-		console.log(`The video is ${video.duration} seconds long.`);
 		const duration = Math.floor(video.duration);
-		console.log(duration);
-
 		setSubmitting(true);
 		const data = new FormData();
 		data.append("video", file);
@@ -67,10 +63,7 @@ export default function VideoUpload() {
 
 	return (
 		<Form onSubmit={handleSubmit}>
-			<Navigation
-				label=""
-				path={staticURLs.client.panel.course.lesson.one({ courseId: parseInt(courseId), lessonId: parseInt(lessonId) })}
-			/>
+			<Navigation label="" path={staticURLs.client.panel.course.lesson.one({ courseId: parseInt(courseId), lessonId: parseInt(lessonId) })} />
 
 			{error && <p>{error}</p>}
 			{submitting && <p>{progress}%</p>}

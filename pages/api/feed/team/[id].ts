@@ -8,8 +8,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	if (req.method === "GET") {
 		try {
 			const { id } = req.query;
-			console.log(req.query);
-
 			if (!id || !parseInt(id as string)) return res.json(onErrorResponse("bad team request"));
 
 			// prisma

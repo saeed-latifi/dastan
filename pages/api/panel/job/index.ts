@@ -70,13 +70,6 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		}
 	}
 
-	if (req.method === "GET") {
-		console.log("get jobs :: ", req.query);
-
-		const validateData = zJobUpdate.safeParse(req.query);
-		return res.json(onSuccessResponse("sfgdg"));
-	}
-
 	// not supported method
 	else {
 		return res.json(onErrorResponse("not supported method"));

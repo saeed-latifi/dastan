@@ -11,6 +11,7 @@ import { PermissionType } from "@prisma/client";
 import { permissionHasAccess } from "@providers/permissionChecker";
 import { useImage } from "./useImage";
 import { produce } from "immer";
+import { iRemovePortfo, iResumeUpdate } from "@models/iResume";
 
 export function useAccount() {
 	const router = useRouter();
@@ -185,6 +186,24 @@ export function useAccount() {
 	}
 
 	// resume
+	async function updateResume({ resumeContext }: iResumeUpdate) {
+		try {
+			const { data }: { data: apiResponse<userResType> } = await HTTPService.put(staticURLs.server.panel.resume.base, { resumeContext });
+			if (data.resState === responseState.ok) {
+				userMutate(undefined, {
+					populateCache(_r, _) {
+						return data.data;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.panel.resume.base);
+				return toast.success("resume updated.");
+			} else return toast.warn("resume update failed!");
+		} catch (error) {
+			return toast.warn("resume update failed!");
+		}
+	}
+
 	async function addPortfolio({ formData }: { formData: FormData }) {
 		try {
 			const { data }: { data: apiResponse<userResType> } = await HTTPService.post(staticURLs.server.panel.portfolio.add, formData);
@@ -202,6 +221,26 @@ export function useAccount() {
 			}
 		} catch (error) {
 			return toast.warn("image upload failed!");
+		}
+	}
+
+	async function removePortfolio({ imageName }: iRemovePortfo) {
+		try {
+			const { data }: { data: apiResponse<userResType> } = await HTTPService.patch(staticURLs.server.panel.resume.base, { imageName });
+			if (data.resState === responseState.ok) {
+				userMutate(undefined, {
+					populateCache(_r, _) {
+						return data.data;
+					},
+					revalidate: false,
+				});
+				router.push(staticURLs.client.panel.resume.base);
+				return toast.success("image removed.");
+			} else {
+				return toast.warn("remove image failed!");
+			}
+		} catch (error) {
+			return toast.warn("remove image failed!");
 		}
 	}
 
@@ -241,6 +280,8 @@ export function useAccount() {
 		onErrorPurge,
 		onUpdateProfileImage,
 		addPortfolio,
+		updateResume,
+		removePortfolio,
 		userInfo: userInfo,
 		isLoading: isLoading,
 		error: userErr,

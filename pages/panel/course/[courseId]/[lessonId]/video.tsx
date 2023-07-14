@@ -8,7 +8,6 @@ export default function LessonVideo() {
 	if (!router.isReady) return <LoadingSpinner />;
 
 	const { lessonId, courseId } = router.query as { lessonId: string; courseId: string };
-	console.log({ lessonId });
 
 	return (
 		<div className="flex flex-col w-full gap-2 items-center max-w-2xl">

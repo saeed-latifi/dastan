@@ -37,8 +37,6 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = squareImage
 			onSubmit && onSubmit(blob);
 			return blob;
 		} catch (error) {
-			console.log(error);
-
 			toast.warn("bad image. try again!");
 		}
 	}
@@ -79,16 +77,7 @@ export default function ImageCropper({ preLoadURL, onSubmit, width = squareImage
 				}}
 			/>
 			<div className="w-full flex flex-1 flex-col sm:items-center justify-between gap-4 py-4 sm:flex-row sm:gap-2">
-				<input
-					className="zoomer-slide"
-					name="scale"
-					type="range"
-					onChange={handleScale}
-					min="1"
-					max="5"
-					step="0.01"
-					defaultValue="1"
-				/>
+				<input className="zoomer-slide" name="scale" type="range" onChange={handleScale} min="1" max="5" step="0.01" defaultValue="1" />
 
 				<ButtonBase type="button" onClick={() => document.getElementById("fileSelect")?.click()}>
 					select pic

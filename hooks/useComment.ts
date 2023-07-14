@@ -94,10 +94,7 @@ export function useComment({ contentId }: { contentId?: number }) {
 		await commentMutator(
 			async () => {
 				try {
-					const { data }: { data: apiResponse<commentResType> } = await HTTPService.put(
-						staticURLs.server.feed.comment.base,
-						body
-					);
+					const { data }: { data: apiResponse<commentResType> } = await HTTPService.put(staticURLs.server.feed.comment.base, body);
 					if (data.resState === responseState.ok) return data.data as any;
 					toast.warn("some problem");
 					throw 500;
@@ -167,10 +164,7 @@ export function useComment({ contentId }: { contentId?: number }) {
 		await commentMutator(
 			async () => {
 				try {
-					const { data }: { data: apiResponse<commentResType> } = await HTTPService.patch(
-						staticURLs.server.feed.comment.base,
-						{ id }
-					);
+					const { data }: { data: apiResponse<commentResType> } = await HTTPService.patch(staticURLs.server.feed.comment.base, { id });
 					if (data.resState === responseState.ok) return data.data as any;
 					toast.warn("some problem");
 					throw 500;
@@ -195,8 +189,6 @@ export function useComment({ contentId }: { contentId?: number }) {
 				},
 
 				populateCache: (res, _baseState) => {
-					console.log(res);
-
 					if (parentId) {
 						return commentInfo?.map((comment) => {
 							if (comment.id === parentId) {

@@ -52,9 +52,7 @@ export default function Jobs() {
 			if (team) {
 				const item = team.jobs?.find((item: any) => item.id === parseInt(router.query.item as string));
 				if (item) {
-					console.log("item :: ", item);
 					setJob(item);
-
 					setTitle(item.title);
 					setDescription(item.description);
 					setRequirements(item.requirements);
@@ -96,19 +94,10 @@ export default function Jobs() {
 			const validJob = zJobCreate.safeParse(purged);
 			if (validJob.success) {
 				setErrors({});
-
-				// for remote jobs
 				validJob.data.provinceId = provinceHandler();
-
-				if (job) {
-					await onUpdateJob({ ...validJob.data, id: parseInt(router.query.item as string) });
-				} else {
-					await onAddJob(validJob.data);
-				}
-			} else {
-				console.log(zodErrorMapper(validJob.error.issues));
-				setErrors(zodErrorMapper(validJob.error.issues));
-			}
+				if (job) await onUpdateJob({ ...validJob.data, id: parseInt(router.query.item as string) });
+				else await onAddJob(validJob.data);
+			} else setErrors(zodErrorMapper(validJob.error.issues));
 		}
 	}
 
@@ -237,9 +226,7 @@ export default function Jobs() {
 					<FormRadio label="AGREEMENT" value={WageType.AGREEMENT} onChange={setWageType} selected={wageType} />
 					<FormRadio label="PARTNERSHIP" value={WageType.PARTNERSHIP} onChange={setWageType} selected={wageType} />
 				</div>
-				{wageType === WageType.FIXED && (
-					<FormInput type="number" value={wage} onChange={(e) => setWage(parseInt(e.target.value))}></FormInput>
-				)}
+				{wageType === WageType.FIXED && <FormInput type="number" value={wage} onChange={(e) => setWage(parseInt(e.target.value))}></FormInput>}
 			</FormSection>
 
 			<ButtonBase Variety={BaseButtonVariety.form} type="submit">

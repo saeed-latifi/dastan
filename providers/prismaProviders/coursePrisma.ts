@@ -173,8 +173,6 @@ export default class CoursePrismaProvider {
 	}
 
 	async addImage({ courseId, imageName }: { courseId: number; imageName: string }): Promise<courseImageRes> {
-		console.log("courseId : ", courseId);
-
 		return await prismaProvider.course.update({
 			where: { id: courseId },
 			data: { content: { update: { image: imageName } } },

@@ -26,13 +26,9 @@ export default function Courses() {
 			{coursesInfo && coursesInfo.length > 0 && (
 				<FormSection title="your courses">
 					{coursesInfo.map((course, index) => {
-						console.log(course);
-
 						return (
 							<div key={index} className="flex items-center justify-between gap-2">
-								<Link href={staticURLs.client.panel.course.one({ courseId: course.id })}>
-									{course.content.title}
-								</Link>
+								<Link href={staticURLs.client.panel.course.one({ courseId: course.id })}>{course.content.title}</Link>
 							</div>
 						);
 					})}
