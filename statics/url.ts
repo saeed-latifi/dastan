@@ -56,7 +56,7 @@ export const staticURLs = {
 			course: ({ courseName }: { courseName: string }) => `/courses/${courseName}`,
 			resume: ({ username }: { username: string }) => `/resume/${username}`,
 
-			jobs: "/jobs",
+			jobs: { base: "/jobs", one: (id: number) => `/jobs/${id}` },
 			team: (id: number) => `/team/${id}`,
 		},
 	},

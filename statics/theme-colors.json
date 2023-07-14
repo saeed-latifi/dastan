@@ -9,5 +9,7 @@
 	"theme-form": "#323",
 	"theme-dark-gray": "#3d3c47",
 	"theme-light-gray": "#9e9cab",
-	"theme-white": "#f7f7f6"
+	"theme-white": "#f7f7f6",
+	"theme-border-light": "#cce",
+	"theme-text": "#445"
 }

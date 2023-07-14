@@ -40,7 +40,10 @@ export const zJobUpdate = z
 const take = z.number();
 const skip = z.number();
 export const zJobFeed = z.object({ take, skip, categoryId: categoryId.optional() });
+export const zJobFeedById = z.object({ id: z.number() });
+
 // types
 export type iJobCreate = z.infer<typeof zJobCreate>;
 export type iJobUpdate = z.infer<typeof zJobUpdate>;
+export type iJobFeedById = z.infer<typeof zJobFeedById>;
 export type iJobFeed = z.infer<typeof zJobFeed>;

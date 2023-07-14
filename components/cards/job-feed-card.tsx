@@ -1,6 +1,7 @@
 import DateFormatter from "@components/dateFormatter";
 import TeamLogo, { logoImageTypes } from "@components/images/team-logo";
 import { jobFeedType } from "@providers/prismaProviders/jobPrisma";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
 import { staticURLs } from "statics/url";
@@ -12,7 +13,9 @@ export default function JobFeedCard({ job }: { job: jobFeedType }) {
 
 	return (
 		<div className="flex flex-col gap-2 border border-theme-border rounded-theme-border p-2 w-full ">
-			<p>{title}</p>
+			<Link className="text-lg " href={staticURLs.client.feed.jobs.one(id)}>
+				{title}
+			</Link>
 			<p className="gap-2">
 				<span>category : </span>
 				<span>{category.title}</span>

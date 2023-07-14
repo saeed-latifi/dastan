@@ -10,7 +10,7 @@ export default function HeaderMain() {
 				<div className="flex items-center gap-8">
 					<Link href={staticURLs.client.home}>{staticUIText.navbar.home}</Link>
 					<Link href={staticURLs.client.feed.courses}>{staticUIText.navbar.courses}</Link>
-					<Link href={staticURLs.client.feed.jobs}>{staticUIText.navbar.jobs}</Link>
+					<Link href={staticURLs.client.feed.jobs.base}>{staticUIText.navbar.jobs}</Link>
 				</div>
 				<Account />
 			</div>

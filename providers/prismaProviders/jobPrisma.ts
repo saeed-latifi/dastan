@@ -54,21 +54,19 @@ export function jobPanelSelect() {
 	};
 }
 
-export function jobFeedSelect() {
-	return {
-		id: true,
-		title: true,
-		description: true,
-		benefits: true,
-		requirements: true,
-		province: true,
-		updatedAt: true,
-		wageType: true,
-		wage: true,
-		category: true,
-		team: { select: { title: true, id: true, image: true } },
-	};
-}
+export const jobFeedSelect = {
+	id: true,
+	title: true,
+	description: true,
+	benefits: true,
+	requirements: true,
+	province: true,
+	updatedAt: true,
+	wageType: true,
+	wage: true,
+	category: true,
+	team: { select: { title: true, id: true, image: true } },
+};
 
 export type jobFeedType = {
 	id: number;
@@ -81,19 +79,12 @@ export type jobFeedType = {
 	wageType: WageType;
 	wage: number | null;
 	category: Category;
-	team: {
-		title: string;
-		id: number;
-		image: string | null;
-	};
+	team: { title: string; id: number; image: string | null };
 };
 
-export type jobFeedResType = {
-	jobs: jobFeedType[];
-	count?: number;
-};
-
+export type jobFeedResType = { jobs: jobFeedType[]; count?: number };
 type getJobsArgs = { take: number; skip: number; categoryId?: number };
+
 export default class JobPrismaProvider {
 	// panel
 	async create(body: createBodyType): Promise<jobPanelResType> {
@@ -112,11 +103,15 @@ export default class JobPrismaProvider {
 		const jobCount = await prismaProvider.job.count({ where: { categoryId } });
 		const jobs = await prismaProvider.job.findMany({
 			where: { categoryId },
-			select: jobFeedSelect(),
+			select: jobFeedSelect,
 			take,
 			skip,
 		});
 		return { jobs, count: jobCount };
+	}
+
+	async getById({ id }: { id: number }): Promise<jobFeedType | null> {
+		return await prismaProvider.job.findFirst({ where: { id }, select: jobFeedSelect });
 	}
 
 	// internal

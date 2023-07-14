@@ -32,6 +32,7 @@ export type teamImageRes = {
 	id: number;
 };
 
+export type teamFeedJobType = { title: string; id: number; createdAt: Date; category: { id: number; title: string } };
 export type teamFeedResType = {
 	id: number;
 	title: string;
@@ -39,10 +40,18 @@ export type teamFeedResType = {
 	description: string;
 	context: string | null;
 	contactMethods: string[];
-	jobs: { title: string }[];
+	jobs: teamFeedJobType[];
 };
 
-const feedSelect = { id: true, title: true, image: true, description: true, context: true, contactMethods: true, jobs: { select: { title: true } } };
+const feedSelect = {
+	id: true,
+	title: true,
+	image: true,
+	description: true,
+	context: true,
+	contactMethods: true,
+	jobs: { select: { title: true, id: true, createdAt: true, category: { select: { title: true, id: true } } } },
+};
 
 export default class TeamPrismaProvider {
 	// panel
@@ -64,7 +73,10 @@ export default class TeamPrismaProvider {
 
 	// feed
 	async getTeamFeed(id: number): Promise<teamFeedResType | null> {
-		return await prismaProvider.team.findFirst({ where: { id }, select: feedSelect });
+		return await prismaProvider.team.findFirst({
+			where: { id },
+			select: feedSelect,
+		});
 	}
 
 	// internal

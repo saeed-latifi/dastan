@@ -12,7 +12,9 @@ export default function Account() {
 	if (userInfo) {
 		return (
 			<div className="flex items-center gap-2">
-				<ProfileImage image={userInfo.image} />
+				<Link href={staticURLs.client.account.base}>
+					<ProfileImage image={userInfo.image} />
+				</Link>
 				<Link href={staticURLs.client.account.base}>{staticUIText.navbar.profile}</Link>
 			</div>
 		);
