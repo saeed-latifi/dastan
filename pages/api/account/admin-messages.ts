@@ -46,7 +46,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 		}
 	}
 
-	// on view
+	// on delete
 	if (req.method === "DELETE") {
 		try {
 			// token

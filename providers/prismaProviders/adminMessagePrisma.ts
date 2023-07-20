@@ -3,8 +3,10 @@ import prismaProvider from "@providers/prismaProvider";
 export type adminMessageResType = { id: number; title: string; description: string; isRead: boolean; isActive: boolean; createdAt: Date; userId: number };
 export default class AdminMessagesPrismaProvider {
 	// panel
-	async get({ userId, skip, take }: { userId: number; take: number; skip: number }): Promise<adminMessageResType[]> {
-		return await prismaProvider.adminMessage.findMany({ where: { userId, isActive: true }, take, skip });
+	async get({ userId, skip, take }: { userId: number; take: number; skip: number }): Promise<{ messages: adminMessageResType[]; count: number }> {
+		const count = await prismaProvider.adminMessage.count({ where: { userId, isActive: true } });
+		const messages = await prismaProvider.adminMessage.findMany({ where: { userId, isActive: true }, take, skip });
+		return { messages, count };
 	}
 
 	async view(id: number): Promise<adminMessageResType> {

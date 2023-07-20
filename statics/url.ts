@@ -1,7 +1,6 @@
 export const staticURLs = {
 	client: {
 		home: "/",
-
 		welcome: "/welcome",
 		login: "/login",
 		EmailCheck: "/check-email",
@@ -48,14 +47,13 @@ export const staticURLs = {
 				},
 			},
 			resume: { base: "/panel/resume", addImage: "/panel/resume/add" },
+			adminMessages: { base: "/panel/admin-messages" },
 		},
 
 		feed: {
 			courses: "/courses",
-
 			course: ({ courseName }: { courseName: string }) => `/courses/${courseName}`,
 			resume: ({ username }: { username: string }) => `/resume/${username}`,
-
 			jobs: { base: "/jobs", one: (id: number) => `/jobs/${id}` },
 			team: (id: number) => `/team/${id}`,
 		},
@@ -63,14 +61,8 @@ export const staticURLs = {
 
 	server: {
 		panel: {
-			course: {
-				image: "panel/course/image",
-				base: "panel/course",
-			},
-			lesson: {
-				base: "panel/lesson",
-				video: "panel/lesson/video",
-			},
+			course: { image: "panel/course/image", base: "panel/course" },
+			lesson: { base: "panel/lesson", video: "panel/lesson/video" },
 			team: { base: "panel/team", image: "panel/team/image" },
 			job: { base: "panel/job" },
 			portfolio: { add: "panel/portfolio/add" },
@@ -83,27 +75,20 @@ export const staticURLs = {
 			email: "account/email",
 			phone: "account/phone",
 			image: "account/image",
+			adminMessage: { base: "account/admin-messages" },
 		},
 
 		public: {
-			province: {
-				base: "public/province",
-			},
-			category: {
-				base: "public/category",
-			},
+			province: { base: "public/province" },
+			category: { base: "public/category" },
 		},
 
 		feed: {
-			course: {
-				all: "feed/course",
-			},
+			course: { all: "feed/course" },
 			resume: "feed/resume",
 			like: "feed/like",
 			follow: "feed/follow",
-			comment: {
-				base: "feed/comment",
-			},
+			comment: { base: "feed/comment" },
 			jobs: "feed/job",
 			team: (id: number) => `feed/team/${id}`,
 		},

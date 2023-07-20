@@ -1,10 +1,10 @@
-import JobFeedCard from "@components/cards/job-feed-card";
 import LoadingSpinner from "@components/common/loader-spinner";
-import { useJobFeed } from "@hooks/feed/useJobFeed";
+import { useAdminMessages } from "@hooks/panel/useAdminMessage";
+import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
-export default function JobsFeedPage() {
-	const { isLoading, jobsInfo, setPage, hasMore } = useJobFeed({});
+export default function AdminMessages() {
+	const { isLoading, messages, hasMore, setPage } = useAdminMessages();
 
 	if (isLoading) return <LoadingSpinner />;
 	return (
@@ -19,7 +19,7 @@ export default function JobsFeedPage() {
 				threshold={150}
 			>
 				<div key="jobList" className="flex flex-col w-full gap-2 max-w-theme">
-					{jobsInfo?.map((page) => page?.jobs.map((job) => <JobFeedCard key={job.id} job={job} />))}
+					{messages?.map((page) => page?.messages.map((message) => <div key={message.id}>{message.title}</div>))}
 				</div>
 			</InfiniteScroll>
 		</div>

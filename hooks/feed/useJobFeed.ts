@@ -11,7 +11,7 @@ type argsType = { categoryId?: number; wageType?: WageType; wage?: number; provi
 
 export function useJobFeed({ categoryId, provinceId, wage, wageType }: argsType) {
 	function keyGenerator(pageIndex: number, previousPageData: any) {
-		return `jub,${pageIndex}`;
+		return `job,${pageIndex}`;
 	}
 
 	const options = {
@@ -38,5 +38,10 @@ export function useJobFeed({ categoryId, provinceId, wage, wageType }: argsType)
 		}
 	}
 
-	return { isLoading: isLoading, isValidating, jobsInfo, setPage: setSize, size };
+	function hasMore() {
+		if (jobsInfo && jobsInfo[0]?.count && !isValidating && size * takeNumber < jobsInfo[0]?.count) return true;
+		return false;
+	}
+
+	return { isLoading: isLoading, isValidating, jobsInfo, setPage: setSize, size, hasMore: hasMore() };
 }
