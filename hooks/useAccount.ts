@@ -8,10 +8,10 @@ import { staticURLs } from "statics/url";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
 import { uerImageRes, userResType } from "@providers/prismaProviders/userPrisma";
 import { PermissionType } from "@prisma/client";
-import { permissionHasAccess } from "@providers/permissionChecker";
 import { useImage } from "./useImage";
 import { produce } from "immer";
 import { iRemovePortfo, iResumeUpdate } from "@models/iResume";
+import { permissionHasAccess } from "@utilities/permissionChecker";
 
 export function useAccount() {
 	const router = useRouter();

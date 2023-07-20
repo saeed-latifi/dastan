@@ -22,6 +22,6 @@ export function permissionHasAccess({ require, current }: { require: PermissionT
 			return true;
 
 		default:
-			break;
+			return false;
 	}
 }
