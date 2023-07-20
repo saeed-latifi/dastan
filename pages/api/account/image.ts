@@ -2,7 +2,7 @@ import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandle
 import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
 import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { profileImageAWS } from "@providers/bucketsAWS/imageAWS";
 import { errorLogger } from "@utilities/apiLogger";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
@@ -21,10 +21,8 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad profile request"));
-			}
+			if (!token) return tokenFixer({ req, res });
+
 			const id = token.userId;
 			const { files } = await formParser(req);
 			const reqImage = files.image as formidable.File;

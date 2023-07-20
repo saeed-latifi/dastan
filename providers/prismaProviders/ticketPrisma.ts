@@ -1,7 +1,7 @@
 import prismaProvider from "@providers/prismaProvider";
 
 export type ticketResType = { id: number; title: string; isActive: boolean; userId: number };
-export default class JobPrismaProvider {
+export default class TicketPrismaProvider {
 	// panel
 	async get({ userId, skip, take }: { userId: number; take: number; skip: number }): Promise<ticketResType[]> {
 		return await prismaProvider.ticket.findMany({ where: { userId, isActive: true }, take, skip });

@@ -1,25 +1,17 @@
 import { zTeamCreate, zTeamUpdate } from "@models/iTeam";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
-import { teamLimits } from "statics/measures";
 
 const teamPrismaProvider = new TeamPrismaProvider();
 export default async function apiHandler(req: NextApiRequest, res: NextApiResponse) {
-	// token
-	// validation
-	// prisma
-	// api
 	if (req.method === "GET") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// prisma
 			const teams = await teamPrismaProvider.getByManager(token.userId);
@@ -36,10 +28,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateData = zTeamCreate.safeParse(req.body);
@@ -76,10 +65,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateData = zTeamUpdate.safeParse(req.body);

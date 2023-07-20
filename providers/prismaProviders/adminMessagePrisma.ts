@@ -1,7 +1,7 @@
 import prismaProvider from "@providers/prismaProvider";
 
 export type adminMessageResType = { id: number; title: string; description: string; isRead: boolean; isActive: boolean; createdAt: Date; userId: number };
-export default class JobPrismaProvider {
+export default class AdminMessagesPrismaProvider {
 	// panel
 	async get({ userId, skip, take }: { userId: number; take: number; skip: number }): Promise<adminMessageResType[]> {
 		return await prismaProvider.adminMessage.findMany({ where: { userId, isActive: true }, take, skip });

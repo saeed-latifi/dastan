@@ -2,7 +2,7 @@ import { zUserEmail, zResetPassword, zPasswordUpdate } from "@models/iUser";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { recoverPasswordEmailSender } from "@providers/emailService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
-import { emailTokenValidator, removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { emailTokenValidator, tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -55,10 +55,7 @@ export default async function recoverAccountApi(req: NextApiRequest, res: NextAp
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation !
 			const validateUpdate = zPasswordUpdate.safeParse(req.body);

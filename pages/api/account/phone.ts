@@ -3,7 +3,7 @@ import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } fro
 import { sendSMS } from "@providers/otpService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import TempOTP from "@providers/tempOTP";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { otpGenerator } from "@utilities/otpGenerator";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -17,10 +17,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad identify request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// zod
 			const validate = zPhone.safeParse(req.body);
@@ -58,10 +55,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad identify request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// valid otp
 			const otp = tempOTP.getOne(token.userId);

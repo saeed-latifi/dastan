@@ -1,7 +1,7 @@
 import { zLike } from "@models/iLike";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import ContentPrismaProvider from "@providers/prismaProviders/contentPrisma";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -11,10 +11,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			const validateData = zLike.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));

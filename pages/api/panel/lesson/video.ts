@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { AWSProfileConfig, imageBucketName } from "statics/keys";
 import AWS from "aws-sdk";
 import { Stream } from "stream";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import LessonPrismaProvider from "@providers/prismaProviders/lessonPrisma";
 
 export const config = {
@@ -20,10 +20,8 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad course request"));
-			}
+			if (!token) return tokenFixer({ req, res });
+
 			const lessonId = req.query.lessonId;
 			const duration = req.query.duration;
 			if (!lessonId || !duration) return onErrorResponse("Incomplete information for lesson");

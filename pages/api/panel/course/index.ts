@@ -1,7 +1,7 @@
 import { zCourseCreate, zCourseUpdate } from "@models/iCourse";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import CoursePrismaProvider from "@providers/prismaProviders/coursePrisma";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -11,10 +11,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// prisma
 			const courses = await coursePrismaProvider.getByAuthor(token.userId);
@@ -31,10 +28,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateData = zCourseCreate.safeParse(req.body);
@@ -67,10 +61,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateData = zCourseUpdate.safeParse(req.body);

@@ -2,7 +2,7 @@ import { zUserEmail, zUserLogin } from "@models/iUser";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { authEmailSender, changeEmailEmailSender } from "@providers/emailService";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
-import { changeEmailTokenValidator, emailTokenValidator, removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
+import { changeEmailTokenValidator, emailTokenValidator, setCookieToken, tokenCreator, tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -13,10 +13,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad identify"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateData = zUserLogin.safeParse(req.body);
@@ -56,10 +53,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad identify"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// token
 			const emailToken = changeEmailTokenValidator(req.body.token);

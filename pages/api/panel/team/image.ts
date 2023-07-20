@@ -2,7 +2,7 @@ import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandle
 import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
 import webpSquareBuffer from "@providers/imageGenerators/webpSquare";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { teamLogoAWS } from "@providers/bucketsAWS/imageAWS";
 import TeamPrismaProvider from "@providers/prismaProviders/teamPrisma";
 import { errorLogger } from "@utilities/apiLogger";
@@ -20,10 +20,7 @@ export default async function teamLogoApi(req: NextApiRequest, res: NextApiRespo
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad team request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			const { files, fields } = await formParser(req);
 			if (!fields.id || !files.image) return res.json(onErrorResponse("incomplete team information"));

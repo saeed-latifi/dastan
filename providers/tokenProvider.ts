@@ -3,6 +3,7 @@ import { setCookie } from "cookies-next";
 import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 import { tokenStatics } from "statics/keys";
+import { onErrorResponse, onSuccessResponse } from "./apiResponseHandler";
 
 type token = { userId: number; permission: PermissionType; username: string };
 export function tokenValidator(token: string): token | false {
@@ -45,6 +46,17 @@ export function removeCookieToken({ req, res }: removeCookieTokenArgs) {
 		path: tokenStatics.tokenPath,
 		sameSite: true,
 	});
+}
+
+export function onLogOut({ req, res }: { req: NextApiRequest; res: NextApiResponse }) {
+	removeCookieToken({ req, res });
+	return res.json(onSuccessResponse(false));
+}
+
+export function tokenFixer({ req, res }: { req: NextApiRequest; res: NextApiResponse }) {
+	console.log("tokenFixer");
+	removeCookieToken({ req, res });
+	return res.json(onErrorResponse("bad identify"));
 }
 
 // Email

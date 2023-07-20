@@ -1,7 +1,7 @@
 import { onErrorResponse, onSuccessResponse } from "@providers/apiResponseHandler";
 import { formParser } from "@utilities/formParser";
 import { NextApiRequest, NextApiResponse } from "next";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import CoursePrismaProvider from "@providers/prismaProviders/coursePrisma";
 import webpLandscapeBuffer from "@providers/imageGenerators/webpLandscape";
 import { courseImageAWS } from "@providers/bucketsAWS/imageAWS";
@@ -20,10 +20,8 @@ export default async function courseImageApi(req: NextApiRequest, res: NextApiRe
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad course request"));
-			}
+			if (!token) return tokenFixer({ req, res });
+
 			const { files, fields } = await formParser(req);
 			if (!fields.courseId || !files.image) return res.json(onErrorResponse("incomplete course information"));
 			const courseId = parseInt(fields.courseId as string);

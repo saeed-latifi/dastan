@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { removeCookieToken, setCookieToken, tokenCreator, tokenValidator } from "@providers/tokenProvider";
+import { onLogOut, setCookieToken, tokenCreator, tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { errorType, onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import { zUserCreate, zUserLogin, zUserUpdate } from "@models/iUser";
@@ -16,10 +16,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad identify request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// prisma
 			const user = await userPrismaProvider.getOne(token.userId);
@@ -94,9 +91,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	// logout
 	else if (req.method === "DELETE") {
 		try {
-			// api
-			removeCookieToken({ req, res });
-			return res.json(onSuccessResponse(false));
+			return onLogOut({ req, res });
 		} catch (error) {
 			return errorLogger({ error, res, name: "account" });
 		}
@@ -107,10 +102,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad user request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			// validation
 			const validateUpdate = zUserUpdate.safeParse(req.body);

@@ -1,7 +1,7 @@
 import { zCommentCreate, zCommentDelete, zCommentGet, zCommentUpdate } from "@models/iComment";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import CommentPrismaProvider from "@providers/prismaProviders/commentPrisma";
-import { removeCookieToken, tokenValidator } from "@providers/tokenProvider";
+import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { sleep } from "@utilities/devSleep";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -44,10 +44,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	if (req.method === "POST") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad comment request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			const validateData = zCommentCreate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
@@ -66,10 +63,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	if (req.method === "PUT") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad comment request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			const validateData = zCommentUpdate.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
@@ -92,10 +86,7 @@ export default async function apiHandler(req: NextApiRequest, res: NextApiRespon
 	if (req.method === "PATCH") {
 		try {
 			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) {
-				removeCookieToken({ req, res });
-				return res.json(onErrorResponse("bad comment request"));
-			}
+			if (!token) return tokenFixer({ req, res });
 
 			const validateData = zCommentDelete.safeParse(req.body);
 			if (!validateData.success) return res.json(onZodErrorResponse(validateData.error.issues));
