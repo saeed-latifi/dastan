@@ -88,10 +88,7 @@ type getJobsArgs = { take: number; skip: number; categoryId?: number };
 export default class JobPrismaProvider {
 	// panel
 	async create(body: createBodyType): Promise<jobPanelResType> {
-		return await prismaProvider.job.create({
-			data: body,
-			select: jobPanelSelect(),
-		});
+		return await prismaProvider.job.create({ data: body, select: jobPanelSelect() });
 	}
 
 	async update(id: number, body: updateBodyType): Promise<jobPanelResType> {
@@ -101,12 +98,7 @@ export default class JobPrismaProvider {
 	// feed
 	async get({ take, skip, categoryId }: getJobsArgs): Promise<jobFeedResType> {
 		const jobCount = await prismaProvider.job.count({ where: { categoryId } });
-		const jobs = await prismaProvider.job.findMany({
-			where: { categoryId },
-			select: jobFeedSelect,
-			take,
-			skip,
-		});
+		const jobs = await prismaProvider.job.findMany({ where: { categoryId }, select: jobFeedSelect, take, skip });
 		return { jobs, count: jobCount };
 	}
 
