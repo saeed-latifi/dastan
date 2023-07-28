@@ -1,16 +1,16 @@
-import { zAdminMessagesGet, zCreateAdminMessage } from "@models/iAdminMessage";
 import { zPagination } from "@models/iPagination";
+import { zAddMessageTicket, zAdminUsers } from "@models/iTicket";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
-import AdminMessagesPrismaProvider from "@providers/prismaProviders/adminMessagePrisma";
+import UserPrismaProvider from "@providers/prismaProviders/userPrisma";
 import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
 import { errorLogger } from "@utilities/apiLogger";
 import { permissionHasAccess } from "@utilities/permissionChecker";
 import { NextApiRequest, NextApiResponse } from "next";
 
-const adminMessagesPrismaProvider = new AdminMessagesPrismaProvider();
+const userPrismaProvider = new UserPrismaProvider();
 export default async function changeEmailApi(req: NextApiRequest, res: NextApiResponse) {
-	// get admin messages
-	if (req.method === "PUT") {
+	// get AdminUsers
+	if (req.method === "POST") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
@@ -25,39 +25,15 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			if (!pagination.success) return res.json(onZodErrorResponse(pagination.error.issues));
 			const { skip, take } = pagination.data;
 
-			const validation = zAdminMessagesGet.safeParse(req.body);
+			const validation = zAdminUsers.safeParse(req.body);
 			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
 			const { isActive } = validation.data;
 
 			// prisma
-			const AdminUsers = await adminMessagesPrismaProvider.getAdminList({ skip, take, isActive });
+			const AdminUsers = await userPrismaProvider.adminUsersList({ skip, take, isActive });
 
 			// api
 			return res.json(onSuccessResponse(AdminUsers));
-		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
-		}
-	}
-
-	// create admin message
-	if (req.method === "POST") {
-		try {
-			// token
-			const token = tokenValidator(req?.cookies?.token as string);
-			if (!token) return tokenFixer({ req, res });
-			const hasAccess = permissionHasAccess({ current: token.permission, require: "ADMIN" });
-			if (!hasAccess) return res.json(onErrorResponse("access denied"));
-
-			// validation
-			const validation = zCreateAdminMessage.safeParse(req.body);
-			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
-			const { description, title, userId } = validation.data;
-
-			// prisma
-			const message = await adminMessagesPrismaProvider.add({ userId, title, description });
-
-			// api
-			return res.json(onSuccessResponse(message));
 		} catch (error) {
 			return errorLogger({ error, res, name: "email" });
 		}

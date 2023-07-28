@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 type props = {
 	onCloseModal?: () => void;
 	onOutClose?: boolean;
-} & React.HTMLAttributes<HTMLDivElement>;
+	children: ReactNode;
+};
+// & React.HTMLAttributes<HTMLDivElement>;
 
 export default function Modal({ children, onCloseModal, onOutClose = true }: props) {
 	const wrapper = "w-full h-full overflow-y-auto bg-fixed transition-all bg-black";

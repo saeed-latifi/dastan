@@ -43,6 +43,26 @@ export type userFeedResType = {
 	_count: { followers: number; follows: number };
 } | null;
 
+export type userAdminResType = {
+	id: number;
+	username: string;
+	firstName: string | null;
+	lastName: string | null;
+	image: string | null;
+	email: string;
+	phone: string | null;
+	provinceId: number | null;
+	resumeContext: string;
+	portfolio: string[];
+	accountId: string;
+	account: {
+		permission: PermissionType;
+		createdAt: Date;
+		isActive: boolean;
+		isDeleted: boolean;
+	};
+};
+
 // select
 const userUniqueReturnField = { username: true, id: true, email: true, phone: true, account: { select: { permission: true } } };
 
@@ -72,6 +92,8 @@ const userFeedSelect = (viewerId?: number) => {
 		followers: !viewerId ? undefined : { where: { id: viewerId }, select: { id: true } },
 	};
 };
+
+const userAdminInclude = { account: { select: { permission: true, createdAt: true, isActive: true, isDeleted: true } } };
 
 export default class UserPrismaProvider {
 	// account
@@ -188,5 +210,16 @@ export default class UserPrismaProvider {
 			where: { email },
 			select: { id: true, email: true, account: { select: { isActive: true } } },
 		});
+	}
+
+	// admin
+	async adminUsersList({ isActive, skip, take }: { take: number; skip: number; isActive?: boolean }): Promise<{ users: userAdminResType[]; count: number }> {
+		const count = await prismaProvider.user.count({ where: { account: { isActive } } });
+		const users = await prismaProvider.user.findMany({ take, skip, where: { account: { isActive } }, include: userAdminInclude });
+		return { users, count };
+	}
+
+	async adminGetUser(username: string): Promise<userAdminResType | null> {
+		return await prismaProvider.user.findFirst({ where: { username }, include: userAdminInclude });
 	}
 }

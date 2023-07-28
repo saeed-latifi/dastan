@@ -13,23 +13,10 @@ export default function FormRichText({ value, onChange }: { value: string; onCha
 		<QuillNoSSRWrapper
 			value={value}
 			className="w-full"
-			modules={{
-				toolbar: [
-					{ size: [] },
-					{ color: [] },
-					"bold",
-					"italic",
-					"code",
-					{ list: "ordered" },
-					{ list: "bullet" },
-					{ direction: "rtl" },
-				],
-			}}
+			modules={{ toolbar: [{ size: [] }, { color: [] }, "bold", "italic", "code", { list: "ordered" }, { list: "bullet" }, { direction: "rtl" }] }}
 			formats={formats}
 			theme="snow"
-			onChange={(content) => {
-				onChange(content);
-			}}
+			onChange={onChange}
 		/>
 	);
 }

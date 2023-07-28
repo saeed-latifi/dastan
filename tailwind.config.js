@@ -46,6 +46,11 @@ module.exports = {
 			boxShadow: {
 				"theme-dark": `0 0 0.1rem  0rem ${colors["theme-select"]}`,
 			},
+
+			fontFamily: {
+				homa: ["homa"],
+				esfahan: ["esfahan"],
+			},
 		},
 	},
 	plugins: [],

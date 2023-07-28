@@ -57,6 +57,12 @@ export const staticURLs = {
 			jobs: { base: "/jobs", one: (id: number) => `/jobs/${id}` },
 			team: (id: number) => `/team/${id}`,
 		},
+
+		admin: {
+			messages: { base: "/admin/messages" },
+			users: { base: "/admin/users" },
+			base: "/admin",
+		},
 	},
 
 	server: {
@@ -92,5 +98,6 @@ export const staticURLs = {
 			jobs: "feed/job",
 			team: (id: number) => `feed/team/${id}`,
 		},
+		admin: { users: { base: "admin/users" }, messages: { base: "admin/messages" }, tickets: { base: "admin/tickets" } },
 	},
 };

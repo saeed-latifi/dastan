@@ -21,4 +21,26 @@ export default class AdminMessagesPrismaProvider {
 	async add({ description, userId, title }: { userId: number; description: string; title: string }): Promise<adminMessageResType> {
 		return await prismaProvider.adminMessage.create({ data: { userId, description, title } });
 	}
+
+	async getAdminList({ isActive, skip, take }: { take: number; skip: number; isActive?: boolean }): Promise<{ messages: AdminMessagesResType[]; count: number }> {
+		const count = await prismaProvider.adminMessage.count({ where: { isActive } });
+		const messages = await prismaProvider.adminMessage.findMany({
+			take,
+			skip,
+			where: { isActive },
+			include: { user: { select: { id: true, username: true } } },
+		});
+		return { messages, count };
+	}
 }
+
+export type AdminMessagesResType = {
+	user: { id: number; username: string };
+	id: number;
+	title: string;
+	description: string;
+	isRead: boolean;
+	isActive: boolean;
+	createdAt: Date;
+	userId: number;
+};

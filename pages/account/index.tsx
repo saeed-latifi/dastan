@@ -17,6 +17,7 @@ import { useProvince } from "@hooks/public/useProvince";
 import FormSection from "@components/forms/form-section";
 import { staticURLs } from "statics/url";
 import { useCategory } from "@hooks/public/useCategory";
+import { permissionHasAccess } from "@utilities/permissionChecker";
 
 export default function Profile() {
 	const router = useRouter();
@@ -163,6 +164,14 @@ export default function Profile() {
 						your messages
 					</ButtonBase>
 				</div>
+
+				{permissionHasAccess({ current: userInfo.account.permission, require: "ADMIN" }) && (
+					<div className="w-full flex flex-col gap-1">
+						<ButtonBase type="button" onClick={() => router.push(staticURLs.client.admin.base)}>
+							admin
+						</ButtonBase>
+					</div>
+				)}
 			</div>
 		</Form>
 	);

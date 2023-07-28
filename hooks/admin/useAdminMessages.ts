@@ -1,7 +1,9 @@
+import { iCreateAdminMessage } from "@models/iAdminMessage";
 import { iPagination } from "@models/iPagination";
 import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
-import { adminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
+import { AdminMessagesResType, adminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
+import { userAdminResType } from "@providers/prismaProviders/userPrisma";
 import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
 import useSWRInfinite from "swr/infinite";
@@ -28,10 +30,21 @@ export function useAdminMessages() {
 		const body: iPagination = { take: takeNumber, skip: pageNumber * takeNumber };
 
 		try {
-			const { data }: { data: apiResponse<{ messages: adminMessageResType[]; count: number }> } = await HTTPService.post(
-				staticURLs.server.account.adminMessage.base,
+			const { data }: { data: apiResponse<{ messages: AdminMessagesResType[]; count: number }> } = await HTTPService.put(
+				staticURLs.server.admin.messages.base,
 				body
 			);
+			if (data.resState === responseState.ok) return data.data;
+		} catch (error: any) {
+			toast.warn("bad connection");
+		}
+	}
+
+	async function sendMessage(body: iCreateAdminMessage) {
+		try {
+			const { data }: { data: apiResponse<adminMessageResType> } = await HTTPService.post(staticURLs.server.admin.messages.base, body);
+			console.log("data : ", data);
+
 			if (data.resState === responseState.ok) return data.data;
 		} catch (error: any) {
 			toast.warn("bad connection");
@@ -43,5 +56,13 @@ export function useAdminMessages() {
 		return false;
 	}
 
-	return { isLoading: isLoading, isValidating, messages: data, setPage: setSize, size, hasMore: hasMore() };
+	return {
+		isLoading: isLoading,
+		isValidating,
+		messages: data,
+		setPage: setSize,
+		size,
+		hasMore: hasMore(),
+		sendMessage,
+	};
 }

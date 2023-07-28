@@ -245,7 +245,7 @@ export function useAccount() {
 	}
 
 	// access
-	function checkAccessAndRedirect(requirePermissionLevel = PermissionType.USER) {
+	function checkAccessAndRedirect(requirePermissionLevel: PermissionType = PermissionType.USER) {
 		if (isLoading) return;
 		if (!userInfo) return router.push(staticURLs.client.login);
 

@@ -31,3 +31,16 @@
 .ql-editor {
 	min-height: 14rem;
 }
+
+html {
+	font-family: homa;
+}
+
+@font-face {
+	font-family: homa;
+	src: url("/fonts/homa.woff");
+}
+@font-face {
+	font-family: esfahan;
+	src: url("/fonts/esfahan.woff");
+}

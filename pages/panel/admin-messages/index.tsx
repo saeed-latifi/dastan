@@ -1,10 +1,10 @@
 import LoadingSpinner from "@components/common/loader-spinner";
-import { useAdminMessages } from "@hooks/panel/useAdminMessage";
+import { usePanelAdminMessages } from "@hooks/panel/usePanelAdminMessage";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 
 export default function AdminMessages() {
-	const { isLoading, messages, hasMore, setPage } = useAdminMessages();
+	const { isLoading, messages, hasMore, setPage } = usePanelAdminMessages();
 
 	if (isLoading) return <LoadingSpinner />;
 	return (
