@@ -1,13 +1,13 @@
-import ModalAdminViewMessage from "@components/modals/admin/modal-admin-update-message";
+import ModalUserReadMessage from "@components/modals/messages/modal-user-read-message";
 import { ModalContext } from "@providers/contexts/ModalContext";
 import { AdminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
 import React, { useContext } from "react";
 
-export default function AdminMessageCard({ message }: { message: AdminMessageResType }) {
+export default function UserMessageCard({ message }: { message: AdminMessageResType }) {
 	const { onCloseModal, setModal } = useContext(ModalContext);
 
 	function onOpenMessageModal() {
-		setModal(<ModalAdminViewMessage onCloseModal={onCloseModal} message={message} />);
+		setModal(<ModalUserReadMessage onCloseModal={onCloseModal} message={message} />);
 	}
 
 	return (

@@ -29,7 +29,7 @@ export default function ModalAdminViewMessage({ onCloseModal, message }: { messa
 						<FormInput value={title} onChange={(event) => setTitle(event.target.value)} />
 						<FormRichText value={description} onChange={setDescription} />
 					</FormSection>
-					<ButtonBase Variety={BaseButtonVariety.primary}>send message</ButtonBase>
+					<ButtonBase Variety={BaseButtonVariety.primary}>update message</ButtonBase>
 				</Form>
 			</CardModal>
 		</Modal>
