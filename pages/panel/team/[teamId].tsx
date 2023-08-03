@@ -17,7 +17,7 @@ import { errorType, zodErrorMapper } from "@providers/apiResponseHandler";
 import { emptyPurger } from "@utilities/nullPurger";
 import { useRouter } from "next/router";
 import { useTeamPanel } from "@hooks/panel/useTeamPanel";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
 import { jobPanelResType } from "@providers/prismaProviders/jobPrisma";

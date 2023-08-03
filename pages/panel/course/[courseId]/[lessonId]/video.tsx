@@ -1,7 +1,7 @@
 import Navigation from "@components/navigation";
 import { staticURLs } from "statics/url";
 import { useRouter } from "next/router";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 
 export default function LessonVideo() {
 	const router = useRouter();

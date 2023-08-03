@@ -4,7 +4,7 @@ import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import { FormEvent, useEffect, useState } from "react";
 import FormSection from "@components/forms/form-section";
 import { useRouter } from "next/router";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Navigation from "@components/navigation";
 import { emptyPurger } from "@utilities/nullPurger";
 import { zLessonCreate, zLessonUpdate } from "@models/iLesson";

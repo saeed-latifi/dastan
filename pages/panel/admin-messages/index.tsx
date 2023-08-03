@@ -1,4 +1,4 @@
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import { usePanelAdminMessages } from "@hooks/panel/usePanelAdminMessage";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";

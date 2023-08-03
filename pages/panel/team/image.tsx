@@ -1,5 +1,5 @@
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Form from "@components/forms/form";
 import { useTeamPanel } from "@hooks/panel/useTeamPanel";
 import { useAccount } from "@hooks/useAccount";
@@ -77,16 +77,7 @@ export default function TeamLogoCropper() {
 				}}
 			/>
 			<div className="w-full flex flex-1 flex-col sm:items-center justify-between gap-4 py-4 sm:flex-row sm:gap-2">
-				<input
-					className="zoomer-slide"
-					name="scale"
-					type="range"
-					onChange={handleScale}
-					min="1"
-					max="5"
-					step="0.01"
-					defaultValue="1"
-				/>
+				<input className="zoomer-slide" name="scale" type="range" onChange={handleScale} min="1" max="5" step="0.01" defaultValue="1" />
 
 				<ButtonBase type="button" onClick={() => document.getElementById("fileSelect")?.click()}>
 					select

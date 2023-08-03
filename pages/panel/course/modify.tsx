@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormSection from "@components/forms/form-section";
@@ -112,10 +112,7 @@ export default function ModifyCourse() {
 			{course && (
 				<FormSection title="course image">
 					<CourseImage image={course.content.image} />
-					<ButtonBase
-						type="button"
-						onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.id }))}
-					>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.image({ courseId: course.id }))}>
 						update your course image
 					</ButtonBase>
 				</FormSection>
@@ -142,9 +139,7 @@ export default function ModifyCourse() {
 			<FormSection title="category">
 				<Select
 					selectId="profileProvinces"
-					preSelect={
-						course?.content.category && { label: course?.content.category?.title, value: course?.content.category?.id }
-					}
+					preSelect={course?.content.category && { label: course?.content.category?.title, value: course?.content.category?.id }}
 					options={categories?.map((category) => ({ value: category.id, label: category.title }))}
 					onChange={onSelectCategory}
 				/>
@@ -166,10 +161,7 @@ export default function ModifyCourse() {
 			{course && (
 				<FormSection title="lessons">
 					{/* TODO lesson */}
-					<ButtonBase
-						type="button"
-						onClick={() => router.push(staticURLs.client.panel.course.lesson.add({ courseId: course.id }))}
-					>
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.course.lesson.add({ courseId: course.id }))}>
 						add new lesson
 					</ButtonBase>
 

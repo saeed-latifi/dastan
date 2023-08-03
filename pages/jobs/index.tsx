@@ -1,5 +1,5 @@
 import JobFeedCard from "@components/cards/job-feed-card";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import { useJobFeed } from "@hooks/feed/useJobFeed";
 import InfiniteScroll from "react-infinite-scroller";
 

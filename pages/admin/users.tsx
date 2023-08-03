@@ -1,5 +1,5 @@
 import AdminUserCard from "@components/cards/admin-user-card";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import FormSection from "@components/forms/form-section";
 import Navigation from "@components/navigation";
 import { useAdminUsers } from "@hooks/admin/useAdminUsers";

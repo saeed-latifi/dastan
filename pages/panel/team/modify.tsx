@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import FormItemRow from "@components/forms/form-item-row";
@@ -137,19 +137,14 @@ export default function ModifyTeam() {
 			{team && (
 				<FormSection title="jobs">
 					{allowMoreJob(team.id) && (
-						<ButtonBase
-							type="button"
-							onClick={() => router.push(staticURLs.client.panel.team.job.add({ teamId: team.id }))}
-						>
+						<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.team.job.add({ teamId: team.id }))}>
 							open a new job
 						</ButtonBase>
 					)}
 					{Array.isArray(team.jobs) &&
 						team.jobs.map((job: any, index: number) => (
 							<div key={index} className="flex items-center justify-between gap-2 py-2">
-								<Link href={staticURLs.client.panel.team.job.one({ jobId: job.id, teamId: team.id })}>
-									{job.title}
-								</Link>
+								<Link href={staticURLs.client.panel.team.job.one({ jobId: job.id, teamId: team.id })}>{job.title}</Link>
 								<DateFormatter date={job.updatedAt} />
 							</div>
 						))}

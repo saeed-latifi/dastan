@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Form from "@components/forms/form";
 import FormInput from "@components/forms/form-input";
 import { zodResolver } from "@hookform/resolvers/zod";

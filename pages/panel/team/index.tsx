@@ -1,5 +1,5 @@
 import ButtonBase from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import FormSection from "@components/forms/form-section";
 import TeamLogo from "@components/images/team-logo";
 import { useAccount } from "@hooks/useAccount";

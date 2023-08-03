@@ -1,4 +1,3 @@
-import { iCreateAdminMessage } from "@models/iAdminMessage";
 import { iPagination } from "@models/iPagination";
 import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";

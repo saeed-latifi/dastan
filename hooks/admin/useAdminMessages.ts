@@ -3,7 +3,6 @@ import { iPagination } from "@models/iPagination";
 import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
 import { AdminMessagesResType, adminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
-import { userAdminResType } from "@providers/prismaProviders/userPrisma";
 import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
 import useSWRInfinite from "swr/infinite";

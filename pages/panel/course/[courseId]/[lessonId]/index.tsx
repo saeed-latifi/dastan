@@ -1,5 +1,5 @@
 import ButtonBase from "@components/common/base-button";
-import LoadingSpinner from "@components/common/loader-spinner";
+import LoadingSpinner from "@components/animations/LoadingAnimation";
 import Form from "@components/forms/form";
 import Navigation from "@components/navigation";
 import HTTPService from "@providers/HTTPService";
