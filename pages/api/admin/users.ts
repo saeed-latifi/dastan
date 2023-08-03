@@ -16,7 +16,6 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) return tokenFixer({ req, res });
 			const hasAccess = permissionHasAccess({ current: token.permission, require: "ADMIN" });
-			console.log(token.permission, hasAccess);
 
 			if (!hasAccess) return res.json(onErrorResponse("access denied"));
 
@@ -35,7 +34,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(AdminUsers));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "adminUsers" });
 		}
 	}
 

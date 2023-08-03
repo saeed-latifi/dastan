@@ -34,6 +34,9 @@
 
 html {
 	font-family: homa;
+	/* overflow-y: scroll; */
+}
+body {
 }
 
 @font-face {

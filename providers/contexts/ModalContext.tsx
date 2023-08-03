@@ -4,27 +4,11 @@ type MOdalContextType = { modal: JSX.Element | undefined; onCloseModal: () => vo
 
 const ModalContext = createContext<MOdalContextType>({ modal: undefined, onCloseModal() {}, setModal() {} });
 
-function useModal() {
-	const [modal, setModal] = useState<JSX.Element>();
-	function onCloseModal() {
-		console.log("onClose!!!");
-
-		setModal(undefined);
-	}
-
-	return;
-}
-
 function ModalProvider({ children }: { children: ReactNode }) {
 	const [modal, setModal] = useState<JSX.Element>();
-	function onCloseModal() {
-		console.log("onClose!!!");
-
-		setModal(undefined);
-	}
 
 	return (
-		<ModalContext.Provider value={{ modal, onCloseModal, setModal }}>
+		<ModalContext.Provider value={{ modal, onCloseModal: () => setModal(undefined), setModal }}>
 			{children}
 			{modal}
 		</ModalContext.Provider>

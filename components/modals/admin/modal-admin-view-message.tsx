@@ -3,21 +3,21 @@ import Modal from "../Modal";
 import CardModal from "@components/cards/modal-card";
 import FormRichText from "@components/forms/form-rich-text";
 import FormSection from "@components/forms/form-section";
-import { userAdminResType } from "@providers/prismaProviders/userPrisma";
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
 import Form from "@components/forms/form";
 import { useAdminMessages } from "@hooks/admin/useAdminMessages";
 import FormInput from "@components/forms/form-input";
+import { AdminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
 
-export default function ModalAdminSendMessage({ onCloseModal, user }: { user: userAdminResType; onCloseModal: () => void }) {
-	const [description, setDescription] = useState<string>("");
-	const [title, setTitle] = useState<string>("");
+export default function ModalAdminViewMessage({ onCloseModal, message }: { message: AdminMessageResType; onCloseModal: () => void }) {
+	const [description, setDescription] = useState<string>(message.description);
+	const [title, setTitle] = useState<string>(message.title);
 
-	const { sendMessage } = useAdminMessages();
+	const { updateMessage } = useAdminMessages();
 
 	async function onSubmit(event: FormEvent) {
 		event.preventDefault();
-		const res = await sendMessage({ description, title, userId: user.id });
+		const res = await updateMessage({ description, title, messageId: message.id });
 		if (res) onCloseModal();
 	}
 
@@ -25,7 +25,7 @@ export default function ModalAdminSendMessage({ onCloseModal, user }: { user: us
 		<Modal onCloseModal={onCloseModal}>
 			<CardModal>
 				<Form onSubmit={onSubmit}>
-					<FormSection title={`send message to ${user.username} `}>
+					<FormSection title={`send message to ${message.user.username} `}>
 						<FormInput value={title} onChange={(event) => setTitle(event.target.value)} />
 						<FormRichText value={description} onChange={setDescription} />
 					</FormSection>

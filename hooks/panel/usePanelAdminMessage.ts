@@ -1,7 +1,7 @@
 import { iPagination } from "@models/iPagination";
 import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
-import { adminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
+import { AdminMessageResType } from "@providers/prismaProviders/adminMessagePrisma";
 import { toast } from "react-toastify";
 import { staticURLs } from "statics/url";
 import useSWRInfinite from "swr/infinite";
@@ -28,7 +28,7 @@ export function usePanelAdminMessages() {
 		const body: iPagination = { take: takeNumber, skip: pageNumber * takeNumber };
 
 		try {
-			const { data }: { data: apiResponse<{ messages: adminMessageResType[]; count: number }> } = await HTTPService.post(
+			const { data }: { data: apiResponse<{ messages: AdminMessageResType[]; count: number }> } = await HTTPService.post(
 				staticURLs.server.account.adminMessage.base,
 				body
 			);

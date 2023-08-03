@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "npx prisma generate && next build",
+		"simple": "next build",
 		"start": "next start",
 		"dev": "next dev",
 		"lint": "next lint",

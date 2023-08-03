@@ -13,7 +13,6 @@ export default function AdminUsers() {
 	const { hasMore, isLoading, users, setPage, isValidating } = useAdminUsers();
 	checkAccessAndRedirect("ADMIN");
 
-	// if (isLoading) return <LoadingSpinner />;
 	return (
 		<div className="flex flex-col w-full p-4 gap-4 max-w-theme">
 			<Navigation label="admin" path={staticURLs.client.admin.base} />

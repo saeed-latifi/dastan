@@ -4,16 +4,17 @@ import { userAdminResType } from "@providers/prismaProviders/userPrisma";
 import React, { useContext } from "react";
 
 export default function AdminUserCard({ user }: { user: userAdminResType }) {
-	const { modal, onCloseModal, setModal } = useContext(ModalContext);
+	const { onCloseModal, setModal } = useContext(ModalContext);
 
-	console.log(modal);
 	function onOpenMessageModal() {
 		setModal(<ModalAdminSendMessage onCloseModal={onCloseModal} user={user} />);
 	}
 
 	return (
 		<div className="">
-			<p onClick={onOpenMessageModal}>{user.username}</p>
+			<p className="select-none cursor-pointer" onClick={onOpenMessageModal}>
+				{user.username}
+			</p>
 		</div>
 	);
 }

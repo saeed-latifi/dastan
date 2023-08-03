@@ -33,7 +33,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(tickets));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 
@@ -58,7 +58,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(tickets));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 

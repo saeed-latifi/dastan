@@ -34,7 +34,6 @@ export default async function profileImageApi(req: NextApiRequest, res: NextApiR
 
 			const buffer = await webpPortfolioBuffer({ path: reqImage.filepath });
 			const fileName = v4() + "." + buffer.info.format;
-			console.log("fileName :: ", fileName);
 
 			const awsRes = await portFolioImageAWS({ file: buffer.data, fileName });
 			if (!awsRes) return res.json(onErrorResponse("error on aws"));

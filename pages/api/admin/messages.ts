@@ -1,4 +1,4 @@
-import { zAdminMessagesGet, zCreateAdminMessage } from "@models/iAdminMessage";
+import { zAdminMessagesGet, zCreateAdminMessage, zUpdateAdminMessage } from "@models/iAdminMessage";
 import { zPagination } from "@models/iPagination";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import AdminMessagesPrismaProvider from "@providers/prismaProviders/adminMessagePrisma";
@@ -16,7 +16,6 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) return tokenFixer({ req, res });
 			const hasAccess = permissionHasAccess({ current: token.permission, require: "ADMIN" });
-			console.log(token.permission, hasAccess);
 
 			if (!hasAccess) return res.json(onErrorResponse("access denied"));
 
@@ -30,12 +29,12 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			const { isActive } = validation.data;
 
 			// prisma
-			const AdminUsers = await adminMessagesPrismaProvider.getAdminList({ skip, take, isActive });
+			const AdminUsers = await adminMessagesPrismaProvider.getAdminMessageList({ skip, take, isActive });
 
 			// api
 			return res.json(onSuccessResponse(AdminUsers));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "admin message" });
 		}
 	}
 
@@ -59,7 +58,31 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(message));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "admin message" });
+		}
+	}
+
+	// update admin message
+	if (req.method === "PATCH") {
+		try {
+			// token
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) return tokenFixer({ req, res });
+			const hasAccess = permissionHasAccess({ current: token.permission, require: "ADMIN" });
+			if (!hasAccess) return res.json(onErrorResponse("access denied"));
+
+			// validation
+			const validation = zUpdateAdminMessage.safeParse(req.body);
+			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
+			const { description, title, messageId } = validation.data;
+
+			// prisma
+			const message = await adminMessagesPrismaProvider.update({ messageId, title, description });
+
+			// api
+			return res.json(onSuccessResponse(message));
+		} catch (error) {
+			return errorLogger({ error, res, name: "admin message" });
 		}
 	}
 

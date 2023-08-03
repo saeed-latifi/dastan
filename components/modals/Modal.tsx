@@ -25,8 +25,10 @@ export default function Modal({ children, onCloseModal, onOutClose = true }: pro
 		setBackgroundStyle(backOpen);
 		setWrapperStyle(wrapperOpen);
 		document.body.style.overflow = "hidden";
+		// document.documentElement.style.overflowY = "hidden";
 		return () => {
 			document.body.style.overflow = "unset";
+			// document.documentElement.style.overflowY = "scroll";
 			setBackgroundStyle("");
 			setWrapperStyle("");
 		};
