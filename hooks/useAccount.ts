@@ -254,6 +254,7 @@ export function useAccount() {
 	}
 
 	function hasAccess(requirePermissionLevel: PermissionType) {
+		// TODO enum(waiting,has,not)
 		return permissionHasAccess({ require: requirePermissionLevel, current: userInfo?.account.permission || "GUEST" });
 	}
 

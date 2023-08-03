@@ -1,5 +1,5 @@
 import ButtonBase from "@components/common/base-button";
-import LoadingSpinner from "@components/animations/LoadingAnimation";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import { useResumeFeed } from "@hooks/feed/useResumeFeed";
 import { useAccount } from "@hooks/useAccount";
 import React, { useState } from "react";

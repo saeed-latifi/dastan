@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/animations/LoadingAnimation";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import Form from "@components/forms/form";
 import Navigation from "@components/navigation";
 import { useAccount } from "@hooks/useAccount";

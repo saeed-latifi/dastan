@@ -1,4 +1,4 @@
-import LoadingSpinner from "@components/animations/LoadingAnimation";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import DateFormatter from "@components/dateFormatter";
 import FormSection from "@components/forms/form-section";
 import TeamLogo, { logoImageTypes } from "@components/images/team-logo";

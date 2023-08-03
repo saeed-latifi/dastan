@@ -43,5 +43,5 @@ export function useAdminUsers() {
 		return false;
 	}
 
-	return { isLoading: isLoading, isValidating, users: data, setPage: setSize, size, hasMore: hasMore() };
+	return { isLoading, isValidating, users: data, setPage: setSize, size, hasMore: hasMore() };
 }

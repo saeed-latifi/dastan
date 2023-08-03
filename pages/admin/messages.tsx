@@ -1,5 +1,5 @@
 import AdminMessageCard from "@components/cards/admin-message-card";
-import LoadingSpinner from "@components/animations/LoadingAnimation";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import FormSection from "@components/forms/form-section";
 import Navigation from "@components/navigation";
 import { useAdminMessages } from "@hooks/admin/useAdminMessages";

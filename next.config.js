@@ -9,6 +9,7 @@ const nextConfig = {
 	// crossOrigin: false,
 
 	output: "standalone",
+	images: { domains: ["https://dastan.storage.iran.liara.space", "liara", "dastan", "dastan.storage.iran.liara.space"] },
 };
 
 module.exports = nextConfig;

@@ -1,5 +1,5 @@
 import ButtonBase, { BaseButtonVariety } from "@components/common/base-button";
-import LoadingSpinner from "@components/animations/LoadingAnimation";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import Form from "@components/forms/form";
 import { useCoursePanel } from "@hooks/panel/useCoursePanel";
 import { useAccount } from "@hooks/useAccount";
