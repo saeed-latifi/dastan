@@ -11,7 +11,9 @@ const isActive = z.boolean().optional();
 export const zAdminMessagesGet = z.object({ isActive });
 export const zCreateAdminMessage = z.object({ title, description, userId });
 export const zUpdateAdminMessage = z.object({ title, description, messageId });
+export const zViewAdminMessage = z.object({ messageId });
 
 // types
 export type iCreateAdminMessage = z.infer<typeof zCreateAdminMessage>;
 export type iUpdateAdminMessage = z.infer<typeof zUpdateAdminMessage>;
+export type iViewAdminMessage = z.infer<typeof zViewAdminMessage>;

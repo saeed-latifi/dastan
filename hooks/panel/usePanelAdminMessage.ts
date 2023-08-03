@@ -1,3 +1,4 @@
+import { iViewAdminMessage } from "@models/iAdminMessage";
 import { iPagination } from "@models/iPagination";
 import HTTPService, { takeNumber } from "@providers/HTTPService";
 import { apiResponse, responseState } from "@providers/apiResponseHandler";
@@ -20,7 +21,7 @@ export function usePanelAdminMessages() {
 		// revalidateOnMount: false,
 	};
 
-	const { data, isLoading, isValidating, size, setSize } = useSWRInfinite(keyGenerator, getMessages, { ...options });
+	const { data: messagesInfo, isLoading, isValidating, size, setSize, mutate } = useSWRInfinite(keyGenerator, getMessages, { ...options });
 
 	async function getMessages(key: string) {
 		const pageNumber = parseInt(key.split(",")[1]);
@@ -38,10 +39,65 @@ export function usePanelAdminMessages() {
 		}
 	}
 
+	async function onView(body: iViewAdminMessage) {
+		try {
+			const { data }: { data: apiResponse<AdminMessageResType> } = await HTTPService.put(staticURLs.server.account.adminMessage.base, body);
+			if (data.resState === responseState.ok) {
+				mutate(undefined, {
+					populateCache(_result, _baseState) {
+						const newPagesArr: { messages: AdminMessageResType[]; count: number }[] = [];
+						messagesInfo?.forEach(
+							(page) =>
+								page &&
+								newPagesArr.push({
+									count: page.count,
+									messages: page.messages.map((message) => {
+										if (message.id === data.data.id) message = data.data;
+										return message;
+									}),
+								})
+						);
+						return newPagesArr;
+					},
+					revalidate: false,
+				});
+				return data.data;
+			}
+		} catch (error: any) {
+			toast.warn("bad connection");
+		}
+	}
+
+	async function onDelete(body: iViewAdminMessage) {
+		try {
+			const { data }: { data: apiResponse<AdminMessageResType> } = await HTTPService.patch(staticURLs.server.account.adminMessage.base, body);
+			if (data.resState === responseState.ok) {
+				mutate(undefined, {
+					populateCache(_result, _baseState) {
+						const newPagesArr: { messages: AdminMessageResType[]; count: number }[] = [];
+						messagesInfo?.forEach(
+							(page) =>
+								page &&
+								newPagesArr.push({
+									count: page.count,
+									messages: page.messages.filter((message) => message.id !== data.data.id),
+								})
+						);
+						return newPagesArr;
+					},
+					revalidate: false,
+				});
+				return data.data;
+			}
+		} catch (error: any) {
+			toast.warn("bad connection");
+		}
+	}
+
 	function hasMore() {
-		if (data && data[0]?.count && !isValidating && size * takeNumber < data[0]?.count) return true;
+		if (messagesInfo && messagesInfo[0]?.count && !isValidating && size * takeNumber < messagesInfo[0]?.count) return true;
 		return false;
 	}
 
-	return { isLoading: isLoading, isValidating, messages: data, setPage: setSize, size, hasMore: hasMore() };
+	return { isLoading: isLoading, isValidating, messages: messagesInfo, setPage: setSize, size, hasMore: hasMore(), onView, onDelete };
 }

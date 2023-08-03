@@ -1,3 +1,4 @@
+import { zViewAdminMessage } from "@models/iAdminMessage";
 import { zPagination } from "@models/iPagination";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import AdminMessagesPrismaProvider from "@providers/prismaProviders/adminMessagePrisma";
@@ -30,14 +31,24 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 	}
 
 	// on view
-	if (req.method === "GET") {
+	if (req.method === "PUT") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) return tokenFixer({ req, res });
 
+			// validation
+			const validation = zViewAdminMessage.safeParse(req.body);
+			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
+			const { messageId } = validation.data;
+
+			// check owner
+			const owner = await adminMessagesPrismaProvider.gatMessageOwnerId({ messageId });
+			if (!owner) return res.json(onErrorResponse("bad message id "));
+			if (owner.userId !== token.userId) return res.json(onErrorResponse("message access denied "));
+
 			// prisma
-			const messages = await adminMessagesPrismaProvider.view(token.userId);
+			const messages = await adminMessagesPrismaProvider.view({ messageId });
 
 			// api
 			return res.json(onSuccessResponse(messages));
@@ -47,14 +58,24 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 	}
 
 	// on delete
-	if (req.method === "DELETE") {
+	if (req.method === "PATCH") {
 		try {
 			// token
 			const token = tokenValidator(req?.cookies?.token as string);
 			if (!token) return tokenFixer({ req, res });
 
+			// validation
+			const validation = zViewAdminMessage.safeParse(req.body);
+			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
+			const { messageId } = validation.data;
+
+			// check owner
+			const owner = await adminMessagesPrismaProvider.gatMessageOwnerId({ messageId });
+			if (!owner) return res.json(onErrorResponse("bad message id "));
+			if (owner.userId !== token.userId) return res.json(onErrorResponse("message access denied "));
+
 			// prisma
-			const messages = await adminMessagesPrismaProvider.delete(token.userId);
+			const messages = await adminMessagesPrismaProvider.delete({ messageId });
 
 			// api
 			return res.json(onSuccessResponse(messages));

@@ -26,12 +26,12 @@ export default class AdminMessagesPrismaProvider {
 		return { messages, count };
 	}
 
-	async view(id: number): Promise<AdminMessageResType> {
-		return await prismaProvider.adminMessage.update({ where: { id }, data: { isRead: true }, include: includeUser });
+	async view({ messageId }: { messageId: number }): Promise<AdminMessageResType> {
+		return await prismaProvider.adminMessage.update({ where: { id: messageId }, data: { isRead: true }, include: includeUser });
 	}
 
-	async delete(id: number): Promise<AdminMessageResType> {
-		return await prismaProvider.adminMessage.update({ where: { id }, data: { isActive: false }, include: includeUser });
+	async delete({ messageId }: { messageId: number }): Promise<AdminMessageResType> {
+		return await prismaProvider.adminMessage.update({ where: { id: messageId }, data: { isActive: false }, include: includeUser });
 	}
 
 	// admin
@@ -47,6 +47,11 @@ export default class AdminMessagesPrismaProvider {
 		const count = await prismaProvider.adminMessage.count({ where: { isActive } });
 		const messages = await prismaProvider.adminMessage.findMany({ take, skip, where: { isActive }, include: includeUser, orderBy: { createdAt: "desc" } });
 		return { messages, count };
+	}
+
+	// internal
+	async gatMessageOwnerId({ messageId }: { messageId: number }) {
+		return await prismaProvider.adminMessage.findFirst({ where: { id: messageId }, select: { userId: true } });
 	}
 }
 type getListArgsType = { take: number; skip: number; isActive?: boolean };

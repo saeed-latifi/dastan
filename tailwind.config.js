@@ -18,6 +18,7 @@ module.exports = {
 			minWidth: {
 				"theme-small": "5rem",
 				"theme-medium": "7rem",
+				"theme-modal": "15rem",
 			},
 			rotate: {
 				270: "270deg",
