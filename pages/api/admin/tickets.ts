@@ -50,10 +50,10 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 
 			const validation = zAddMessageTicket.safeParse(req.body);
 			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
-			const { description, id } = validation.data;
+			const { description, ticketId } = validation.data;
 
 			// prisma
-			const tickets = await ticketPrismaProvider.answer({ description, id });
+			const tickets = await ticketPrismaProvider.answer({ description, ticketId });
 
 			// api
 			return res.json(onSuccessResponse(tickets));

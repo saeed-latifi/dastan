@@ -155,10 +155,17 @@ export default function Profile() {
 					</ButtonBase>
 				</div>
 				<div className="w-full flex flex-col gap-1">
+					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.tickets.base)}>
+						support
+					</ButtonBase>
+				</div>
+
+				<div className="w-full flex flex-col gap-1">
 					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.resume.base)}>
 						your portfolio
 					</ButtonBase>
 				</div>
+
 				<div className="w-full flex flex-col gap-1">
 					<ButtonBase type="button" onClick={() => router.push(staticURLs.client.panel.adminMessages.base)}>
 						your messages

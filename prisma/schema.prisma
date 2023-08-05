@@ -122,6 +122,7 @@ model TicketMessage {
   isAdmin     Boolean @default(false)
   ticketId    Int
   ticket      Ticket  @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  isActive    Boolean @default(true)
 
   @@index([ticketId])
 }

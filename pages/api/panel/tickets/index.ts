@@ -7,7 +7,7 @@ import { errorLogger } from "@utilities/apiLogger";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const ticketPrismaProvider = new TicketPrismaProvider();
-export default async function changeEmailApi(req: NextApiRequest, res: NextApiResponse) {
+export default async function ticketPanelApi(req: NextApiRequest, res: NextApiResponse) {
 	// create ticket
 	if (req.method === "POST") {
 		try {
@@ -26,7 +26,7 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(ticket));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 
@@ -40,22 +40,22 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// validation
 			const validation = zAddMessageTicket.safeParse(req.body);
 			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
-			const { description, id } = validation.data;
+			const { description, ticketId } = validation.data;
 
 			// prisma
-			const owner = await ticketPrismaProvider.checkOwner(id);
-			if (owner?.userId === token.userId) return res.json(onErrorResponse("ticket access denied."));
+			const owner = await ticketPrismaProvider.checkOwner(ticketId);
+			if (owner?.userId !== token.userId) return res.json(onErrorResponse("ticket access denied."));
 
-			const ticket = await ticketPrismaProvider.addMessage({ description, id });
+			const ticket = await ticketPrismaProvider.addMessage({ description, ticketId });
 
 			// api
 			return res.json(onSuccessResponse(ticket));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 
-	// get Message
+	// get tickets
 	if (req.method === "PATCH") {
 		try {
 			// token
@@ -73,11 +73,11 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			// api
 			return res.json(onSuccessResponse(ticket));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 
-	// get Message
+	// close ticket
 	if (req.method === "DELETE") {
 		try {
 			// token
@@ -86,19 +86,47 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 
 			// validation
 
-			const id = parseInt(req.query.id as string);
+			const id = parseInt(req.query.ticketId as string);
 			if (!id) return res.json(onErrorResponse("bad ticket id"));
 
 			// prisma
 			const owner = await ticketPrismaProvider.checkOwner(id);
-			if (owner?.userId === token.userId) return res.json(onErrorResponse("ticket access denied."));
+			if (owner?.userId !== token.userId) return res.json(onErrorResponse("ticket access denied."));
 
 			const ticket = await ticketPrismaProvider.close(id);
 
 			// api
 			return res.json(onSuccessResponse(ticket));
 		} catch (error) {
-			return errorLogger({ error, res, name: "email" });
+			return errorLogger({ error, res, name: "tickets" });
+		}
+	}
+
+	// get one message
+	if (req.method === "GET") {
+		try {
+			// token
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) return tokenFixer({ req, res });
+
+			// validation
+
+			const ticketId = parseInt(req.query.ticketId as string);
+			if (!ticketId) return res.json(onErrorResponse("bad ticket id"));
+
+			// prisma
+			const owner = await ticketPrismaProvider.checkOwner(ticketId);
+
+			console.log(owner, token.userId);
+
+			if (owner?.userId !== token.userId) return res.json(onErrorResponse("ticket access denied."));
+
+			const ticket = await ticketPrismaProvider.GetOne(ticketId);
+
+			// api
+			return res.json(onSuccessResponse(ticket));
+		} catch (error) {
+			return errorLogger({ error, res, name: "tickets" });
 		}
 	}
 

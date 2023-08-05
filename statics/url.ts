@@ -48,6 +48,7 @@ export const staticURLs = {
 			},
 			resume: { base: "/panel/resume", addImage: "/panel/resume/add" },
 			adminMessages: { base: "/panel/admin-messages" },
+			tickets: { base: "/panel/tickets", on: ({ id }: { id: number }) => `/panel/tickets/${id}` },
 		},
 
 		feed: {
@@ -73,6 +74,7 @@ export const staticURLs = {
 			job: { base: "panel/job" },
 			portfolio: { add: "panel/portfolio/add" },
 			resume: { base: "panel/resume" },
+			tickets: { base: "panel/tickets" },
 		},
 
 		account: {

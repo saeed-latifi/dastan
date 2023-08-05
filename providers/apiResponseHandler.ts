@@ -34,3 +34,5 @@ export function zodErrorMapper(issues: ZodIssue[]) {
 	});
 	return mappedErrors;
 }
+
+export type resWithPaginationType<T> = { count: number; items: T[] };
