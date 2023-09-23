@@ -11,6 +11,7 @@ const isActive = z.boolean().optional();
 export const zCreateTicket = z.object({ title, description });
 export const zAddMessageTicket = z.object({ ticketId, description });
 export const zAdminTickets = z.object({ userId, isActive });
+export const zAdminOneTicket = z.object({ ticketId });
 export const zAdminUsers = z.object({ isActive });
 
 // types

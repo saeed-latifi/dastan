@@ -1,5 +1,5 @@
 import { zPagination } from "@models/iPagination";
-import { zAddMessageTicket, zAdminTickets } from "@models/iTicket";
+import { zAddMessageTicket, zAdminOneTicket, zAdminTickets } from "@models/iTicket";
 import { onErrorResponse, onSuccessResponse, onZodErrorResponse } from "@providers/apiResponseHandler";
 import TicketPrismaProvider from "@providers/prismaProviders/ticketPrisma";
 import { tokenFixer, tokenValidator } from "@providers/tokenProvider";
@@ -28,10 +28,34 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			const { isActive, userId } = validation.data;
 
 			// prisma
-			const tickets = await ticketPrismaProvider.getForAdmin({ skip, take, isActive, userId });
+			const tickets = await ticketPrismaProvider.getAdminTickets({ skip, take, isActive, userId });
 
 			// api
 			return res.json(onSuccessResponse(tickets));
+		} catch (error) {
+			return errorLogger({ error, res, name: "tickets" });
+		}
+	}
+
+	// get one ticket
+	if (req.method === "PATCH") {
+		try {
+			// token
+			const token = tokenValidator(req?.cookies?.token as string);
+			if (!token) return tokenFixer({ req, res });
+			const hasAccess = permissionHasAccess({ current: token.permission, require: "ADMIN" });
+			if (!hasAccess) return res.json(onErrorResponse("access denied"));
+
+			const validation = zAdminOneTicket.safeParse(req.body);
+			if (!validation.success) return res.json(onZodErrorResponse(validation.error.issues));
+			const { ticketId } = validation.data;
+
+			// prisma
+			const ticket = await ticketPrismaProvider.getAdminOneTicket({ ticketId });
+			if (!ticket) return res.json(onErrorResponse("this ticket id not exists."));
+
+			// api
+			return res.json(onSuccessResponse(ticket));
 		} catch (error) {
 			return errorLogger({ error, res, name: "tickets" });
 		}

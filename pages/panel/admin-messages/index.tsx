@@ -6,7 +6,7 @@ import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { staticURLs } from "statics/url";
 
-export default function AdminMessages() {
+export default function UserAdminMessages() {
 	const { isLoading, messages, hasMore, setPage } = usePanelAdminMessages();
 
 	if (isLoading) return <LoadingSpinner />;
@@ -23,7 +23,7 @@ export default function AdminMessages() {
 				initialLoad={true}
 				threshold={150}
 			>
-				<div key="jobList" className="flex flex-col w-full gap-2 max-w-theme">
+				<div key="userAdminMessageList" className="flex flex-col w-full gap-2 max-w-theme">
 					{messages?.map((page) => page?.messages.map((message) => <UserMessageCard message={message} key={message.id} />))}
 				</div>
 			</InfiniteScroll>

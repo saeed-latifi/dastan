@@ -10,9 +10,9 @@ import { staticURLs } from "statics/url";
 
 export default function AdminMessages() {
 	const { checkAccessAndRedirect } = useAccount();
+	checkAccessAndRedirect("ADMIN");
 
 	const { hasMore, setPage, messages } = useAdminMessages();
-	checkAccessAndRedirect("ADMIN");
 
 	return (
 		<div className="flex flex-col w-full p-4 gap-4 max-w-theme">
@@ -27,7 +27,7 @@ export default function AdminMessages() {
 					initialLoad={true}
 					threshold={150}
 				>
-					<div key="jobList" className="flex flex-col w-full gap-2 max-w-theme">
+					<div key="adminMessageList" className="flex flex-col w-full gap-2 max-w-theme">
 						{messages?.map((page) => page?.messages.map((message) => <AdminMessageCard message={message} key={message.id} />))}
 					</div>
 				</InfiniteScroll>

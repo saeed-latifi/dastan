@@ -29,10 +29,10 @@ export default async function changeEmailApi(req: NextApiRequest, res: NextApiRe
 			const { isActive } = validation.data;
 
 			// prisma
-			const AdminUsers = await adminMessagesPrismaProvider.getAdminMessageList({ skip, take, isActive });
+			const AdminMessages = await adminMessagesPrismaProvider.getAdminMessageList({ skip, take, isActive });
 
 			// api
-			return res.json(onSuccessResponse(AdminUsers));
+			return res.json(onSuccessResponse(AdminMessages));
 		} catch (error) {
 			return errorLogger({ error, res, name: "admin message" });
 		}

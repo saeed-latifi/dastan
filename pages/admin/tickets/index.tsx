@@ -1,23 +1,22 @@
-import AdminUserCard from "@components/cards/admin-user-card";
-import LoadingSpinner from "@components/icons/LoadingSpinner";
+import AdminTicketCard from "@components/cards/admin-ticket-card";
 import FormSection from "@components/forms/form-section";
+import LoadingSpinner from "@components/icons/LoadingSpinner";
 import Navigation from "@components/navigation";
-import { useAdminUsers } from "@hooks/admin/useAdminUsers";
+import { useAdminTickets } from "@hooks/admin/useAdminTickets";
 import { useAccount } from "@hooks/useAccount";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroller";
 import { staticURLs } from "statics/url";
 
-export default function AdminUsers() {
+export default function Tickets() {
 	const { checkAccessAndRedirect } = useAccount();
-	const { hasMore, isLoading, users, setPage, isValidating } = useAdminUsers();
 	checkAccessAndRedirect("ADMIN");
 
+	const { hasMore, setPage, tickets } = useAdminTickets();
 	return (
 		<div className="flex flex-col w-full p-4 gap-4 max-w-theme">
 			<Navigation label="admin" path={staticURLs.client.admin.base} />
-
-			<FormSection title="users">
+			<FormSection title="tickets">
 				<InfiniteScroll
 					pageStart={0}
 					loadMore={setPage}
@@ -27,11 +26,10 @@ export default function AdminUsers() {
 					initialLoad={true}
 					threshold={150}
 				>
-					<div key="adminUserList" className="flex flex-col w-full gap-2 max-w-theme">
-						{users?.map((page) => page?.users.map((user) => <AdminUserCard user={user} key={user.id} />))}
+					<div key="adminTicketList" className="flex flex-col w-full gap-2 max-w-theme">
+						{tickets?.map((page) => page?.items.map((ticket) => <AdminTicketCard ticket={ticket} key={ticket.id} />))}
 					</div>
 				</InfiniteScroll>
-				{isValidating && <LoadingSpinner />}
 			</FormSection>
 		</div>
 	);

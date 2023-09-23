@@ -15,6 +15,10 @@ export default function AdminPage() {
 				admin messages
 			</ButtonBase>
 
+			<ButtonBase type="button" onClick={() => router.push(staticURLs.client.admin.tickets.base)}>
+				admin tickets
+			</ButtonBase>
+
 			<ButtonBase type="button" onClick={() => router.push(staticURLs.client.admin.users.base)}>
 				usersList
 			</ButtonBase>

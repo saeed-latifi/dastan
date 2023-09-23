@@ -61,6 +61,7 @@ export const staticURLs = {
 
 		admin: {
 			messages: { base: "/admin/messages" },
+			tickets: { base: "/admin/tickets", one: ({ ticketId }: { ticketId: number }) => `/admin/tickets/${ticketId}` },
 			users: { base: "/admin/users" },
 			base: "/admin",
 		},
