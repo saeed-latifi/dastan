@@ -33,11 +33,11 @@ export default function TicketId() {
 						{ticketInfo.messages.map((message) => (
 							<div
 								key={message.id}
-								className={`flex flex-col gap-4  p-4 rounded-theme-border
+								className={`flex flex-col rounded-theme-border
                                             ${message.isAdmin ? "bg-theme-light-gray" : "bg-theme-border-light"}`}
 							>
-								{message.isAdmin ? <span>admin : </span> : <span>you : </span>}
-								<p> {message.description}</p>
+								{message.isAdmin ? <span className="p-4 pb-0">admin : </span> : <span className="p-4 pb-0">you : </span>}
+								<div className="ql-editor w-full" dangerouslySetInnerHTML={{ __html: message.description }} />
 							</div>
 						))}
 					</FormSection>

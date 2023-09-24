@@ -1,3 +1,4 @@
+import { iUpdateTicketMessage } from "@models/iTicket";
 import { resWithPaginationType } from "@providers/apiResponseHandler";
 import prismaProvider from "@providers/prismaProvider";
 
@@ -66,10 +67,17 @@ export default class TicketPrismaProvider {
 	}
 
 	async getAdminOneTicket({ ticketId }: { ticketId: number }): Promise<adminOneTicketType | null> {
-		return await prismaProvider.ticket.findFirst({ where: { id: ticketId }, include: { messages: true, user: { select: { username: true } } } });
+		return await prismaProvider.ticket.findFirst({
+			where: { id: ticketId },
+			include: { messages: { orderBy: { id: "desc" } }, user: { select: { username: true } } },
+		});
 	}
 
 	async answer({ ticketId, description }: { ticketId: number; description: string }): Promise<ticketMessageType> {
 		return await prismaProvider.ticketMessage.create({ data: { description, ticketId, isAdmin: true } });
+	}
+
+	async updateAnswer({ description, messageId }: iUpdateTicketMessage): Promise<ticketMessageType> {
+		return await prismaProvider.ticketMessage.update({ where: { id: messageId }, data: { description } });
 	}
 }

@@ -60,6 +60,9 @@ export function usePanelTickets() {
 					revalidate: false,
 				});
 				return data.data;
+			} else {
+				const errors = Object.entries(data.errors);
+				toast.warn(errors[0][1]);
 			}
 		} catch (error: any) {
 			toast.warn("bad connection");
